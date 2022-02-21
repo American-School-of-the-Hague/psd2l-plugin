@@ -1,0 +1,28 @@
+<queries>
+	<<!--set name here (also applies to permissions_root-->
+    <query name="BASE_PLUGIN" coreTable="students" flattened="false">
+		<!--add description here-->
+        <description>Description of BASE_PLUGIN here</description>
+		<!--number of columns here must match number sql returns-->
+        <columns>
+			<column column="students.student_number">id</column>
+			<column column="students.lastfirst">name</column>
+			<column column="students.grade_level">grade_level</column>
+ 		</columns>
+		<!--SQL query in format <![CDATA[QUERY]]>-->
+        <sql>
+			<![CDATA[
+				SELECT
+					student_number,
+					lastfirst,
+					grade_level
+				FROM
+					students
+				WHERE
+					enroll_status = 0
+				ORDER BY lastfirst
+			]]>
+        </sql>
+    </query>
+
+</queries>
