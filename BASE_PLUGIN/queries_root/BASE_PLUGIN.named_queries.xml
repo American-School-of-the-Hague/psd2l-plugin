@@ -7,7 +7,7 @@
         <description>Description of BASE_PLUGIN here</description>
 		<!--number of columns here must match number sql returns-->
         <columns>
-			<column column="students.student_number">id</column>
+			<column column="students.student_number">id</column> <!-- for columns not in database use a core filed as a place holderls-->
 			<column column="students.lastfirst">name</column>
 			<column column="students.grade_level">grade_level</column>
  		</columns>
