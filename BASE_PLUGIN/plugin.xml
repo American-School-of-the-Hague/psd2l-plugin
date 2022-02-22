@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- see: https://support.powerschool.com/developer/#/page/plugin-xml-->
 <!-- set description and name here; does not need to match others-->
+<!-- `name` value appears in the plugin screen-->
 <plugin xmlns="http://plugin.powerschool.pearson.com"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		description="Powerquery Example"

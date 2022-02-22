@@ -1,5 +1,7 @@
 <queries>
-	<<!--set name here (also applies to permissions_root-->
+	<!--set name here (also applies to permissions_root-->
+	<!-- name="[com].[organization].[product_name].[area].[name]"-->]
+	<!-- see: https://support.powerschool.com/developer/#/page/powerqueries-->
     <query name="BASE_PLUGIN" coreTable="students" flattened="false">
 		<!--add description here-->
         <description>Description of BASE_PLUGIN here</description>
