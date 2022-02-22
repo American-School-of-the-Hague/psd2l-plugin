@@ -27,4 +27,5 @@ fi
 TIME=$(date "+%Y%m%d_%H%M%S")
 PACKAGENAME=$(basename $1)-$TIME.zip
 pushd $1
-zip -X -r ../$PACKAGENAME ./*
+zip -X -r  ../$PACKAGENAME ./* -x "*.md"
+popd
