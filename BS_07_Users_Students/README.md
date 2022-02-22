@@ -41,19 +41,23 @@ Powerschool &rarr; BrightSpace CSV Student Export for 07-Users
 
 ### PowerQuery Output Columns
 
-| header | default value |
-|-|-|
-|type| user |
-|action| UPDATE|
-|username| _ASH email userid_ |
-|org_define_id| _SIS student number_ |
-|first_name| _SIS First Name_ |
-|last_name| _SIS Last Name_ |
-|password| _NONE_ |
-|role_name| Learner|
-|relationships| TBD |
-|pref_frist_name | TBD |
-|fref_last_name | TBD |
+| header | table.field | value | NOTE |
+|-|-|-|-|
+|type| STUDENTS.ID | user | N1 |
+|action| STUDENTS.ID | UPDATE | N1 |
+|username| U_STUDENTSUSERFIELDS.EMAILSTUDENT |_ASH email userid_ |
+|org_define_id| STUDENTS.ID | _SIS student number_ |
+|first_name| STUDENTS.FIRST_NAME | _SIS First Name_ |
+|last_name| STUDENTS.LAST_NAME |_SIS Last Name_ | 
+|password| STUDENTS.ID |_NONE_ | N1 |
+|role_name| STUDENTS.ID | Learner | N1 |
+|relationships| STUDENTS.ID | TBD | N1 |
+|pref_frist_name| STUDENTS.ID |TBD | N1 |
+|pref_last_name| STUDENTS.ID |TBD | N1 |
+
+#### Notes
+
+**N1:** Field does not appear in database; use a known field such as `<column column=STUDENT.ID>header<\column>` to prevent an "unknown column error"
 
 ### Tables Used
 
@@ -87,4 +91,5 @@ from STUDENTS STUDENTS,
 where STUDENTS.ENROLL_STATUS =0
     and U_STUDENTSUSERFIELDS.STUDENTSDCID=STUDENTS.DCID
     and STUDENTS.GRADE_LEVEL >=5
+    order by STUDENTS.GRADE_LEVEL asc
 ```
