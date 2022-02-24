@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- see: https://support.powerschool.com/developer/#/page/plugin-xml-->
 <!-- set description and name here; does not need to match others-->
-<!-- `name` value appears in the plugin screen-->
 <plugin xmlns="http://plugin.powerschool.pearson.com"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		description="Powerquery Example"
-		name="PowerQuery Example (Birthdays)"
-		version="1.0"
+		description="BASE PLUGIN Template -- update this in plugin.xml"
+		name="BASE PLUGIN Template"
+		version="0.0.7.99991334"
 		xsi:schemaLocation="http://plugin.powerschool.pearson.com plugin.xsd">
 		
 	<publisher name="Your/Org Name">
 		<contact email="contact@host.tld"/>
 	</publisher>
-	
 </plugin>

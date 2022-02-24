@@ -1,28 +1,23 @@
 <queries>
 	<!--set name here (also applies to permissions_root-->
-	<!-- name="[com].[organization].[product_name].[area].[name]"-->]
-	<!-- see: https://support.powerschool.com/developer/#/page/powerqueries-->
-    <query name="BASE_PLUGIN" coreTable="students" flattened="false">
+    <query name="com.txoof.brightspace.students.user" coreTable="students" flattened="false">
 		<!--add description here-->
-        <description>Description of BASE_PLUGIN here</description>
+        <description>active students</description>
 		<!--number of columns here must match number sql returns-->
         <columns>
-			<column column="students.student_number">id</column> <!-- for columns not in database use a core filed as a place holderls-->
-			<column column="students.lastfirst">name</column>
-			<column column="students.grade_level">grade_level</column>
+			<column column="STUDENTS.ID">bar</column> <!-- for columns not in database use a core filed-->
+			<column column="STUDENTS.ID">id</column>
+			<column column="STUDENTS.LAST_NAME">LAST_NAME</column>
  		</columns>
 		<!--SQL query in format <![CDATA[QUERY]]>-->
         <sql>
 			<![CDATA[
-				SELECT
-					student_number,
-					lastfirst,
-					grade_level
-				FROM
-					students
-				WHERE
-					enroll_status = 0
-				ORDER BY lastfirst
+			select 
+			    'foo' as "bar",
+			    STUDENTS.ID as ID,
+				STUDENTS.LAST_NAME as LAST_NAME 
+			from STUDENTS STUDENTS 
+			where STUDENTS.ENROLL_STATUS =0
 			]]>
         </sql>
     </query>
