@@ -4,10 +4,10 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		description="BrightSpace 03_Semesters export current term id"
 		name="BrightSpace 03-Semesters Export"
-		version="0.0.1.20220224"
+		version="1.0.0.20220225"
 		xsi:schemaLocation="http://plugin.powerschool.pearson.com plugin.xsd">
 		
-	<publisher name="Your/Org Name">
-		<contact email="contact@host.tld"/>
+	<publisher name="Aaron Ciuffo">
+		<contact email="aaron.ciuffo@gmail.com"/>
 	</publisher>
 </plugin>

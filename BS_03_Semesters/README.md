@@ -5,21 +5,30 @@ Powerschool &rarr; BrightSpace CSV Teacher and Staff Export for 07-Users
 ## Data Export Manager
 
 - **Category:** Show All
-- **Export Form:**  tld.domain.product.area.name
+- **Export Form:**  NQ com.txoof.brightpsace.terms.id
 
 ### Lables Used on Export
 
 | Label |
 |-|
-|foo|
-|ID|
-|LAST_NAME|
+|type|
+|action|
+|code|
+|name|
+|start_date|
+|end|date|
+|is_active|
+|department_code|
+|template_code|
+|semester_code|
+|offering_code|
+|custom_code|
 
 ### Export Summary and Output Options
 
 #### Export Format
 
-- *Export File Name:* `BASE_PLUGIN.csv`
+- *Export File Name:* `3-Semesters.csv`
 - *Line Delimiter:* `CR-LF`
 - *Field Delimiter:* `,`
 - *Character Set:* TBD
@@ -35,9 +44,18 @@ Powerschool &rarr; BrightSpace CSV Teacher and Staff Export for 07-Users
 
 | header | table.field | value | NOTE |
 |-|-|-|-|
-|foo| STUDENTS.ID | user | N1 |
-|ID| STUDENTS.ID |_SIS student number_ |
-|last_name| STUDENTS.LAST_NAME |_SIS Last Name_ | 
+|type| TERMS.ID | _semester_| N1|
+|action| TERMS.ID | _update_ | N1|
+|code| `TERMS.SCHOOLID\|\|'_term_'\|\|TERMS.ID` | _1\_term\_3100_ 
+|name| TERMS.NAME | _2021-2022_; _Semester 1_
+|start_date| TERMS.FIRSTDAY| _08/18_2021_
+|end|date| TERMS.LASTDAY | _01/23/2022_
+|is_active| `TERMS.FIRSTDAY < sysdate < TERMS.LASTDAY` | _0_; _1_
+|department_code| TERMS.ID | '' | N1
+|template_code| TERMS.ID | '' | N1
+|semester_code| TERMS.ID | '' | N1
+|offering_code| TERMS.ID | '' | N1
+|custom_code| TERMS.ID | '' | N1
 
 #### Notes
 
@@ -47,15 +65,30 @@ Powerschool &rarr; BrightSpace CSV Teacher and Staff Export for 07-Users
 
 | Table |  |
 |-|-|
-|STUDENTS| |
+|TERMS| |
 
 ### SQL
 
 ```
-select 
-   'foo' as "bar",
-   STUDENTS.ID as ID,
-STUDENTS.LAST_NAME as LAST_NAME 
-from STUDENTS STUDENTS 
-where STUDENTS.ENROLL_STATUS =0
+select
+		'semester' as "type",
+		'UPDATE' as "action",
+		'term_'||TERMS.ID as "code",
+		TERMS.NAME as "name",
+		TERMS.FIRSTDAY as "start_date",
+		TERMS.LASTDAY as "end_date",
+		'' as "is_active",
+		'' as "department_code",
+		'' as "template_code",
+		'' as "semester_code",
+		'' as "offering_code",
+		'' as "custom_code"
+	from TERMS TERMS 
+	where TERMS.YEARID = (CASE 
+	WHEN (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
+	 THEN EXTRACT(year from sysdate)-2000+9
+	WHEN (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
+	 THEN EXTRACT(year from sysdate)-2000+10
+  	END)
+	order by "code" asc
 ```
