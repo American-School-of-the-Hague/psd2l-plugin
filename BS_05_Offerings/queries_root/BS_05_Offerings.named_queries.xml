@@ -8,7 +8,7 @@
 			<column column="CC.ID">type</column> <!-- for columns not in database use a core filed-->
 			<column column="CC.ID">action</column>
 			<column column="CC.SCHOOLID">code</column>
-			<column column="C.COURSE_NAME">name</column>
+			<column column="COURSES.COURSE_NAME">name</column>
 			<column column="CC.ID">start_date</column>
 			<column column="CC.ID">end_date</column>
 			<column column="CC.ID">is_active</column>

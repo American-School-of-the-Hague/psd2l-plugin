@@ -21,7 +21,7 @@ Powerschool &rarr; BrightSpace CSV Teacher and Staff Export for 07-Users
 ## Data Export Manager
 
 - **Category:** Show All
-- **Export Form:**  com.txoof.brightspace.cc.sections
+- **Export Form:**  com.txoof.brightspace.courses.offerings
 
 ### Lables Used on Export
 
@@ -98,6 +98,7 @@ select distinct
   '' as "start_date",
   '' as "end_date",
   '' as "is_active",
+  '' as "department_code",
   '' as "template_code",
   cc.schoolid||'_term_'||cc.termid as "semester code",
   '' as "offering_code",
