@@ -1,0 +1,8 @@
+<!--see: https://cookbrianj.wordpress.com/2017/01/23/plugin-export-with-ps-dem/-->
+<permission_mappings>
+  <!--Anyone that has access to the following page can run this query-->
+  <permission name='/admin/home.html'>
+  <!--.../query/BASE_PLUGIN should be identical to `name` in named_queries.xml-->
+	<implies allow="post">/ws/schema/query/com.txoof.brightspace.students.user</implies>
+  </permission>
+</permission_mappings>
