@@ -2,6 +2,10 @@
 
 Powerschool &rarr; BrightSpace CSV Teacher and Staff Export for 07-Users
 
+## Outstanding Issues
+- [ ] will Brightspace choke on accented characters?
+- [ ] ?
+
 **PROVIDES FIELDS:**
 
 - `org_defined_id` used in [08-Enrollments Students](../BS_08_Enrollments_Students/8-Enrollments_students_README.md) as `child_code`
@@ -102,8 +106,8 @@ select
 
  from TEACHERS TEACHERS
  where TEACHERS.HOMESCHOOLID = TEACHERS.SCHOOLID 
-	AND TEACHERS.STATUS = 1 
-	/* Ignore all users with no email address */
-	AND LENGTH(TEACHERS.EMAIL_ADDR) > 0
-	ORDER BY TEACHERS.LAST_NAME ASC
+    AND TEACHERS.STATUS = 1 
+    /* Ignore all users with no email address */
+    AND LENGTH(TEACHERS.EMAIL_ADDR) > 0
+    ORDER BY TEACHERS.LAST_NAME ASC
 ```
