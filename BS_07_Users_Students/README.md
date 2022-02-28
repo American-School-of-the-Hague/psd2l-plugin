@@ -2,6 +2,18 @@
 
 Powerschool &rarr; BrightSpace CSV Student Export for 07-Users
 
+**PROVIDES FIELDS:**
+
+- `org_defined_id` used in [08-Enrollments](../BS_08_Enrollments/README.md) as `child_code` 
+
+|Field |Format |example |
+|:-|:-|:-|
+|`org_defined_id`| `STUDENTS.STUDENT_NUMBER` | cs_2_C5A_3100
+
+**USES FIELDS:**
+
+- none
+
 ## Data Export Manager
 
 - **Category:** Show All
@@ -46,7 +58,7 @@ Powerschool &rarr; BrightSpace CSV Student Export for 07-Users
 |type| STUDENTS.ID | user | N1 |
 |action| STUDENTS.ID | UPDATE | N1 |
 |username| U_STUDENTSUSERFIELDS.EMAILSTUDENT |_ASH email userid_ |
-|org_define_id| STUDENTS.ID | _SIS student number_ |
+|org_define_id| STUDENTS.STUDENT_NUMBER | _SIS student number_ |
 |first_name| STUDENTS.FIRST_NAME | _SIS First Name_ |
 |last_name| STUDENTS.LAST_NAME |_SIS Last Name_ | 
 |password| STUDENTS.ID |_NONE_ | N1 |
@@ -69,27 +81,27 @@ Powerschool &rarr; BrightSpace CSV Student Export for 07-Users
 ### SQL
 
 ```
-select 
+select STUDENTS.ID as ID,
     'user' as "type",
     'UPDATE' as "action",
-    REGEXP_REPLACE(U_STUDENTSUSERFIELDS.EMAILSTUDENT, '(^.*)(@.*)', '\1') as "username",    
-    STUDENTS.ID as "org_defined_id",
+    REGEXP_REPLACE(U_STUDENTSUSERFIELDS.EMAILSTUDENT, '(^.*)(@.*)', '\1') as "username",
+    /* use student number as unique id - we recycle email addresses and this causes issues */
+    STUDENTS.STUDENT_NUMBER as "org_defined_id",
     STUDENTS.FIRST_NAME as "first_name",
-    STUDENTS.LAST_NAME as "last_name", 
+    STUDENTS.LAST_NAME as "last_name",
     '' as "password",
-    'Learner' as "role_name",
-    '' as "relationships",
-    '' as "pref_first_name",
-    '' as "pref_last_name",
-    U_STUDENTSUSERFIELDS.EMAILSTUDENT as "email",
     (CASE STUDENTS.ENROLL_STATUS
         WHEN 0 THEN 1
-        ELSE NULL END) as "is_active"
-        
-from STUDENTS STUDENTS,
-    U_STUDENTSUSERFIELDS U_STUDENTSUSERFIELDS
-where STUDENTS.ENROLL_STATUS =0
-    and U_STUDENTSUSERFIELDS.STUDENTSDCID=STUDENTS.DCID
+        ELSE NULL END) as "is_active",
+    'Learner' as "role_name",
+    U_STUDENTSUSERFIELDS.EMAILSTUDENT as "email",
+    '' as "relationships",
+    '' as "pref_first_name",
+    '' as "pref_last_name"
+ from U_STUDENTSUSERFIELDS U_STUDENTSUSERFIELDS,
+    STUDENTS STUDENTS 
+ where STUDENTS.DCID=U_STUDENTSUSERFIELDS.STUDENTSDCID
+    and STUDENTS.ENROLL_STATUS =0
     and STUDENTS.GRADE_LEVEL >=5
-    order by STUDENTS.GRADE_LEVEL asc
+ order by STUDENTS.GRADE_LEVEL ASC, STUDENTS.LAST_NAME ASC
 ```
