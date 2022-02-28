@@ -1,2 +1,4 @@
 temp/**
 scratch_dir/**
+*.code-workspace
+*.swp
