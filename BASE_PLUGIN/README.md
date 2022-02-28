@@ -1,6 +1,18 @@
 # BS_07_Users_Teachers
 
-Powerschool &rarr; BrightSpace CSV Teacher and Staff Export for 07-Users
+Powerschool &rarr; BrightSpace CSV x for 00-xx
+
+**PROVIDES FIELDS:**
+
+`xx` used in 6-Sections as `yyy` 
+
+|Field |Format |example |
+|:-|:-|:-|
+|`xx`| `foo_`_`cc.bar`_| foo_bar
+
+**USES FIELDS:**
+
+`xx` from [foo]() as `yyy`
 
 ## Data Export Manager
 
