@@ -4,7 +4,8 @@ Powerschool &rarr; BrightSpace CSV Teacher and Staff Export for 07-Users
 
 **PROVIDES FIELDS:**
 
-- `org_defined_id` used in [08-Enrollments](../BS_08_Enrollments/README.md) as `child_code` 
+- `org_defined_id` used in [08-Enrollments Students](../BS_08_Enrollments_Students/8-Enrollments_students_README.md) as `child_code`
+- `org_defined_id` used in [08-Enrollments Teachers](../BS_08_Enrollments_Teachers/8-Enrollments_Teachers_README.md) as `child_code`
 
 |Field |Format |example |
 |:-|:-|:-|

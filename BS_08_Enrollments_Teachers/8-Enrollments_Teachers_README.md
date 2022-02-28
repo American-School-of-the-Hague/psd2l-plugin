@@ -17,8 +17,8 @@ Powerschool &rarr; BrightSpace CSV Enrollments for 08-Enrollments
 
 **USES FIELDS:**
 
-- `org_defined_id` from [07-Users - Students](../BS_07_Users_Students/README.md) as `child_code`
-- `code` from [06-Sections](../BS_06_Offerings/README.md) as `parent_code`
+- `org_defined_id` from [07-Users - Teachers](../BS_07_Users_Teachers/7-Users_teachers_README.md) as `child_code`
+- `code` from [06-Sections](../BS_06_Sections/6-Sections_README.md) as `parent_code`
 - ALTERNATIVE: `code` from [05-Offerings](../BS_05_Offerings/README.md) as `parent_code`
 
 
@@ -57,10 +57,10 @@ Powerschool &rarr; BrightSpace CSV Enrollments for 08-Enrollments
 
 | header | table.field | value | NOTE |
 |-|-|-|-|
-|type| CC.ID | _enrollment_ | N1
-|action| CC.ID | _UPDATE_ | N1
-|child_code| `S_`_`STUDENTS.STUDENT_NUMBER`_ | _S\_506113_
-|role_name| CC.ID | _Learner_ | N1
+|type| TEACHERS.ID | _enrollment_ | N1
+|action| TEACHERS.ID | _UPDATE_ | N1
+|child_code| `T_`_`TEACHERS.ID`_ | _T\_765_
+|role_name| CC.ID | _Instructor_ | N1
 |parent_code| `cs_`_`cc.schoolid`_`_`_`cc.course_number`_`_`_`cc.termid`_ | _cs_2_E0DNS_3100_ 
 
 #### Notes
@@ -79,32 +79,24 @@ Powerschool &rarr; BrightSpace CSV Enrollments for 08-Enrollments
 ### SQL
 
 ```
-select 
+select distinct
     'enrollment' as "type",
     'UPDATE' as "action",
-    /* using 7-Users:org_defined_id as child_code */
-    STUDENTS.STUDENT_NUMBER as "child_code",
-    /* REGEXP_REPLACE(U_STUDENTSUSERFIELDS.EMAILSTUDENT, '(^.*)(@.*)', '\1') as "child_code", */
-    'Learner' as "role_name",
-    /* using 6-Sections:code as parent_code */
-    'cs_'||cc.schoolid||'_'||cc.course_number||'_'||cc.TermID as "parent_code"
- from 
-    /* U_STUDENTSUSERFIELDS U_STUDENTSUSERFIELDS, */
-    SECTIONS SECTIONS,
-    COURSES COURSES,
-    CC CC,
-    STUDENTS STUDENTS 
+    'T_'||TEACHERS.ID as "child_code",
+    'Instructor' as "role_name",
+    'cs_'||CC.SCHOOLID||'_'||cc.COURSE_NUMBER||'_'||CC.TERMID as "parent_code"
+ from CC CC,
+    STUDENTS STUDENTS,
+    TEACHERS TEACHERS 
  where CC.STUDENTID=STUDENTS.ID
-    and COURSES.COURSE_NUMBER=CC.COURSE_NUMBER
-    and SECTIONS.ID=CC.SECTIONID
-    /* and U_STUDENTSUSERFIELDS.STUDENTSDCID=STUDENTS.DCID */ 
+    and CC.TEACHERID=TEACHERS.ID
     and STUDENTS.ENROLL_STATUS =0
-    and STUDENTS.GRADE_LEVEL >=5
-    and CC.TERMID >= case 
+    and TEACHERS.STATUS =1
+    and cc.termid >= case 
 		when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
 		THEN (EXTRACT(year from sysdate)-2000+9)*100
 		when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
 		THEN (EXTRACT(year from sysdate)-2000+10)*100
 		end
- order by STUDENTS.GRADE_LEVEL ASC, STUDENTS.LASTFIRST ASC, SECTIONS.SECTION_NUMBER ASC
+order by "child_code" asc, "parent_code" asc
 ```
