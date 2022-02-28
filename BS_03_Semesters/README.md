@@ -1,6 +1,16 @@
-# BS_07_Users_Teachers
+# BS_03_Semesters
 
-Powerschool &rarr; BrightSpace CSV Teacher and Staff Export for 07-Users
+Powerschool &rarr; BrightSpace CSV Teacher and Staff Export for 03-Semesters
+
+**PROVIDES FIELDS:**
+
+`code` used in [5-Oferings](../BS_05_Offerings/README.md) as `semester_code`
+
+|Field |Format |example |
+|:-|:-|:-|
+|`code`| `term_`_`cc.TermID`_| term_3102
+
+
 
 ## Data Export Manager
 
