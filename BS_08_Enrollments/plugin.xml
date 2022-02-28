@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- set description and name here; does not need to match others-->
+<plugin xmlns="http://plugin.powerschool.pearson.com"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		description="BrightSpace 08-Enrollments com.txoof.brightspace.students.student_number"
+		name="BrightSpace 08-Enrollments"
+		version="1.0.0.20220228"
+		xsi:schemaLocation="http://plugin.powerschool.pearson.com plugin.xsd">
+		
+	<publisher name="Aaron Ciuffo">
+		<contact email="aaron.ciuffo@gmail.com"/>
+	</publisher>
+</plugin>
