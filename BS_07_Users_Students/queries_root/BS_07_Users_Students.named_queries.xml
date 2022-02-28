@@ -22,12 +22,13 @@
 		<!--SQL query in format <![CDATA[QUERY]]>-->
         <sql>
 			<![CDATA[
-				select STUDENTS.ID as ID,
+				select 
 					'user' as "type",
 					'UPDATE' as "action",
 					REGEXP_REPLACE(U_STUDENTSUSERFIELDS.EMAILSTUDENT, '(^.*)(@.*)', '\1') as "username",
-					/* use student number as unique id */
-					STUDENTS.STUDENT_NUMBER as "org_defined_id",
+					/* use student number as unique id - we recycle email addresses and this causes issues */
+					/* prepend a 'S" to the number to distinguish between students & teachers */
+					'S_'||STUDENTS.STUDENT_NUMBER as "org_defined_id",
 					STUDENTS.FIRST_NAME as "first_name",
 					STUDENTS.LAST_NAME as "last_name",
 					'' as "password",
