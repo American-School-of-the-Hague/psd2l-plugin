@@ -4,7 +4,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		description="BrightSpace export for all active courses com.txoof.brightspace.courses.offerings"
 		name="BrightSpace 05-Offerings"
-		version="1.0.1.20220225"
+		version="1.1.0.20220228"
 		xsi:schemaLocation="http://plugin.powerschool.pearson.com plugin.xsd">
 		
 	<publisher name="Aaron Ciuffo">
