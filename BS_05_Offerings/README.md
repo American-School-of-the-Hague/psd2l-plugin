@@ -10,12 +10,15 @@ Powerschool &rarr; BrightSpace CSV Teacher and Staff Export for 07-Users
 
 **PROVIDES FIELDS:**
 
-`code` used in 6-Sections as `offering_code`
+`code` used in 6-Sections as `offering_code` 
 
+|Field |Format |example |
+|:-|:-|:-|
+|`code`| `co_`_`cc.SchoolID`_`_`_`cc.Course_Number`_| co_3_ITLDPROG1
 
 **USES FIELDS:**
 
-`code` from BS_03_Semesters as `semester_code`
+`code` from [BS_03_Semesters](../BS_03_Semesters/README.md) as `semester_code`
 
 
 ## Data Export Manager
@@ -62,8 +65,8 @@ Powerschool &rarr; BrightSpace CSV Teacher and Staff Export for 07-Users
 |-|-|-|-|
 |type| CC.ID | _course offering_ | N1
 |action| CC.ID | _UPDATE_ | N1
-|code| 'co_'schoolid'\_'coursename'\_'termid | _c\_3\_SCIBI\_3102_
-|name| C.COURSE_NAME | _SCI Biology I_ 
+|code| 'co_'schoolid'\_'coursename'\_'termid | _co\_3\_ITLDPROG1_
+|name| C.COURSE_NAME | _IT Programming_ 
 |start_date| CC.ID | '' | N1
 |end_date| CC.ID | '' | N1
 |is_active| CC.ID | '' | N1
@@ -86,6 +89,39 @@ Powerschool &rarr; BrightSpace CSV Teacher and Staff Export for 07-Users
 |TERMS|
 
 ### SQL
+```
+select distinct
+	'course offering' as "type",
+	'UPDATE' as "action",
+  /* co_cc.schoolid_cc.course_number */
+  'co_'||cc.schoolid||'_'||cc.course_number as "code",
+	c.course_name as "name",
+	'' as "start_date",
+	'' as "end_date",
+	'' as "is_active",
+	'' as "department_code",
+	'' as "template_code",
+	cc.schoolid||'_term_'||cc.termid as "semester code",
+	'' as "offering_code",
+	'' as "custom_code"
+from 
+students s
+join cc on cc.studentid = s.id
+join schoolstaff ss on ss.id = cc.teacherid
+join courses c on c.course_number = cc.course_number,
+terms terms
+where
+	terms.id = cc.termid and
+	/* select only courses that are in the current yearid (e.g. 2021-2022 == 3100)*/
+	cc.termid >= case 
+		when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
+		THEN (EXTRACT(year from sysdate)-2000+9)*100
+		when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
+		THEN (EXTRACT(year from sysdate)-2000+10)*100
+		end
+order by "semester code" desc	
+```
+
 
 ```
 select distinct
