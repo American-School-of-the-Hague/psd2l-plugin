@@ -1,6 +1,6 @@
 # BS_03_Semesters
 
-Powerschool &rarr; BrightSpace CSV Teacher and Staff Export for 03-Semesters
+Powerschool &rarr; BrightSpace CSV Export for 03-Semesters
 
 ## Outstanding Issues
 - [ ] what other fields are needed e.g. `start/end_date`; `is_active`
@@ -97,12 +97,12 @@ select
 		'' as "semester_code",
 		'' as "offering_code",
 		'' as "custom_code"
-	from TERMS TERMS 
+from TERMS TERMS 
 	where TERMS.YEARID = (CASE 
 	WHEN (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
 	 THEN EXTRACT(year from sysdate)-2000+9
 	WHEN (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
 	 THEN EXTRACT(year from sysdate)-2000+10
   	END)
-	order by "code" asc
+order by "code" asc
 ```

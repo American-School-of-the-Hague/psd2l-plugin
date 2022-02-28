@@ -5,7 +5,7 @@
         <description>active students</description>
 		<!--number of columns here must match number sql returns-->
         <columns>
-			<column column="TERMS.ID">term</column>
+			<column column="TERMS.ID">type</column>
 			<column column="TERMS.ID">action</column>
 			<column column="TERMS.ID">code</column>
 			<column column="TERMS.NAME">name</column>
@@ -24,7 +24,7 @@
 			select
 				'semester' as "type",
 				'UPDATE' as "action",
-				TERMS.SCHOOLID||'_term_'||TERMS.ID as "code",
+				'term_'||TERMS.ID as "code",
 				TERMS.NAME as "name",
 				TERMS.FIRSTDAY as "start_date",
 				TERMS.LASTDAY as "end_date",
@@ -35,12 +35,12 @@
 				'' as "offering_code",
 				'' as "custom_code"
 			from TERMS TERMS 
-			where TERMS.YEARID = (CASE 
-			WHEN (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
-			 THEN EXTRACT(year from sysdate)-2000+9
-			WHEN (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
-			 THEN EXTRACT(year from sysdate)-2000+10
-		  	END)
+				where TERMS.YEARID = (CASE 
+				WHEN (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
+				THEN EXTRACT(year from sysdate)-2000+9
+				WHEN (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
+				THEN EXTRACT(year from sysdate)-2000+10
+				END)
 			order by "code" asc
 			]]>
         </sql>
