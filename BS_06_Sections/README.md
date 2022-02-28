@@ -1,30 +1,29 @@
-# BS_05_Offerings
+# BS_07_Users_Teachers
 
-Powerschool &rarr; BrightSpace CSV Teacher and Staff Export for 07-Users
+Powerschool &rarr; BrightSpace CSV Sections for 06_Sections
 
-## Outstanding Questions
-* does `code` need to be unique?
-  * can resolve by Post-pended CC.TERMID to make unique
-* what other fields are needed?
-* `code` is structured as `co_schoolid_course_number`
+## Outstanding questions
+- [ ] Where does the `code` field get used?
+- [ ] How do we connect sections to users
+- [ ] How does this relate to 08-enrollments?
 
 **PROVIDES FIELDS:**
 
-`code` used in 6-Sections as `offering_code` 
+`code` used in ?? as `????` 
 
 |Field |Format |example |
 |:-|:-|:-|
-|`code`| `co_`_`cc.SchoolID`_`_`_`cc.Course_Number`_| co_3_ITLDPROG1
+|`code`| `cs_`_`cc.schoolID`_`_`_`cc.course_number`_`_`_`cc.termid`_| 
 
 **USES FIELDS:**
 
-`code` from [BS_03_Semesters](../BS_03_Semesters/README.md) as `semester_code`
-
+- `code` from [03_Semesters](../BS_03_Semesters/README.md) as `semester_code`
+- `code` from [05_Offerings](../BS_05_Offerings/README.md) as `offering_code`
 
 ## Data Export Manager
 
 - **Category:** Show All
-- **Export Form:**  com.txoof.brightspace.courses.offerings
+- **Export Form:**  com.txoof.brightspace.courses.sections
 
 ### Lables Used on Export
 
@@ -47,7 +46,7 @@ Powerschool &rarr; BrightSpace CSV Teacher and Staff Export for 07-Users
 
 #### Export Format
 
-- *Export File Name:* `5-Offerings.csv`
+- *Export File Name:* `BASE_PLUGIN.csv`
 - *Line Delimiter:* `CR-LF`
 - *Field Delimiter:* `,`
 - *Character Set:* TBD
@@ -65,15 +64,15 @@ Powerschool &rarr; BrightSpace CSV Teacher and Staff Export for 07-Users
 |-|-|-|-|
 |type| CC.ID | _course offering_ | N1
 |action| CC.ID | _UPDATE_ | N1
-|code| 'co_'schoolid\_coursenumber' | _co\_3\_ITLDPROG1_
-|name| C.COURSE_NAME | _IT Programming_ 
+|code| 'co_'schoolid\_coursenumber\_termid | _cs\_3\_MCABAP\_3100_
+|name| C.COURSE_NAME | _MA AP Calculus (AB)_ 
 |start_date| CC.ID | '' | N1
 |end_date| CC.ID | '' | N1
 |is_active| CC.ID | '' | N1
 |department_code| CC.ID | '' | N1
 |template_code| CC.ID | '' | N1
-|semester_code|   schoolid'\_term\_'cc.termid | _3_term_3102_ 
-|offering_code| CC.ID | '' | N1
+|semester_code|   CC.ID | '' | N1 
+|offering_code| 'co_'schoolid\_coursenumber | _co\_3\_ITLDPROG1_
 |custom_code| CC.ID | '' | N1
 
 #### Notes
@@ -89,20 +88,21 @@ Powerschool &rarr; BrightSpace CSV Teacher and Staff Export for 07-Users
 |TERMS|
 
 ### SQL
+
 ```
 select distinct
-	'course offering' as "type",
+	'course section' as "type",
 	'UPDATE' as "action",
-  /* co_cc.schoolid_cc.course_number */
-  'co_'||cc.schoolid||'_'||cc.course_number as "code",
+    /* cs_cc.schoolid_cc.course_number */
+    'cs_'||cc.schoolid||'_'||cc.course_number||'_'||cc.TermID as "code",
 	c.course_name as "name",
 	'' as "start_date",
 	'' as "end_date",
 	'' as "is_active",
 	'' as "department_code",
 	'' as "template_code",
-	cc.schoolid||'_term_'||cc.termid as "semester code",
-	'' as "offering_code",
+	'' as "semester code",
+	'co_'||cc.schoolid||'_'||cc.course_number as "offering_code",
 	'' as "custom_code"
 from 
 students s
