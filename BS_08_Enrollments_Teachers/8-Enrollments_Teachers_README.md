@@ -93,10 +93,10 @@ select distinct
     and STUDENTS.ENROLL_STATUS =0
     and TEACHERS.STATUS =1
     and cc.termid >= case 
-		when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
-		THEN (EXTRACT(year from sysdate)-2000+9)*100
-		when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
-		THEN (EXTRACT(year from sysdate)-2000+10)*100
-		end
+      when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
+      THEN (EXTRACT(year from sysdate)-2000+9)*100
+      when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
+      THEN (EXTRACT(year from sysdate)-2000+10)*100
+      end
 order by "child_code" asc, "parent_code" asc
 ```
