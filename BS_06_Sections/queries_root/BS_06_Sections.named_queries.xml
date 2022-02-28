@@ -50,7 +50,7 @@
 						when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
 						THEN (EXTRACT(year from sysdate)-2000+10)*100
 						end
-				order by "semester code" desc	
+				order by "semester code" desc
 			]]>
         </sql>
     </query>
