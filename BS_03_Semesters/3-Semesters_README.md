@@ -2,9 +2,13 @@
 
 Powerschool &rarr; BrightSpace CSV Teacher and Staff Export for 03-Semesters
 
+## Outstanding Issues
+- [ ] what other fields are needed e.g. `start/end_date`; `is_active`
+- [ ] ?
+
 **PROVIDES FIELDS:**
 
-`code` used in [5-Oferings](../BS_05_Offerings/README.md) as `semester_code`
+`code` used in [5-Oferings](../BS_05_Offerings/5-Offerings_README.md) as `semester_code`
 
 |Field |Format |example |
 |:-|:-|:-|
@@ -26,7 +30,7 @@ Powerschool &rarr; BrightSpace CSV Teacher and Staff Export for 03-Semesters
 |code|
 |name|
 |start_date|
-|end|date|
+|end_date|
 |is_active|
 |department_code|
 |template_code|
@@ -56,10 +60,10 @@ Powerschool &rarr; BrightSpace CSV Teacher and Staff Export for 03-Semesters
 |-|-|-|-|
 |type| TERMS.ID | _semester_| N1|
 |action| TERMS.ID | _update_ | N1|
-|code| `TERMS.SCHOOLID\|\|'_term_'\|\|TERMS.ID` | _1\_term\_3100_ 
-|name| TERMS.NAME | _2021-2022_; _Semester 1_
-|start_date| TERMS.FIRSTDAY| _08/18_2021_
-|end|date| TERMS.LASTDAY | _01/23/2022_
+|code| `'term_'\|\|TERMS.ID` | _term\_3100_ 
+|name| TERMS.NAME | _2021-2022_ or _Semester 1_ or _Quarter 1_
+|start_date| TERMS.FIRSTDAY| _08/18/2021_
+|end_date| TERMS.LASTDAY | _01/23/2022_
 |is_active| `TERMS.FIRSTDAY < sysdate < TERMS.LASTDAY` | _0_; _1_
 |department_code| TERMS.ID | '' | N1
 |template_code| TERMS.ID | '' | N1

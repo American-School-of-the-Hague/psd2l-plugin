@@ -17,8 +17,8 @@ Powerschool &rarr; BrightSpace CSV Sections for 06_Sections
 
 **USES FIELDS:**
 
-- `code` from [03_Semesters](../BS_03_Semesters/README.md) as `semester_code`
-- `code` from [05_Offerings](../BS_05_Offerings/README.md) as `offering_code`
+- `code` from [03_Semesters](../BS_03_Semesters/3-Semesters_README.md) as `semester_code`
+- `code` from [05_Offerings](../BS_05_Offerings/5-Offerings_README.md) as `offering_code`
 
 ## Data Export Manager
 
@@ -64,7 +64,7 @@ Powerschool &rarr; BrightSpace CSV Sections for 06_Sections
 |-|-|-|-|
 |type| CC.ID | _course offering_ | N1
 |action| CC.ID | _UPDATE_ | N1
-|code| 'co_'schoolid\_coursenumber\_termid | _cs\_3\_MCABAP\_3100_
+|code| 'co_'schoolid\_coursenumber\_termid | _co\_3\_MCABAP\_3100_
 |name| C.COURSE_NAME | _MA AP Calculus (AB)_ 
 |start_date| CC.ID | '' | N1
 |end_date| CC.ID | '' | N1
@@ -119,5 +119,5 @@ where
 		when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
 		THEN (EXTRACT(year from sysdate)-2000+10)*100
 		end
-order by "semester code" desc	
+order by "semester code" desc
 ```

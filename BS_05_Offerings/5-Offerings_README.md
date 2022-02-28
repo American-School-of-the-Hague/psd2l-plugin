@@ -10,7 +10,7 @@ Powerschool &rarr; BrightSpace CSV Teacher and Staff Export for 07-Users
 
 **PROVIDES FIELDS:**
 
-`code` used in 6-Sections as `offering_code` 
+`code` used in [BS_06_Sections](../BS_06_Sections/6-Sections_README.md) as `offering_code` 
 
 |Field |Format |example |
 |:-|:-|:-|
@@ -18,7 +18,7 @@ Powerschool &rarr; BrightSpace CSV Teacher and Staff Export for 07-Users
 
 **USES FIELDS:**
 
-`code` from [BS_03_Semesters](../BS_03_Semesters/README.md) as `semester_code`
+`code` from [BS_03_Semesters](../BS_03_Semesters/3-Semesters_README.md) as `semester_code`
 
 
 ## Data Export Manager
@@ -72,7 +72,7 @@ Powerschool &rarr; BrightSpace CSV Teacher and Staff Export for 07-Users
 |is_active| CC.ID | '' | N1
 |department_code| CC.ID | '' | N1
 |template_code| CC.ID | '' | N1
-|semester_code|   schoolid'\_term\_'cc.termid | _3_term_3102_ 
+|semester_code|   schoolid'\_term\_'cc.termid | _term_3102_ 
 |offering_code| CC.ID | '' | N1
 |custom_code| CC.ID | '' | N1
 
@@ -90,34 +90,34 @@ Powerschool &rarr; BrightSpace CSV Teacher and Staff Export for 07-Users
 
 ### SQL
 ```
-select distinct
-	'course offering' as "type",
-	'UPDATE' as "action",
-  /* co_cc.schoolid_cc.course_number */
-  'co_'||cc.schoolid||'_'||cc.course_number as "code",
-	c.course_name as "name",
-	'' as "start_date",
-	'' as "end_date",
-	'' as "is_active",
-	'' as "department_code",
-	'' as "template_code",
-	cc.schoolid||'_term_'||cc.termid as "semester code",
-	'' as "offering_code",
-	'' as "custom_code"
-from 
-students s
-join cc on cc.studentid = s.id
-join schoolstaff ss on ss.id = cc.teacherid
-join courses c on c.course_number = cc.course_number,
-terms terms
-where
-	terms.id = cc.termid and
-	/* select only courses that are in the current yearid (e.g. 2021-2022 == 3100)*/
-	cc.termid >= case 
-		when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
-		THEN (EXTRACT(year from sysdate)-2000+9)*100
-		when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
-		THEN (EXTRACT(year from sysdate)-2000+10)*100
-		end
-order by "semester code" desc	
+	select distinct
+		'course offering' as "type",
+		'UPDATE' as "action",
+	/* co_cc.schoolid_cc.course_number */
+	'co_'||cc.schoolid||'_'||cc.course_number as "code",
+		c.course_name as "name",
+		'' as "start_date",
+		'' as "end_date",
+		'' as "is_active",
+		'' as "department_code",
+		'' as "template_code",
+		'term_'||cc.termid as "semester code",
+		'' as "offering_code",
+		'' as "custom_code"
+	from 
+	students s
+	join cc on cc.studentid = s.id
+	join schoolstaff ss on ss.id = cc.teacherid
+	join courses c on c.course_number = cc.course_number,
+	terms terms
+	where
+		terms.id = cc.termid and
+		/* select only courses that are in the current yearid (e.g. 2021-2022 == 3100)*/
+		cc.termid >= case 
+			when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
+			THEN (EXTRACT(year from sysdate)-2000+9)*100
+			when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
+			THEN (EXTRACT(year from sysdate)-2000+10)*100
+			end
+	order by "semester code" desc
 ```

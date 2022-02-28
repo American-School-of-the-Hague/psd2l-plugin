@@ -4,11 +4,11 @@ Powerschool &rarr; BrightSpace CSV Student Export for 07-Users
 
 **PROVIDES FIELDS:**
 
-- `org_defined_id` used in [08-Enrollments](../BS_08_Enrollments/README.md) as `child_code` 
+- `org_defined_id` used in [08-Enrollments_Students](../BS_08_Enrollments_Students/8-Enrollments_students_README.md) as `child_code` 
 
 |Field |Format |example |
 |:-|:-|:-|
-|`org_defined_id`| `STUDENTS.STUDENT_NUMBER` | cs_2_C5A_3100
+|`org_defined_id`| `S_`_`STUDENTS.STUDENT_NUMBER`_ | S_123456
 
 **USES FIELDS:**
 
@@ -57,12 +57,12 @@ Powerschool &rarr; BrightSpace CSV Student Export for 07-Users
 |-|-|-|-|
 |type| STUDENTS.ID | user | N1 |
 |action| STUDENTS.ID | UPDATE | N1 |
-|username| U_STUDENTSUSERFIELDS.EMAILSTUDENT |_ASH email userid_ |
-|org_define_id| STUDENTS.STUDENT_NUMBER | _SIS student number_ |
-|first_name| STUDENTS.FIRST_NAME | _SIS First Name_ |
-|last_name| STUDENTS.LAST_NAME |_SIS Last Name_ | 
-|password| STUDENTS.ID |_NONE_ | N1 |
-|role_name| STUDENTS.ID | Learner | N1 |
+|username| U_STUDENTSUSERFIELDS.EMAILSTUDENT | _bar@ash.nl_ |
+|org_define_id| STUDENTS.STUDENT_NUMBER | _S\_123456_ |
+|first_name| STUDENTS.FIRST_NAME | _Jane_ |
+|last_name| STUDENTS.LAST_NAME |_Doe_ | 
+|password| STUDENTS.ID | '' | N1 |
+|role_name| STUDENTS.ID | _Learner_ | N1 |
 |relationships| STUDENTS.ID | TBD | N1 |
 |pref_frist_name| STUDENTS.ID |TBD | N1 |
 |pref_last_name| STUDENTS.ID |TBD | N1 |
@@ -81,12 +81,13 @@ Powerschool &rarr; BrightSpace CSV Student Export for 07-Users
 ### SQL
 
 ```
-select STUDENTS.ID as ID,
+select 
     'user' as "type",
     'UPDATE' as "action",
     REGEXP_REPLACE(U_STUDENTSUSERFIELDS.EMAILSTUDENT, '(^.*)(@.*)', '\1') as "username",
     /* use student number as unique id - we recycle email addresses and this causes issues */
-    STUDENTS.STUDENT_NUMBER as "org_defined_id",
+    /* prepend a 'S" to the number to distinguish between students & teachers */
+    'S_'||STUDENTS.STUDENT_NUMBER as "org_defined_id",
     STUDENTS.FIRST_NAME as "first_name",
     STUDENTS.LAST_NAME as "last_name",
     '' as "password",

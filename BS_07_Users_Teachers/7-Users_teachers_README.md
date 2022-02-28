@@ -2,6 +2,18 @@
 
 Powerschool &rarr; BrightSpace CSV Teacher and Staff Export for 07-Users
 
+**PROVIDES FIELDS:**
+
+- `org_defined_id` used in [08-Enrollments](../BS_08_Enrollments/README.md) as `child_code` 
+
+|Field |Format |example |
+|:-|:-|:-|
+|`org_defined_id`| `T_`_`TEACHERS.ID`_ | T_123456
+
+**USES FIELDS:**
+
+- none
+
 ## Data Export Manager
 
 - **Category:** Show All
@@ -43,17 +55,17 @@ Powerschool &rarr; BrightSpace CSV Teacher and Staff Export for 07-Users
 
 | header | table.field | value | NOTE |
 |-|-|-|-|
-|type| STUDENTS.ID | user | N1 |
-|action| STUDENTS.ID | UPDATE | N1 |
-|username| U_STUDENTSUSERFIELDS.EMAILSTUDENT |_ASH email userid_ |
-|org_define_id| STUDENTS.ID | _SIS student number_ |
-|first_name| STUDENTS.FIRST_NAME | _SIS First Name_ |
-|last_name| STUDENTS.LAST_NAME |_SIS Last Name_ | 
-|password| STUDENTS.ID |_NONE_ | N1 |
-|role_name| STUDENTS.ID | Learner | N1 |
-|relationships| STUDENTS.ID | TBD | N1 |
-|pref_frist_name| STUDENTS.ID |TBD | N1 |
-|pref_last_name| STUDENTS.ID |TBD | N1 |
+|type| TEACHERS.ID | user | N1 |
+|action| TEACHERS.ID | UPDATE | N1 |
+|username| TEACHERS.EMAIL_ADDR |_foo@ash.nl_ |
+|org_define_id| TEACHERS.ID | _T\_234_ |
+|first_name| TEACHERS.FIRST_NAME | _John_ |
+|last_name| TEACHERS.LAST_NAME |_Doe_ | 
+|password| TEACHERS.ID | '' | N1 |
+|role_name| TEACHER.ID | _Learner_ | N1 |
+|relationships| TEACHERS.ID | TBD | N1 |
+|pref_frist_name| TEACHERS.ID |TBD | N1 |
+|pref_last_name| TEACHERS.ID |TBD | N1 |
 
 #### Notes
 
@@ -75,7 +87,8 @@ select
     'user' as "type",
     'UPDATE' as "action",
     REGEXP_REPLACE(TEACHERS.EMAIL_ADDR, '(^.*)(@.*)', '\1') as "username",
-    TEACHERS.ID as "org_defined_id",
+    /* prepend a 'T' to make sure there are no studentid/teacherid colissions */
+    'T_'||TEACHERS.ID as "org_defined_id",
     TEACHERS.FIRST_NAME as "first_name",
     TEACHERS.LAST_NAME as "last_name",
     '' as "password",
