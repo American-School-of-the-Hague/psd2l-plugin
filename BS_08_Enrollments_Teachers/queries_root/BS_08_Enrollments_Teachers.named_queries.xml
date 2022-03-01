@@ -19,7 +19,17 @@
 					'UPDATE' as "action",
 					'T_'||TEACHERS.ID as "child_code",
 					'Instructor' as "role_name",
-					'cs_'||CC.SCHOOLID||'_'||cc.COURSE_NUMBER||'_'||CC.TERMID as "parent_code"
+					'cs_'||CC.SCHOOLID||'_'||cc.COURSE_NUMBER||'_'||CC.TERMID||'_'||DECODE(substr(cc.expression, 1, 1), 
+					1, 'A', 
+					2, 'B', 
+					3, 'C', 
+					4, 'D', 
+					5, 'E', 
+					6, 'F', 
+					7, 'G', 
+					8, 'H', 
+					9, 'ADV', 
+					'UNKNOWN') as "parent_code"
 				from CC CC,
 					STUDENTS STUDENTS,
 					TEACHERS TEACHERS 

@@ -87,7 +87,17 @@ select
     /* REGEXP_REPLACE(U_STUDENTSUSERFIELDS.EMAILSTUDENT, '(^.*)(@.*)', '\1') as "child_code", */
     'Learner' as "role_name",
     /* using 6-Sections:code as parent_code */
-    'cs_'||cc.schoolid||'_'||cc.course_number||'_'||cc.TermID as "parent_code"
+    'cs_'||cc.schoolid||'_'||cc.course_number||'_'||cc.TermID||'_'||DECODE(substr(cc.expression, 1, 1), 
+     1, 'A', 
+     2, 'B', 
+     3, 'C', 
+     4, 'D', 
+     5, 'E', 
+     6, 'F', 
+     7, 'G', 
+     8, 'H', 
+     9, 'ADV', 
+     'UNKNOWN') as "parent_code"
  from 
     /* U_STUDENTSUSERFIELDS U_STUDENTSUSERFIELDS, */
     SECTIONS SECTIONS,
