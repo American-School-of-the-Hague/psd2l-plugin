@@ -12,7 +12,7 @@ Powerschool &rarr; BrightSpace CSV active departments for 02-Departments
 
 **USES FIELDS:**
 
-`xx` from [foo]() as `yyy`
+- `code` from [1-Other](../BS_01_Other/1-Other_README.md) as `custom_code`
 
 ## Data Export Manager
 
@@ -69,7 +69,7 @@ Powerschool &rarr; BrightSpace CSV active departments for 02-Departments
 |template_code| CC.ID | '' | N1
 |semester_code| CC.ID | '' | N1
 |offering_code| CC.ID | '' | N1
-|custom_code| CC.ID | '' | N1
+|custom_code| SCHOOLS.SCHOOL_NUMBER | _1_ | 
 
 #### Notes
 
@@ -98,11 +98,13 @@ select distinct
     '' as "template_code",
     '' as "semester_code",
     '' as "offering_code",
-    '' as "custom_code"
+    SCHOOLS.SCHOOL_NUMBER as "custom_code"
  from COURSES COURSES,
     STUDENTS STUDENTS,
-    CC CC 
+    CC CC,
+    SCHOOLS SCHOOLS
  where CC.STUDENTID=STUDENTS.ID
+    and CC.SCHOOLID=SCHOOLS.SCHOOL_NUMBER
     and CC.COURSE_NUMBER=COURSES.COURSE_NUMBER
     and CC.TERMID >= case 
             when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)

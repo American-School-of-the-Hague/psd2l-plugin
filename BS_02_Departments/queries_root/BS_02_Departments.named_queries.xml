@@ -16,7 +16,7 @@
 			<column column="CC.ID">template_code</column>
 			<column column="CC.ID">semester_code</column>
 			<column column="CC.ID">offering_code</column>
-			<column column="CC.ID">custom_code</column>
+			<column column="SCHOOLS.SCHOOL_NUMBER">custom_code</column>
  		</columns>
 		<!--SQL query in format <![CDATA[QUERY]]>-->
         <sql>
@@ -33,11 +33,13 @@
 					'' as "template_code",
 					'' as "semester_code",
 					'' as "offering_code",
-					'' as "custom_code"
+					SCHOOLS.SCHOOL_NUMBER as "custom_code"
 				from COURSES COURSES,
 					STUDENTS STUDENTS,
-					CC CC 
+					CC CC,
+					SCHOOLS SCHOOLS
 				where CC.STUDENTID=STUDENTS.ID
+					and CC.SCHOOLID=SCHOOLS.SCHOOL_NUMBER
 					and CC.COURSE_NUMBER=COURSES.COURSE_NUMBER
 					and CC.TERMID >= case 
 							when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
@@ -45,7 +47,7 @@
 							when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
 							THEN (EXTRACT(year from sysdate)-2000+10)*100
 							end
-				order by "code" asc			
+				order by "code" asc		
 			]]>
         </sql>
     </query>
