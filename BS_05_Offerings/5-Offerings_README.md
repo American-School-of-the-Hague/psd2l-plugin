@@ -98,6 +98,7 @@ select distinct
     c.course_name as "name",
     TERMS.FIRSTDAY as "start_date",
     TERMS.LASTDAY as "end_date",
+    /* set courses as active by default */
     '' as "is_active",
     '' as "department_code",
     '' as "template_code",

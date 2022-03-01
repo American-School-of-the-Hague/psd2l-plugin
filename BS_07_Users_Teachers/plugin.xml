@@ -4,7 +4,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		description="BrightSpace export: 07_Users for teachers com.txoof.brightspace.teachers.usernames"
 		name="BrightSpace 07-User Teachers Export"
-		version="1.1.0.220228"
+		version="1.2.0.20220301"
 		xsi:schemaLocation="http://plugin.powerschool.pearson.com plugin.xsd">
 		
 	<publisher name="Aaron Ciuffo">
