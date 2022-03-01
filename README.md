@@ -18,12 +18,14 @@ Feb/March 2022, Aaron Ciuffo
 
 - [ ] Not sure what to do with the `4-Templates` csv -- still unlcear of roles of "templates" in BSpace.
 - [ ] `5-Offerings` not sure how to handle `template_code` 
+- [ ] Consequences of setting `offerings` as inactive? 
 - [ ] What character sets are valid? UTF-8 is in documentation; are accented characters acceptable?
 - [ ] Where do we assign ORG Units for Students, Teachers? 
   - [ ] Is this done at the "template" level?
 - [ ] Can we have multiple files with for each CSV template? e.g: 7-Users_teachers.csv; 7-Users_students.csv?
   - [ ] Potentially rename CSV export `7-Users_00_Teachers.csv` and `7_Users_01_Students.csv`
 - [ ] Guide indicates that we should only provide DELTAS; this may not be possible with our current technical level -- What support can you offer toward this end?
+- [ ] how do we relate parents to students?
 
 
 

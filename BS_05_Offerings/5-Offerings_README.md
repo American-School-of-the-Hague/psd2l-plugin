@@ -102,7 +102,7 @@ select distinct
     /* set courses as inactive by default */
     0 as "is_active",
     '' as "department_code",
-    'Templ_'||CC.SCHOOLID||'_'||C.SCHED_DEPARTMENT as "code",
+    'Templ_'||CC.SCHOOLID||'_'||C.SCHED_DEPARTMENT as "template_code",
     'term_'||cc.termid as "semester code",
     '' as "offering_code",
     '' as "custom_code"
