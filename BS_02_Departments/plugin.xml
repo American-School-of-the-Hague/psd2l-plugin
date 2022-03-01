@@ -4,7 +4,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		description="BrightSpace 2-Departments com.txoof.brightspace.courses.departments"
 		name="Brightspace 02-Departments Export"
-		version="1.0.0.20220301"
+		version="1.1.0.20220301"
 		xsi:schemaLocation="http://plugin.powerschool.pearson.com plugin.xsd">
 		
 	<publisher name="Aaron Ciuffo">
