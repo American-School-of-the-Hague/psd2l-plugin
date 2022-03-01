@@ -14,10 +14,10 @@
 			<column column="TEACHERS.ID">password</column>
 			<column column="STUDENTS.ENROLL_STATUS">is_active</column>
 			<column column="TEACHERS.ID">role_name</column>
+			<column column="TEACHERS.EMAIL_ADDR">email</column>
 			<column column="TEACHERS.ID">relationships</column>
 			<column column="TEACHERS.ID">pref_first_name</column>
 			<column column="TEACHERS.ID">pref_last_name</column>
-			<column column="TEACHERS.EMAIL_ADDR">email</column>
  		</columns>
 		<!--SQL query in format <![CDATA[QUERY]]>-->
         <sql>
