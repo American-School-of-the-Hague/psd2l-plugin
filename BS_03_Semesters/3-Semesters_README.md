@@ -2,10 +2,6 @@
 
 Powerschool &rarr; BrightSpace CSV Export for 03-Semesters
 
-## Outstanding Issues
-- [ ] what other fields are needed e.g. `start/end_date`; `is_active`
-- [ ] ?
-
 **PROVIDES FIELDS:**
 
 `code` used in [5-Oferings](../BS_05_Offerings/5-Offerings_README.md) as `semester_code`
@@ -13,7 +9,6 @@ Powerschool &rarr; BrightSpace CSV Export for 03-Semesters
 |Field |Format |example |
 |:-|:-|:-|
 |`code`| `term_`_`cc.TermID`_| term_3102
-
 
 
 ## Data Export Manager
@@ -62,8 +57,8 @@ Powerschool &rarr; BrightSpace CSV Export for 03-Semesters
 |action| TERMS.ID | _update_ | N1|
 |code| `'term_'\|\|TERMS.ID` | _term\_3100_ 
 |name| TERMS.NAME | _2021-2022_ or _Semester 1_ or _Quarter 1_
-|start_date| TERMS.FIRSTDAY| _08/18/2021_
-|end_date| TERMS.LASTDAY | _01/23/2022_
+|start_date| TERMS.ID | '' | N1
+|end_date| TERMS.ID | '' | N1
 |is_active| `TERMS.FIRSTDAY < sysdate < TERMS.LASTDAY` | _0_; _1_
 |department_code| TERMS.ID | '' | N1
 |template_code| TERMS.ID | '' | N1
@@ -85,24 +80,24 @@ Powerschool &rarr; BrightSpace CSV Export for 03-Semesters
 
 ```
 select
-		'semester' as "type",
-		'UPDATE' as "action",
-		'term_'||TERMS.ID as "code",
-		TERMS.NAME as "name",
-		TERMS.FIRSTDAY as "start_date",
-		TERMS.LASTDAY as "end_date",
-		'' as "is_active",
-		'' as "department_code",
-		'' as "template_code",
-		'' as "semester_code",
-		'' as "offering_code",
-		'' as "custom_code"
+  'semester' as "type",
+  'UPDATE' as "action",
+  'term_'||TERMS.ID as "code",
+  TERMS.NAME as "name",
+  '' as "start_date",
+  '' as "end_date",
+  '' as "is_active",
+  '' as "department_code",
+  '' as "template_code",
+  '' as "semester_code",
+  '' as "offering_code",
+'' as "custom_code"
 from TERMS TERMS 
-	where TERMS.YEARID = (CASE 
-	WHEN (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
-	 THEN EXTRACT(year from sysdate)-2000+9
-	WHEN (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
-	 THEN EXTRACT(year from sysdate)-2000+10
-  	END)
+    where TERMS.YEARID = (CASE 
+    WHEN (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
+     THEN EXTRACT(year from sysdate)-2000+9
+    WHEN (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
+     THEN EXTRACT(year from sysdate)-2000+10
+      END)
 order by "code" asc
 ```
