@@ -22,32 +22,33 @@
         <sql>
 			<![CDATA[
 				select distinct
-				'department' as "type",
-				'UPDATE' as "action",
-				'Templ_'||CC.SCHOOLID||'_'||COURSES.SCHED_DEPARTMENT as "code",
-				COURSES.SCHED_DEPARTMENT as "name",
-				'' as "start_date",
-				'' as "end_date",
-				'' as "is_active",
-				CC.SCHOOLID||'_'||COURSES.SCHED_DEPARTMENT as "department_code",
-				'' as "template_code",
-				'' as "semester_code",
-				'' as "offering_code",
-				'' as "custom_code"
-			from COURSES COURSES,
-				STUDENTS STUDENTS,
-				CC CC,
-				SCHOOLS SCHOOLS
-			where CC.STUDENTID=STUDENTS.ID
-				and CC.SCHOOLID=SCHOOLS.SCHOOL_NUMBER
-				and CC.COURSE_NUMBER=COURSES.COURSE_NUMBER
-				and CC.TERMID >= case 
-						when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
-						THEN (EXTRACT(year from sysdate)-2000+9)*100
-						when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
-						THEN (EXTRACT(year from sysdate)-2000+10)*100
-						end
-			order by "code" asc	
+					'department' as "type",
+					'UPDATE' as "action",
+					'Templ_'||CC.SCHOOLID||'_'||COURSES.SCHED_DEPARTMENT as "code",
+					COURSES.SCHED_DEPARTMENT as "name",
+					'' as "start_date",
+					'' as "end_date",
+					'' as "is_active",
+					CC.SCHOOLID||'_'||COURSES.SCHED_DEPARTMENT as "department_code",
+					'' as "template_code",
+					'' as "semester_code",
+					'' as "offering_code",
+					'' as "custom_code"
+				from COURSES COURSES,
+					STUDENTS STUDENTS,
+					CC CC,
+					SCHOOLS SCHOOLS
+				where CC.STUDENTID=STUDENTS.ID
+					and CC.SCHOOLID=SCHOOLS.SCHOOL_NUMBER
+					and CC.COURSE_NUMBER=COURSES.COURSE_NUMBER
+					and CC.TERMID >= case 
+							when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
+							THEN (EXTRACT(year from sysdate)-2000+9)*100
+							when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
+							THEN (EXTRACT(year from sysdate)-2000+10)*100
+							end
+					and length(COURSES.SCHED_DEPARTMENT) > 0
+				order by "code" asc
 			]]>
         </sql>
     </query>

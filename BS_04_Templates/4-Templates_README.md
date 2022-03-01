@@ -112,5 +112,6 @@ select distinct
             when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
             THEN (EXTRACT(year from sysdate)-2000+10)*100
             end
+    and length(COURSES.SCHED_DEPARTMENT) > 0
  order by "code" asc
 ```
