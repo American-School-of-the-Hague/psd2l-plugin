@@ -12,12 +12,12 @@
 			<column column="STUDENTS.FIRST_NAME">first_name</column>
 			<column column="STUDENTS.LAST_NAME">last_name</column>
 			<column column="STUDENTS.ID">password</column>
+			<column column="STUDENTS.ENROLL_STATUS">is_active</column>
 			<column column="STUDENTS.ID">role_name</column>
+			<column column="U_STUDENTSUSERFIELDS.EMAILSTUDENT">email</column>
 			<column column="STUDENTS.ID">relationships</column>
 			<column column="STUDENTS.ID">pref_first_name</column>
 			<column column="STUDENTS.ID">pref_last_name</column>
-			<column column="U_STUDENTSUSERFIELDS.EMAILSTUDENT">email</column>
-			<column column="STUDENTS.ENROLL_STATUS">is_active</column>
  		</columns>
 		<!--SQL query in format <![CDATA[QUERY]]>-->
         <sql>
