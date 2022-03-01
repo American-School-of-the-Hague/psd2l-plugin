@@ -1,6 +1,56 @@
-# PowerSchool PowerQuery Plugins
+# D2L BrightSpace IPSIS exports from PowerSchool SIS
 
-## Basic Structure
+Feb/March 2022, Aaron Ciuffo
+
+## Outstanding Questions for D2L Implementation Team
+
+### IPSIS
+
+- [ ] Can we enable IPSIS on the Sandbox platform with the appropriate role and permissions?
+- [ ] How best to deal with `Deletion` events for students? 
+  - [ ] Is there a way to deactivate students -- how do active v. inactive students count against our licenses?
+- [ ] How do we trigger course deletion over IPSIS? End Date/Deliberate deletion
+  - [ ] Can we cause courses that have moved past end date to automatically go inactive?
+  - [ ] What happens when a course is not listed in the CSV?
+
+
+### CSV Issues
+
+- [ ] Not sure what to do with the `4-Templates` csv -- still unlcear of roles of "templates" in BSpace.
+- [ ] `5-Offerings` not sure how to handle `template_code` 
+- [ ] What character sets are valid? UTF-8 is in documentation; are accented characters acceptable?
+- [ ] Where do we assign ORG Units for Students, Teachers? 
+  - [ ] Is this done at the "template" level?
+- [ ] Can we have multiple files with for each CSV template? e.g: 7-Users_teachers.csv; 7-Users_students.csv?
+  - [ ] Potentially rename CSV export `7-Users_00_Teachers.csv` and `7_Users_01_Students.csv`
+- [ ] Guide indicates that we should only provide DELTAS; this may not be possible with our current technical level -- What support can you offer toward this end?
+
+
+
+### General Questions
+
+- [ ] We recycle usernames (e.g. ikim@ash has been used **many** times); Student Numbers are incremental and unique. Teacher ID *should* be unique. Can we switch to `org-defined-id` at this point?
+- [ ] We need an org unit for our ES Staff and Other Staff that are not members of HS or MS. What is the best way to handle this?
+- [ ] When should we delete courses? How can we ensure that teacher material is not lost?
+  - [ ] What costs are associated with keeping old courses for 1, 2, 3, forever years?
+
+
+## TASKS TO DO
+
+- [ ] Enable IPSIS on Sandbox
+  - [ ] Create roles
+  - [ ] Assign Permissions
+  - [ ] Set up email notifications (G. Workspace Integration)
+- [ ] Build script that zips up auto exported CSV
+  - [ ] Adds manifest.json
+  - [ ] 
+
+
+## Implementation Notes
+
+Exports are managed through PowerSchool PowerQuery Plugins. Plugins follow the structure outlined below. Each CSV Export for BrightSpace is managed through an individual plugin. Each plugin contains an SQL query that matches the required fields for the CSV.
+
+## Basic PowerQuery Plugin Structure
 
 Plugins must be zipped such that the `plugin.xml` file is at the root of the structure with no top level folder.
 
