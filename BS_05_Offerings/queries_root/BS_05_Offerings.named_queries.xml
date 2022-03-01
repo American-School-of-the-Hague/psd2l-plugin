@@ -30,9 +30,9 @@
 					TERMS.FIRSTDAY as "start_date",
 					TERMS.LASTDAY as "end_date",
 					/* set courses as inactive by default */
-					'' as "is_active",
+					0 as "is_active",
 					'' as "department_code",
-					'' as "template_code",
+					'Templ_'||CC.SCHOOLID||'_'||C.SCHED_DEPARTMENT as "code",
 					'term_'||cc.termid as "semester code",
 					'' as "offering_code",
 					'' as "custom_code"

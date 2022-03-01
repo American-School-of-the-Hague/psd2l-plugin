@@ -18,7 +18,8 @@ Powerschool &rarr; BrightSpace CSV Teacher and Staff Export for 07-Users
 
 **USES FIELDS:**
 
-`code` from [BS_03_Semesters](../BS_03_Semesters/3-Semesters_README.md) as `semester_code`
+- `code` from [BS_03_Semesters](../BS_03_Semesters/3-Semesters_README.md) as `semester_code`
+- `code` from [BS_04_Templates](../BS_04_Templates/4-Templates_README.md) as `template_code`
 
 
 ## Data Export Manager
@@ -69,7 +70,7 @@ Powerschool &rarr; BrightSpace CSV Teacher and Staff Export for 07-Users
 |name| C.COURSE_NAME | _IT Programming_ 
 |start_date| CC.ID | '' | N1
 |end_date| CC.ID | '' | N1
-|is_active| CC.ID | '' | N1
+|is_active| CC.ID | _0_ | N1
 |department_code| CC.ID | '' | N1
 |template_code| CC.ID | '' | N1
 |semester_code|   schoolid'\_term\_'cc.termid | _term_3102_ 
@@ -98,10 +99,10 @@ select distinct
     c.course_name as "name",
     TERMS.FIRSTDAY as "start_date",
     TERMS.LASTDAY as "end_date",
-    /* set courses as active by default */
-    '' as "is_active",
+    /* set courses as inactive by default */
+    0 as "is_active",
     '' as "department_code",
-    '' as "template_code",
+    'Templ_'||CC.SCHOOLID||'_'||C.SCHED_DEPARTMENT as "code",
     'term_'||cc.termid as "semester code",
     '' as "offering_code",
     '' as "custom_code"
