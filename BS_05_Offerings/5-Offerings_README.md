@@ -96,8 +96,8 @@ select distinct
     /* co_cc.schoolid_cc.course_number */
     'co_'||cc.schoolid||'_'||cc.course_number as "code",
     c.course_name as "name",
-    '' as "start_date",
-    '' as "end_date",
+    TERMS.FIRSTDAY as "start_date",
+    TERMS.LASTDAY as "end_date",
     '' as "is_active",
     '' as "department_code",
     '' as "template_code",
