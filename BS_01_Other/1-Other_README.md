@@ -13,7 +13,7 @@ Powerschool &rarr; BrightSpace CSV schools for 01-Other
 ## Data Export Manager
 
 - **Category:** Show All
-- **Export Form:**  com.txoof.brightspace.schools.schoolcode
+- **Export From:**  com.txoof.brightspace.schools.schoolcode
 
 ### Lables Used on Export
 
