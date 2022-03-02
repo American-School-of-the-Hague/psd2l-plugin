@@ -25,6 +25,7 @@ Exports are managed through PowerSchool PowerQuery Plugins. Plugins follow the s
 Each plugin needs to be configured to produce CSV files with the appropriate data, characterset and column headers. Each plugin documents the structure and settings under the **Data Export Manager** heading. See the `README.md` in each plugin directory for more details.
 
 The basic settings are as follows:
+
 1. Select Columns to Export:
    - **Category:** _Show All_
    - **Export From:** _NQ com.txoof.brightspace.table.area_ (see the DEM section in each readme)
@@ -130,15 +131,15 @@ sample:
 ```
 <plugin xmlns="http://plugin.powerschool.pearson.com"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		description="Powerquery Example"
-		name="PowerQuery Example (Birthdays)"
-		version="1.0"
-		xsi:schemaLocation="http://plugin.powerschool.pearson.com plugin.xsd">
-		
-	<publisher name="Your/Org Name">
-		<contact email="contact@host.tld"/>
-	</publisher>
-	
+        description="Powerquery Example"
+        name="PowerQuery Example (Birthdays)"
+        version="1.0"
+        xsi:schemaLocation="http://plugin.powerschool.pearson.com plugin.xsd">
+        
+    <publisher name="Your/Org Name">
+        <contact email="contact@host.tld"/>
+    </publisher>
+    
 </plugin>
 ```
 
