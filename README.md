@@ -2,55 +2,65 @@
 
 Feb/March 2022, Aaron Ciuffo
 
-## Outstanding Questions for D2L Implementation Team
-
-### IPSIS
-
-- [ ] Can we enable IPSIS on the Sandbox platform with the appropriate role and permissions?
-- [ ] How best to deal with `Deletion` events for students? 
-  - [ ] Is there a way to deactivate students -- how do active v. inactive students count against our licenses?
-- [ ] How do we trigger course deletion over IPSIS? End Date/Deliberate deletion
-  - [ ] Can we cause courses that have moved past end date to automatically go inactive?
-  - [ ] What happens when a course is not listed in the CSV?
-
-
-### CSV Issues
-
-- [ ] Not sure what to do with the `4-Templates` csv -- still unlcear of roles of "templates" in BSpace.
-- [ ] `5-Offerings` not sure how to handle `template_code` 
-- [ ] Consequences of setting `offerings` as inactive? 
-- [ ] What character sets are valid? UTF-8 is in documentation; are accented characters acceptable?
-- [ ] Where do we assign ORG Units for Students, Teachers? 
-  - [ ] Is this done at the "template" level?
-- [ ] Can we have multiple files with for each CSV template? e.g: 7-Users_teachers.csv; 7-Users_students.csv?
-  - [ ] Potentially rename CSV export `7-Users_00_Teachers.csv` and `7_Users_01_Students.csv`
-- [ ] Guide indicates that we should only provide DELTAS; this may not be possible with our current technical level -- What support can you offer toward this end?
-- [ ] how do we relate parents to students?
-
-
-
-### General Questions
-
-- [ ] We recycle usernames (e.g. ikim@ash has been used **many** times); Student Numbers are incremental and unique. Teacher ID *should* be unique. Can we switch to `org-defined-id` at this point?
-- [ ] We need an org unit for our ES Staff and Other Staff that are not members of HS or MS. What is the best way to handle this?
-- [ ] When should we delete courses? How can we ensure that teacher material is not lost?
-  - [ ] What costs are associated with keeping old courses for 1, 2, 3, forever years?
-
-
-## TASKS TO DO
-
-- [ ] Enable IPSIS on Sandbox
-  - [ ] Create roles
-  - [ ] Assign Permissions
-  - [ ] Set up email notifications (G. Workspace Integration)
-- [ ] Build script that zips up auto exported CSV
-  - [ ] Adds manifest.json
-  - [ ] 
-
-
 ## Implementation Notes
 
 Exports are managed through PowerSchool PowerQuery Plugins. Plugins follow the structure outlined below. Each CSV Export for BrightSpace is managed through an individual plugin. Each plugin contains an SQL query that matches the required fields for the CSV.
+
+## Setup and Installation
+
+### SIS Installation
+
+1. Download plugins from this GIT Repo; each plugin is stored as a .zip file
+   - See [list below](#list-of-plugins-and-functions) for all plugins and their fuctions
+2. Install plugins throught the _Plugin Management Dashboard_: 
+   - **Start Page > System Administrator > System Settings > Plugin Management Dashboard**
+   - If the plugin is already installed either choose to _Update_ or _Delete_ and reinstall using the .zip files
+3. Configure a template for automated export in [_Data Export Manager_](#data-export-manager-configuration)
+   - **Start Page > System Administrator > Page and Data Management > Data Export Manager**
+
+### Data Export Manager Configuration
+
+**Start Page > System Administrator > Page and Data Management > Data Export Manager**
+
+Each plugin needs to be configured to produce CSV files with the appropriate data, characterset and column headers. Each plugin documents the structure and settings under the **Data Export Manager** heading. See the `README.md` in each plugin directory for more details.
+
+The basic settings are as follows:
+1. Select Columns to Export:
+   - **Category:** _Show All_
+   - **Export From:** _NQ com.txoof.brightspace.table.area_ (see the DEM section in each readme)
+   - ![DEM Screen 00](./documentation/DEM_00.png)
+2. Select all of the fields:
+   - ![DEM Screen 01 - Fields](./documentation/DEM_01.png)
+3.  Remove the `TABLE.` portion in the _Labels used on Export_ for every column (highlighted in blue/red) and click _Next_
+   - ![DEM Screen 02 - labels](./documentation/DEM_02.png)
+4. On the following _Select/Edit Records from NQ - com.txoof.brightspace.table.area_ screen click _Next_
+    - No filtering should be needed
+5. On the following _Export Summary and Output Options_ screen set:
+   - **Export File Name**: _See README.md_ for filename format (e.g. `1-Other.csv`)
+   - **Line Delimiter**: `CR-LF`
+   - **Field Delimiter**: `Comma`
+   - **Character Set**: `UTF-8`
+6. Click _Save Template_; see the `README.md` for each plugin for specifics
+   - **Name**: BSpace 1-Other.csv Export
+   - **Description**: Updated: YYYY.MM.DD
+7. Click _Save as New_
+
+## Automated Exports
+
+TBD
+
+
+## List of Plugins and Functions
+- [BS_01_Other](./BS_01_Other/1-Other_README.md): Setup Schools
+- [BS_02_Departments](./BS_02_Departments/2-Departments_README.md): Set up Departments (ECC, UE, MS, HS)
+- [BS_03_Semesters](./BS_03_Semesters/3-Semesters_README.md): Set semesters (Year-Long, Semester, Quarters)
+- [BS_04_Templates](./BS_04_Templates/4-Templates_README.md): Create cotainers for Departments
+- [BS_05_Offerings](./BS_05_Offerings/5-Offerings_README.md): Set all active courses for the current term
+- [BS_06_Sections](./BS_06_Sections/6-Sections_README.md): Set all active sections for courses (e.g. A, B, C... Blocks)
+- [BS_07_Users_Students](./BS_07_Users_Students/7-Users_students_README.md): Create all student accounts (grades 5-12)
+- [BS_07_Users_Teachers](./BS_07_Users_Teachers/7-Users_teachers_README.md): Create all staff accounts (all staff with SIS Access)
+- [BS_08_Enrollments_Students](./BS_08_Enrollments_Students/8-Enrollments_students_README.md): Enroll students in courses and sections
+- [BS_08_Enrollments_Teachers](./BS_08_Enrollments_Teachers/8-Enrollments_Teachers_README.md): Enroll teachers in courses and sections
 
 ## Basic PowerQuery Plugin Structure
 
