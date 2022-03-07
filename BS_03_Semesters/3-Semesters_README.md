@@ -37,10 +37,10 @@ Powerschool &rarr; BrightSpace CSV Export for 03-Semesters
 
 #### Export Format
 
-- *Export File Name:* `3-Semesters.csv`
+- *Export File Name:* `3-Semesters-%d.csv`
 - *Line Delimiter:* `CR-LF`
 - *Field Delimiter:* `,`
-- *Character Set:* TBD
+- *Character Set:* UTF-8
 
 #### Export Options
 

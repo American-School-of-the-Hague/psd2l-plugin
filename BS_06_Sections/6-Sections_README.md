@@ -23,7 +23,7 @@ Powerschool &rarr; BrightSpace CSV Sections for 06_Sections
 ## Data Export Manager
 
 - **Category:** Show All
-- **Export Form:**  com.txoof.brightspace.courses.sections
+- **Export Form:**  com.txoof.brightspace.courses.sectionid
 
 ### Lables Used on Export
 
@@ -46,10 +46,10 @@ Powerschool &rarr; BrightSpace CSV Sections for 06_Sections
 
 #### Export Format
 
-- *Export File Name:* `BASE_PLUGIN.csv`
+- *Export File Name:* `6-sections-%d.csv`
 - *Line Delimiter:* `CR-LF`
 - *Field Delimiter:* `,`
-- *Character Set:* TBD
+- *Character Set:* UTF-8
 
 #### Export Options
 

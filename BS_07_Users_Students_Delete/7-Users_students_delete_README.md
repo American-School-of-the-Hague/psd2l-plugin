@@ -39,7 +39,7 @@ Powerschool &rarr; BrightSpace CSV Student Export for 07-Users: disable and dele
 
 #### Export Format
 
-- *Export File Name:* `7-Users.csv`
+- *Export File Name:* `7-Users_students_inactive-%d.csv`
 - *Line Delimiter:* `CR-LF`
 - *Field Delimiter:* `,`
 - *Character Set:* UTF-8

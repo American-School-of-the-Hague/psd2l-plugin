@@ -42,10 +42,10 @@ Powerschool &rarr; BrightSpace CSV active departments for 02-Departments
 
 #### Export Format
 
-- *Export File Name:* `BASE_PLUGIN.csv`
+- *Export File Name:* `2-Departments-%d.csv`
 - *Line Delimiter:* `CR-LF`
 - *Field Delimiter:* `,`
-- *Character Set:* TBD
+- *Character Set:* UTF-8
 
 #### Export Options
 

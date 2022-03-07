@@ -42,10 +42,10 @@ Powerschool &rarr; BrightSpace CSV active department-templates for 04-Templates
 
 #### Export Format
 
-- *Export File Name:* `4-Template.csv`
+- *Export File Name:* `4-Template-%d.csv`
 - *Line Delimiter:* `CR-LF`
 - *Field Delimiter:* `,`
-- *Character Set:* TBD
+- *Character Set:* UTF-8
 
 #### Export Options
 

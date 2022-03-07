@@ -48,10 +48,10 @@ Powerschool &rarr; BrightSpace CSV Teacher and Staff Export for 07-Users
 
 #### Export Format
 
-- *Export File Name:* `5-Offerings.csv`
+- *Export File Name:* `5-Offerings-%d.csv`
 - *Line Delimiter:* `CR-LF`
 - *Field Delimiter:* `,`
-- *Character Set:* TBD
+- *Character Set:* UTF-8
 
 #### Export Options
 

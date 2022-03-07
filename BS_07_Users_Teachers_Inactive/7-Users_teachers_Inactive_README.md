@@ -18,7 +18,7 @@ Powerschool &rarr; BrightSpace CSV Delete inactive Teachers and Staff Export for
 ## Data Export Manager
 
 - **Category:** Show All
-- **Export Form:**  com.txoof.brightspace.teachers.delete
+- **Export Form:**  com.txoof.brightspace.teachers.inactive
 
 ### Lables Used on Export
 
@@ -40,10 +40,10 @@ Powerschool &rarr; BrightSpace CSV Delete inactive Teachers and Staff Export for
 
 #### Export Format
 
-- *Export File Name:* `7-Users.csv`
+- *Export File Name:* `7-Users_teachers_inactive-%d.csv`
 - *Line Delimiter:* `CR-LF`
 - *Field Delimiter:* `,`
-- *Character Set:* TBD
+- *Character Set:* UTF-8
 
 #### Export Options
 

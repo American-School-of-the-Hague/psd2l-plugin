@@ -25,7 +25,7 @@ Powerschool &rarr; BrightSpace CSV Enrollments for 08-Enrollments
 ## Data Export Manager
 
 - **Category:** Show All
-- **Export Form:**  com.txoof.brightspace.students.student_number
+- **Export From:**  com.txoof.brightspace.teachers.teacher_number
 
 ### Lables Used on Export
 
@@ -41,10 +41,10 @@ Powerschool &rarr; BrightSpace CSV Enrollments for 08-Enrollments
 
 #### Export Format
 
-- *Export File Name:* `BASE_PLUGIN.csv`
+- *Export File Name:* `8-Enrollments_teachers-%d.csv`
 - *Line Delimiter:* `CR-LF`
 - *Field Delimiter:* `,`
-- *Character Set:* TBD
+- *Character Set:* UTF-8
 
 #### Export Options
 
