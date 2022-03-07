@@ -106,3 +106,40 @@ select
     and STUDENTS.GRADE_LEVEL >=5
  order by STUDENTS.GRADE_LEVEL ASC, STUDENTS.LAST_NAME ASC
 ```
+
+## Relationships
+```
+SELECT
+Students.LastFirst,
+students.student_number,
+'{'||listagg(PCAS_Account.Username || ',') WITHIN GROUP ( ORDER BY Guardian.LastName desc, Upper(Trim(Guardian.LastName)) ) as relationship
+
+
+FROM 
+Guardian Guardian
+
+INNER JOIN 
+GuardianStudent GuardianStudent 
+ON 
+Guardian.GuardianID = GuardianStudent.GuardianID
+
+INNER JOIN 
+Students Students 
+ON 
+GuardianStudent.studentsdcid = Students.dcid
+
+INNER JOIN 
+PCAS_Account PCAS_Account 
+ON 
+Guardian.AccountIdentifier = PCAS_Account.PCAS_AccountToken
+
+INNER JOIN 
+PCAS_EmailContact PCAS_EmailContact 
+ON 
+PCAS_Account.PCAS_AccountID = PCAS_EmailContact.PCAS_AccountID
+
+WHERE Students.enroll_status = 0
+
+GROUP BY Students.LastFirst, students.student_number
+ORDER BY Upper(Trim(Students.LastFirst))
+```
