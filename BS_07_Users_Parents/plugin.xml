@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- set description and name here; does not need to match others-->
+<plugin xmlns="http://plugin.powerschool.pearson.com"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		description="BrightSpace export: 07_Users for active parents w/ students in grades 5-13 com.txoof.brightspace.parents.usernames"
+		name="BrightSpace 07-User Parent Exp"
+		version="0.0.5.20220308"
+		xsi:schemaLocation="http://plugin.powerschool.pearson.com plugin.xsd">
+		
+	<publisher name="Aaron Ciuffo">
+		<contact email="aaron.ciuffo@gmail.com"/>
+	</publisher>
+	
+</plugin>
