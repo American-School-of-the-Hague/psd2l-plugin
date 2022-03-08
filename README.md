@@ -63,7 +63,17 @@ TBD
 - [BS_08_Enrollments_Students](./BS_08_Enrollments_Students/8-Enrollments_students_README.md): Enroll students in courses and sections
 - [BS_08_Enrollments_Teachers](./BS_08_Enrollments_Teachers/8-Enrollments_Teachers_README.md): Enroll teachers in courses and sections
 
-## Basic PowerQuery Plugin Structure
+## Plugin Documentation
+
+### Reference Documentation
+
+- [Plugins](https://support.powerschool.com/developer/#/page/plugins)
+- [Plugin XML](https://support.powerschool.com/developer/#/page/plugin-xml)
+- [Plugin Setup](https://support.powerschool.com/developer/#/page/plugin-zip)
+- [Permission Mapping](https://support.powerschool.com/developer/#/page/permission-mapping)
+- [PowerQueries](https://support.powerschool.com/developer/#/page/powerqueries)
+
+###  Basic PowerQuery Plugin Structure
 
 Plugins must be zipped such that the `plugin.xml` file is at the root of the structure with no top level folder.
 
