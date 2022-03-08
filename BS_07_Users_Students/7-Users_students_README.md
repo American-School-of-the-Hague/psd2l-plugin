@@ -108,13 +108,15 @@ select
 ```
 
 ## Relationships 
-This is the general model for student:parent relationships
+This is the general model for student:parent relationships; there is a trailing "," that may be a problem.
+
 
 ```
 SELECT
 Students.LastFirst,
 students.student_number,
-'{'||listagg('"keyname"'||chr(58)||PCAS_Account.Username || ',') WITHIN GROUP ( ORDER BY Guardian.LastName desc, Upper(Trim(Guardian.LastName)) )||'}' as relationship
+chr(91)||listagg('{"type"'||chr(58)||'"Parent", "Id"'||chr(58)||'"P_'||guardian.guardianid||'"},') WITHIN GROUP ( ORDER BY Guardian.LastName desc, Upper(Trim(Guardian.LastName)) )||chr(93) as relationship
+
 
 
 FROM 
@@ -130,6 +132,7 @@ Students Students
 ON 
 GuardianStudent.studentsdcid = Students.dcid
 
+/*
 INNER JOIN 
 PCAS_Account PCAS_Account 
 ON 
@@ -139,8 +142,10 @@ INNER JOIN
 PCAS_EmailContact PCAS_EmailContact 
 ON 
 PCAS_Account.PCAS_AccountID = PCAS_EmailContact.PCAS_AccountID
+*/
 
 WHERE Students.enroll_status = 0
+and students.grade_level >=5
 
 GROUP BY Students.LastFirst, students.student_number
 ORDER BY Upper(Trim(Students.LastFirst))
