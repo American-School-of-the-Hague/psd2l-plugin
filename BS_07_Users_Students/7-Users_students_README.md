@@ -107,12 +107,14 @@ select
  order by STUDENTS.GRADE_LEVEL ASC, STUDENTS.LAST_NAME ASC
 ```
 
-## Relationships
+## Relationships 
+This is the general model for student:parent relationships
+
 ```
 SELECT
 Students.LastFirst,
 students.student_number,
-'{'||listagg(PCAS_Account.Username || ',') WITHIN GROUP ( ORDER BY Guardian.LastName desc, Upper(Trim(Guardian.LastName)) ) as relationship
+'{'||listagg('"keyname"'||chr(58)||PCAS_Account.Username || ',') WITHIN GROUP ( ORDER BY Guardian.LastName desc, Upper(Trim(Guardian.LastName)) )||'}' as relationship
 
 
 FROM 
