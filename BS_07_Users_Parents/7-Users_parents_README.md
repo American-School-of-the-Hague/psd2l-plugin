@@ -55,17 +55,17 @@ Powerschool &rarr; BrightSpace CSV Student Export for 07-Users
 
 | header | table.field | value | NOTE |
 |-|-|-|-|
-|type| STUDENTS.ID | user | N1 |
-|action| STUDENTS.ID | UPDATE | N1 |
-|username| U_STUDENTSUSERFIELDS.EMAILSTUDENT | _bar@ash.nl_ |
-|org_define_id| STUDENTS.STUDENT_NUMBER | _S\_123456_ |
+|type| GUARDIAN.ID | user | N1 |
+|action| GUARDIAN.ID | UPDATE | N1 |
+|username|  | _bar@foo.com_ |
+|org_define_id|  | _P\_123456_ |
 |first_name| STUDENTS.FIRST_NAME | _Jane_ |
 |last_name| STUDENTS.LAST_NAME |_Doe_ | 
-|password| STUDENTS.ID | '' | N1 |
-|role_name| STUDENTS.ID | _Learner_ | N1 |
-|relationships| STUDENTS.ID | TBD | N1 |
-|pref_frist_name| STUDENTS.ID |TBD | N1 |
-|pref_last_name| STUDENTS.ID |TBD | N1 |
+|password| GUARDIAN.ID | '' | N1 |
+|role_name| GUARDIAN.ID | _Learner_ | N1 |
+|relationships| GUARDIAN.ID | TBD | N1 |
+|pref_frist_name| GUARDIAN.ID |TBD | N1 |
+|pref_last_name| GUARDIAN.ID |TBD | N1 |
 
 #### Notes
 
@@ -129,43 +129,4 @@ select distinct
   PCAS_Account.PCAS_AccountID = PCAS_EmailContact.PCAS_AccountID
 where Students.enroll_status = 0
 order by "org_defined_id"
-```
-
-## Relationships 
-This is the general model for student:parent relationships
-
-```
-SELECT
-Students.LastFirst,
-students.student_number,
-'{'||listagg('"keyname"'||chr(58)||PCAS_Account.Username || ',') WITHIN GROUP ( ORDER BY Guardian.LastName desc, Upper(Trim(Guardian.LastName)) )||'}' as relationship
-
-
-FROM 
-Guardian Guardian
-
-INNER JOIN 
-GuardianStudent GuardianStudent 
-ON 
-Guardian.GuardianID = GuardianStudent.GuardianID
-
-INNER JOIN 
-Students Students 
-ON 
-GuardianStudent.studentsdcid = Students.dcid
-
-INNER JOIN 
-PCAS_Account PCAS_Account 
-ON 
-Guardian.AccountIdentifier = PCAS_Account.PCAS_AccountToken
-
-INNER JOIN 
-PCAS_EmailContact PCAS_EmailContact 
-ON 
-PCAS_Account.PCAS_AccountID = PCAS_EmailContact.PCAS_AccountID
-
-WHERE Students.enroll_status = 0
-
-GROUP BY Students.LastFirst, students.student_number
-ORDER BY Upper(Trim(Students.LastFirst))
 ```
