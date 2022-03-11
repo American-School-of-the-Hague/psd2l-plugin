@@ -105,23 +105,33 @@ Defined in `./plugin.xml`. See [Plugin XML Article](https://support.powerschool.
 
 ### `plugin`
 
-`xmlns`: defines the namespace of the tags that are acceptible in this plugin
+#### `xmlns`: 
+defines the namespace of the tags that are acceptible in this plugin
 
 example: `xmlns="http://plugin.powerschool.pearson.com"`
 
-`description`: Human readable description that will appear in plugin manager screen
+#### `description`: 
+Human readable description that will appear in plugin manager screen
 
-example: `description="example plugin"`
+example: `description="example plugin, does xyz -- tld.domain.app.area.fields <-- this helps users locate in the DEM manu"`
 
-`xmlns:xsi`: scheme to validate this XML document agains
+#### `name`: 
+Name of plugin that appears in plugin menu (`https://<powerschool instance>/admin/pluginconsole/plugInConsole.action`). **NOTE** the name may only be 40 characters or less. Longer names will result in various errors when installing plugins.
+
+example: `name="PowerQuery Example (Birthdays)"`
+
+#### `xmlns:xsi`: 
+scheme to validate this XML document agains
 
 example: `xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"`
 
-`version`: Version number of plugin. Must consist entirely of charset [0-9.].
+#### `version`: 
+Version number of plugin. Must consist entirely of charset [0-9.].
 
 example: `version="1.0.2.22`
 
-`xsi:schemaLocation`:  Schema document, plugin.xsd, against which to validate the XML document for the target namespace http://plugin.powerschool.pearson.com.
+#### `xsi:schemaLocation`:  
+Schema document, plugin.xsd, against which to validate the XML document for the target namespace http://plugin.powerschool.pearson.com.
 
 example: `xsi:schemaLocation="http://plugin.powerschool.pearson.com plugin.xsd"`
 
@@ -129,15 +139,17 @@ example: `xsi:schemaLocation="http://plugin.powerschool.pearson.com plugin.xsd"`
 
 Plublisher contact information displayed in plugin manager screen.
 
-`name`: Publisher or Plublishing organization name
+#### `name`: 
+Publisher or Plublishing organization name
 
 example: `name="Monty Python`
 
-`contact email`: email contact for publisher
+#### `contact email`: 
+email contact for publisher
 
 example: `<contact email=mpython@host.tld`/> 
 
-sample:
+#### sample:
 ```
 <plugin xmlns="http://plugin.powerschool.pearson.com"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
