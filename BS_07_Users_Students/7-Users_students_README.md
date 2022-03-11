@@ -117,12 +117,14 @@ This provides the basic format for the relationships field
 SELECT
     'user' as "type",
     'UPDATE' as "action",
+    u_studentsuserfields.emailstudent as "username",
     'S_'||students.student_number as "org_defined_id",
     students.first_name as "first_name",
     students.last_name as "last_name",
     '' as "password",
     1 as "is_active",
-    'Leaner' as "role_name",    
+    'Leaner' as "role_name",
+    u_studentsuserfields.emailstudent as "email",
     chr(91)||listagg('{"type"'||chr(58)||'"Parent", "Id"'||chr(58)||'"P_'||guardian.guardianid||'"}, ') WITHIN GROUP ( ORDER BY Guardian.LastName desc )||chr(93) as "relationship",
     '' as "pref_last_name",
     '' as "pref_first_name"
@@ -148,7 +150,7 @@ WHERE
     Students.enroll_status = 0
     and students.grade_level >=5
 
-GROUP BY students.student_number, students.first_name, students.last_name
+GROUP BY students.student_number, students.first_name, students.last_name, u_studentsuserfields.emailstudent
 ORDER BY "org_defined_id"
 ```
 
