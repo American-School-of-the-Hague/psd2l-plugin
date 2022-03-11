@@ -22,30 +22,42 @@
 		<!--SQL query in format <![CDATA[QUERY]]>-->
         <sql>
 			<![CDATA[
-				select 
-					'user' as "type",
-					'UPDATE' as "action",
-					REGEXP_REPLACE(U_STUDENTSUSERFIELDS.EMAILSTUDENT, '(^.*)(@.*)', '\1') as "username",
-					/* use student number as unique id - we recycle email addresses and this causes issues */
-					/* prepend a 'S" to the number to distinguish between students & teachers */
-					'S_'||STUDENTS.STUDENT_NUMBER as "org_defined_id",
-					STUDENTS.FIRST_NAME as "first_name",
-					STUDENTS.LAST_NAME as "last_name",
-					'' as "password",
-					(CASE STUDENTS.ENROLL_STATUS
-						WHEN 0 THEN 1
-						ELSE NULL END) as "is_active",
-					'Learner' as "role_name",
-					U_STUDENTSUSERFIELDS.EMAILSTUDENT as "email",
-					'' as "relationships",
-					'' as "pref_first_name",
-					'' as "pref_last_name"
-				from U_STUDENTSUSERFIELDS U_STUDENTSUSERFIELDS,
-					STUDENTS STUDENTS 
-				where STUDENTS.DCID=U_STUDENTSUSERFIELDS.STUDENTSDCID
-					and STUDENTS.ENROLL_STATUS =0
-					and STUDENTS.GRADE_LEVEL >=5
-				order by STUDENTS.GRADE_LEVEL ASC, STUDENTS.LAST_NAME ASC
+			SELECT
+				'user' as "type",
+				'UPDATE' as "action",
+				'S_'||students.student_number as "org_defined_id",
+				students.first_name as "first_name",
+				students.last_name as "last_name",
+				'' as "password",
+				1 as "is_active",
+				'Leaner' as "role_name",    
+				chr(91)||listagg('{"type"'||chr(58)||'"Parent", "Id"'||chr(58)||'"P_'||guardian.guardianid||'"}, ') WITHIN GROUP ( ORDER BY Guardian.LastName desc )||chr(93) as "relationship",
+				'' as "pref_last_name",
+				'' as "pref_first_name"
+				FROM 
+			Guardian Guardian
+			
+			INNER JOIN 
+			GuardianStudent GuardianStudent 
+			ON 
+			Guardian.GuardianID = GuardianStudent.GuardianID
+			
+			INNER JOIN 
+			Students Students 
+			ON 
+			GuardianStudent.studentsdcid = Students.dcid
+			
+			INNER JOIN
+			U_STUDENTSUSERFIELDS U_STUDENTSUSERFIELDS
+			ON
+			U_STUDENTSUSERFIELDS.STUDENTSDCID = students.dcid
+			
+			WHERE 
+				Students.enroll_status = 0
+				and students.grade_level >=5
+			
+			GROUP BY students.student_number, students.first_name, students.last_name
+			ORDER BY "org_defined_id"
 			]]>
         </sql>
     </query>

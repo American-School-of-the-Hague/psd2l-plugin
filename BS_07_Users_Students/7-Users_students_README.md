@@ -107,9 +107,53 @@ select
  order by STUDENTS.GRADE_LEVEL ASC, STUDENTS.LAST_NAME ASC
 ```
 
-## Relationships 
+### Relationships 
 This is the general model for student:parent relationships; there is a trailing "," that may be a problem.
 
+
+This provides the basic format for the relationships field
+
+```
+SELECT
+    'user' as "type",
+    'UPDATE' as "action",
+    'S_'||students.student_number as "org_defined_id",
+    students.first_name as "first_name",
+    students.last_name as "last_name",
+    '' as "password",
+    1 as "is_active",
+    'Leaner' as "role_name",    
+    chr(91)||listagg('{"type"'||chr(58)||'"Parent", "Id"'||chr(58)||'"P_'||guardian.guardianid||'"}, ') WITHIN GROUP ( ORDER BY Guardian.LastName desc )||chr(93) as "relationship",
+    '' as "pref_last_name",
+    '' as "pref_first_name"
+    FROM 
+Guardian Guardian
+
+INNER JOIN 
+GuardianStudent GuardianStudent 
+ON 
+Guardian.GuardianID = GuardianStudent.GuardianID
+
+INNER JOIN 
+Students Students 
+ON 
+GuardianStudent.studentsdcid = Students.dcid
+
+INNER JOIN
+U_STUDENTSUSERFIELDS U_STUDENTSUSERFIELDS
+ON
+U_STUDENTSUSERFIELDS.STUDENTSDCID = students.dcid
+
+WHERE 
+    Students.enroll_status = 0
+    and students.grade_level >=5
+
+GROUP BY students.student_number, students.first_name, students.last_name
+ORDER BY "org_defined_id"
+```
+
+
+### NOPE NOPE NOPE NOPE
 
 ```
 SELECT
