@@ -90,7 +90,7 @@ Powerschool &rarr; BrightSpace CSV Teacher and Staff Export for 07-Users
 |TERMS|
 
 ### SQL
-```
+```SQL
 select distinct
     'course offering' as "type",
     'UPDATE' as "action",

@@ -85,7 +85,7 @@ Powerschool &rarr; BrightSpace CSV active department-templates for 04-Templates
 
 ### SQL
 
-```
+```SQL
 select distinct
     'department' as "type",
     'UPDATE' as "action",

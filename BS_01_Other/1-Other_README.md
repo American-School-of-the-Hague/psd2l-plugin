@@ -18,8 +18,6 @@ Powerschool &rarr; BrightSpace CSV schools for 01-Other
 ### Lables Used on Export
 
 | Label |
-
-| Label |
 |-|
 |type|
 |action|

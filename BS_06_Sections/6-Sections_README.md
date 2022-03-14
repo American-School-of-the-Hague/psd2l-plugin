@@ -89,7 +89,7 @@ Powerschool &rarr; BrightSpace CSV Sections for 06_Sections
 
 ### SQL
 
-```
+```SQL
 select distinct
     'course section' as "type",
     'UPDATE' as "action",

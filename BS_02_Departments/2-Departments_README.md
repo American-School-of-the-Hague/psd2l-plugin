@@ -22,8 +22,6 @@ Powerschool &rarr; BrightSpace CSV active departments for 02-Departments
 ### Lables Used on Export
 
 | Label |
-
-| Label |
 |-|
 |type|
 |action|
@@ -85,7 +83,7 @@ Powerschool &rarr; BrightSpace CSV active departments for 02-Departments
 
 ### SQL
 
-```
+```SQL
 select distinct
     'department' as "type",
     'UPDATE' as "action",

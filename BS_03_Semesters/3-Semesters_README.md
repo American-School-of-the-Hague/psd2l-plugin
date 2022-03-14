@@ -78,7 +78,7 @@ Powerschool &rarr; BrightSpace CSV Export for 03-Semesters
 
 ### SQL
 
-```
+```SQL
 select
   'semester' as "type",
   'UPDATE' as "action",
