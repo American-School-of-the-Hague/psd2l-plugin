@@ -1,0 +1,43 @@
+<queries>
+	<!--set name here (also applies to permissions_root-->
+    <query name="com.txoof.brightspace.org.01other" coreTable="SCHOOLS" flattened="false">
+		<!--add description here-->
+        <description>active students</description>
+		<!--number of columns here must match number sql returns-->
+        <columns>
+			<column column="SCHOOLS.ID">type</column>
+			<column column="SCHOOLS.ID">action</column>
+			<column column="SCHOOLS.SCHOOL_NUMBER">code</column>
+			<column column="SCHOOLS.NAME">name</column>
+			<column column="SCHOOLS.ID">start_date</column>
+			<column column="SCHOOLS.ID">end_date</column>
+			<column column="SCHOOLS.ID">is_active</column>
+			<column column="SCHOOLS.ID">department_code</column>
+			<column column="SCHOOLS.ID">template_code</column>
+			<column column="SCHOOLS.ID">semester_code</column>
+			<column column="SCHOOLS.ID">offering_code</column>
+			<column column="SCHOOLS.ID">custom_code</column>
+ 		</columns>
+		<!--SQL query in format <![CDATA[QUERY]]>-->
+        <sql>
+			<![CDATA[
+				select
+					'school' as "type",
+					'UPDATE' as "action",
+					SCHOOLS.SCHOOL_NUMBER as "code",
+					SCHOOLS.NAME as "name",
+					'' as "start_date",
+					'' as "end_date",
+					'' as "is_active",
+					'' as "department_code",
+					'' as "template_code",
+					'' as "semester_code",
+					'' as "offering_code",
+					'' as "custom_code"
+				from SCHOOLS SCHOOLS
+				order by "code" asc	
+			]]>
+        </sql>
+    </query>
+
+</queries>

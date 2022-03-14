@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- set description and name here; does not need to match others-->
+<plugin xmlns="http://plugin.powerschool.pearson.com"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		description="BrightSpace Organizational Export (Other, Departments, Semesters, Templates, Offerings, Sections)"
+		name="BrightSpace Organization Export"
+		version="1.0.1.20220314"
+		xsi:schemaLocation="http://plugin.powerschool.pearson.com plugin.xsd">
+		
+	<publisher name="Aaron Ciuffo">
+		<contact email="aaron.ciuffo@gmail.com"/>
+	</publisher>
+</plugin>
