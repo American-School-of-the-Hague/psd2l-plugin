@@ -1,0 +1,51 @@
+<queries>
+	<!--set name here (also applies to permissions_root-->
+    <query name="com.txoof.brightspace.teachers.teacher_number" coreTable="TEACHERS" flattened="false">
+		<!--add description here-->
+        <description>active students</description>
+		<!--number of columns here must match number sql returns-->
+        <columns>
+			<column column="TEACHERS.ID">type</column>
+			<column column="TEACHERS.ID">action</column>
+			<column column="TEACHERS.ID">child_code</column>
+			<column column="CC.ID">role_name</column>
+			<column column="CC.schoolid">parent_code</column>
+ 		</columns>
+		<!--SQL query in format <![CDATA[QUERY]]>-->
+        <sql>
+			<![CDATA[
+				select distinct
+					'enrollment' as "type",
+					'UPDATE' as "action",
+					'T_'||TEACHERS.ID as "child_code",
+					'Instructor' as "role_name",
+					'cs_'||CC.SCHOOLID||'_'||cc.COURSE_NUMBER||'_'||CC.TERMID||'_'||DECODE(substr(cc.expression, 1, 1), 
+					1, 'A', 
+					2, 'B', 
+					3, 'C', 
+					4, 'D', 
+					5, 'E', 
+					6, 'F', 
+					7, 'G', 
+					8, 'H', 
+					9, 'ADV', 
+					'UNKNOWN') as "parent_code"
+				from CC CC,
+					STUDENTS STUDENTS,
+					TEACHERS TEACHERS 
+				where CC.STUDENTID=STUDENTS.ID
+					and CC.TEACHERID=TEACHERS.ID
+					and STUDENTS.ENROLL_STATUS =0
+					and TEACHERS.STATUS =1
+					and cc.termid >= case 
+					when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
+					THEN (EXTRACT(year from sysdate)-2000+9)*100
+					when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
+					THEN (EXTRACT(year from sysdate)-2000+10)*100
+					end
+				order by "child_code" asc, "parent_code" asc
+			]]>
+        </sql>
+    </query>
+
+</queries>

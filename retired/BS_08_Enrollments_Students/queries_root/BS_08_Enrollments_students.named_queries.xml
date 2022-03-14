@@ -1,0 +1,59 @@
+<queries>
+	<!--set name here (also applies to permissions_root-->
+    <query name="com.txoof.brightspace.students.student_number" coreTable="cc" flattened="false">
+		<!--add description here-->
+        <description>active students</description>
+		<!--number of columns here must match number sql returns-->
+        <columns>
+			<column column="CC.ID">type</column>
+			<column column="CC.ID">action</column>
+			<column column="STUDENTS.STUDENT_NUMBER">child_code</column>
+			<column column="CC.ID">role_name</column>
+			<column column="CC.schoolid">parent_code</column>
+ 		</columns>
+		<!--SQL query in format <![CDATA[QUERY]]>-->
+        <sql>
+			<![CDATA[
+				select 
+					'enrollment' as "type",
+					'UPDATE' as "action",
+					/* using 7-Users:org_defined_id as child_code */
+					'S_'||STUDENTS.STUDENT_NUMBER as "child_code",
+					/* REGEXP_REPLACE(U_STUDENTSUSERFIELDS.EMAILSTUDENT, '(^.*)(@.*)', '\1') as "child_code", */
+					'Learner' as "role_name",
+					/* using 6-Sections:code as parent_code */
+					'cs_'||cc.schoolid||'_'||cc.course_number||'_'||cc.TermID||'_'||DECODE(substr(cc.expression, 1, 1), 
+					1, 'A', 
+					2, 'B', 
+					3, 'C', 
+					4, 'D', 
+					5, 'E', 
+					6, 'F', 
+					7, 'G', 
+					8, 'H', 
+					9, 'ADV', 
+					'UNKNOWN') as "parent_code"
+				from 
+					/* U_STUDENTSUSERFIELDS U_STUDENTSUSERFIELDS, */
+					SECTIONS SECTIONS,
+					COURSES COURSES,
+					CC CC,
+					STUDENTS STUDENTS 
+				where CC.STUDENTID=STUDENTS.ID
+					and COURSES.COURSE_NUMBER=CC.COURSE_NUMBER
+					and SECTIONS.ID=CC.SECTIONID
+					/* and U_STUDENTSUSERFIELDS.STUDENTSDCID=STUDENTS.DCID */ 
+					and STUDENTS.ENROLL_STATUS =0
+					and STUDENTS.GRADE_LEVEL >=5
+					and CC.TERMID >= case 
+					when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
+					THEN (EXTRACT(year from sysdate)-2000+9)*100
+					when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
+					THEN (EXTRACT(year from sysdate)-2000+10)*100
+					end
+				order by STUDENTS.GRADE_LEVEL ASC, STUDENTS.LASTFIRST ASC, SECTIONS.SECTION_NUMBER ASC
+			]]>
+        </sql>
+    </query>
+
+</queries>

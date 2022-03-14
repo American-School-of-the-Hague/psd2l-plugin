@@ -1,0 +1,67 @@
+<queries>
+	<!--set name here (also applies to permissions_root-->
+    <query name="com.txoof.brightspace.students.usernames" coreTable="students" flattened="false">
+		<!--add description here-->
+        <description>export all active students grades 5-13 for use with a BrightSpace 7-User import</description>
+		<!--number of columns here must match number sql returns-->
+        <columns>
+			<column column="STUDENTS.ID">type</column> <!-- for columns not in database use a core filed-->
+			<column column="STUDENTS.ID">action</column> <!-- for columns not in database use a core filed-->
+			<column column="U_STUDENTSUSERFIELDS.EMAILSTUDENT">username</column> 
+			<column column="STUDENTS.ID">org_defined_id</column>
+			<column column="STUDENTS.FIRST_NAME">first_name</column>
+			<column column="STUDENTS.LAST_NAME">last_name</column>
+			<column column="STUDENTS.ID">password</column>
+			<column column="STUDENTS.ENROLL_STATUS">is_active</column>
+			<column column="STUDENTS.ID">role_name</column>
+			<column column="U_STUDENTSUSERFIELDS.EMAILSTUDENT">email</column>
+			<column column="STUDENTS.ID">relationships</column>
+			<column column="STUDENTS.ID">pref_first_name</column>
+			<column column="STUDENTS.ID">pref_last_name</column>
+ 		</columns>
+		<!--SQL query in format <![CDATA[QUERY]]>-->
+        <sql>
+			<![CDATA[
+			SELECT
+				'user' as "type",
+				'UPDATE' as "action",
+				u_studentsuserfields.emailstudent as "username",
+				'S_'||students.student_number as "org_defined_id",
+				students.first_name as "first_name",
+				students.last_name as "last_name",
+				'' as "password",
+				1 as "is_active",
+				'Leaner' as "role_name",
+				u_studentsuserfields.emailstudent as "email",
+				chr(91)||listagg('{"type"'||chr(58)||'"Parent", "Id"'||chr(58)||'"P_'||guardian.guardianid||'"}, ') WITHIN GROUP ( ORDER BY Guardian.LastName desc )||chr(93) as "relationship",
+				'' as "pref_last_name",
+				'' as "pref_first_name"
+				FROM 
+			Guardian Guardian
+
+			INNER JOIN 
+			GuardianStudent GuardianStudent 
+			ON 
+			Guardian.GuardianID = GuardianStudent.GuardianID
+
+			INNER JOIN 
+			Students Students 
+			ON 
+			GuardianStudent.studentsdcid = Students.dcid
+
+			INNER JOIN
+			U_STUDENTSUSERFIELDS U_STUDENTSUSERFIELDS
+			ON
+			U_STUDENTSUSERFIELDS.STUDENTSDCID = students.dcid
+
+			WHERE 
+				Students.enroll_status = 0
+				and students.grade_level >=5
+
+			GROUP BY students.student_number, students.first_name, students.last_name, u_studentsuserfields.emailstudent
+			ORDER BY "org_defined_id"
+			]]>
+        </sql>
+    </query>
+
+</queries>
