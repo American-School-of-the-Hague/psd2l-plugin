@@ -164,7 +164,7 @@ There are two separate Named Queries (NQ) for parents, one for mother and one fo
 ### Data Export Manager Setup
 
 - **Category:** Show All
-- **Export From:**  `NQ com.txoof.brightspace.users.07_mactive|07_factive`
+- **Export From:**  `NQ com.txoof.brightspace.users.07m_active|07f_active`
 
 **Labels Used on Export**
 

@@ -219,7 +219,7 @@ select distinct
 ### Data Export Manager Setup
 
 - **Category:** Show All
-- **Export From:**  `NQ com.txoof.brightpspace.org.03offerings`
+- **Export From:**  `NQ com.txoof.brightpspace.org.03semesters`
 
 **Labels Used on Export**
 

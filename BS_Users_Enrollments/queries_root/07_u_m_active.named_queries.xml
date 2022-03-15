@@ -1,6 +1,6 @@
 <queries>
 	<!--set name here (also applies to permissions_root-->
-    <query name="com.txoof.brightspace.users.07_mactive" coreTable="guardian" flattened="false">
+    <query name="com.txoof.brightspace.users.07m_active" coreTable="guardian" flattened="false">
 		<!--add description here-->
         <description>export all active parents grades 5-13 for use with a BrightSpace 7-User import</description>
 		<!--number of columns here must match number sql returns-->

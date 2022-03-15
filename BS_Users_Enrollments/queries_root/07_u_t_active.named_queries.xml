@@ -1,6 +1,6 @@
 <queries>
 	<!--set name here (also applies to permissions_root-->
-    <query name="com.txoof.brightspace.users.07t_active" coreTable="teachers" flattened="false">
+    <query name="com.txoof.brightspace.users.07t_active" coreTable="teachers" flattened="true">
 		<!--add description here-->
         <description>export all active teachers for use with a BrightSpace 7-User import</description>
 		<!--number of columns here must match number sql returns-->

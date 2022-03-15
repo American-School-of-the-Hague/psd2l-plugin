@@ -3,6 +3,6 @@
   <!--Anyone that has access to the following page can run this query-->
   <permission name='/admin/home.html'>
   <!--.../query/BASE_PLUGIN should be identical to `name` in named_queries.xml-->
-	<implies allow="post">/ws/schema/query/com.txoof.brightspace.users.07factive</implies>
+	<implies allow="post">/ws/schema/query/com.txoof.brightspace.users.07f_active</implies>
   </permission>
 </permission_mappings>
