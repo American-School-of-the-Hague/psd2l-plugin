@@ -46,9 +46,22 @@ The basic settings are as follows:
    - **Description**: `Updated: YYYY.MM.DD`
 7. Click _Save as New_
 
-## Automated Exports
+## Automated Exports from PSL to BrightSpace
 
-TBD
+### In Progress Notes
+
+BrightSpace accepts imports via IPSIS. IPSIS expects flat zip files with at minimum 8 CSV files (1-Other, 2-Departments, 3-Semesters, 4-Templates, 5-Offerings, 6-Sections, 7-Users, 8-Enrollments) and a `manifest.json`. 
+
+`manifest.json`
+
+```JSON
+{
+  "version":"2.0"
+}
+```
+
+Files are sent to IPSIS via SFTP. Find SFTP details within the platform [here](https://lms.ash.nl/d2l/im/ipsis/admin/console/integration/3/dashboard)
+
 
 ## List of Plugins and Functions
 
