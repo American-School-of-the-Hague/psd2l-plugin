@@ -232,6 +232,8 @@ There are two separate Named Queries (NQ) for parents, one for mother and one fo
 
 Both mother and father query depend on u_studentuserfields.mother_firstanme|father_firstname be exactly equal to guardian.firstname. u_studentuserfields is populated via an e-collect form by parents. It is unclear how the guardian fields are populated, so this may break in the future. `¯\_(ツ)_/¯`
 
+Remember to update the mother and father Named Query files if any changes are made.
+
 ```SQL:
 select distinct
     'user' as "type",
@@ -260,6 +262,7 @@ where U_STUDENTSUSERFIELDS.STUDENTSDCID=STUDENTS.DCID
     */
     and trim(guardian.firstname)=trim(u_studentsuserfields.mother_firstname)
     and trim(guardian.lastname)=trim(u_studentsuserfields.mother_lastname)
+    and LENGTH(U_STUDENTSUSERFIELDS.EMAILMOTHER) >0
     and STUDENTS.ENROLL_STATUS =0
     and students.grade_level >=5
 order by "org_defined_id" asc
