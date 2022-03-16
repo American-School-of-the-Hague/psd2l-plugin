@@ -146,7 +146,7 @@ select
 
 | header | table.field | value | NOTE |
 |-|-|-|-|
-|type| CC.ID | _department_ | N1
+|type| CC.ID | _course template_ | N1
 |action| CC.ID |_UPDATE_ | N1
 |code| COURSES.SCHED_DEPARTMENT | _3\_HSPerArts_ |
 |name| COURSES.SCHED_DEPARTMENT | _HSPerArts_ |
@@ -175,7 +175,7 @@ select
 
 ```SQL
 select distinct
-    'department' as "type",
+    'course template' as "type",
     'UPDATE' as "action",
     CC.SCHOOLID||'_'||COURSES.SCHED_DEPARTMENT as "code",
     COURSES.SCHED_DEPARTMENT as "name",

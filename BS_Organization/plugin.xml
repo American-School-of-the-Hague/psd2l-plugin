@@ -4,7 +4,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		description="BrightSpace Organizational Export (Other, Departments, Semesters, Templates, Offerings, Sections)"
 		name="BrightSpace Organization Export"
-		version="1.0.4.20220315"
+		version="1.0.5.20220316"
 		xsi:schemaLocation="http://plugin.powerschool.pearson.com plugin.xsd">
 		
 	<publisher name="Aaron Ciuffo">
