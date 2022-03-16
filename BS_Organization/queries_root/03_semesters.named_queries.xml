@@ -21,7 +21,7 @@
 		<!--SQL query in format <![CDATA[QUERY]]>-->
         <sql>
 			<![CDATA[
-				select
+				select distinct
 					'semester' as "type",
 					'UPDATE' as "action",
 					'term_'||TERMS.ID as "code",
