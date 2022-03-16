@@ -447,7 +447,7 @@ select distinct
 select DISTINCT
     'user' as "type",
     'UPDATE' as "action",
-    REGEXP_REPLACE(TEACHERS.EMAIL_ADDR, '(^.*)(@.*)', '\1') as "username",
+    TEACHERS.EMAIL_ADDR as "username",
     /* prepend a 'T' to make sure there are no studentid/teacherid colissions */
     'T_'||TEACHERS.TEACHERNUMBER as "org_defined_id",
     TEACHERS.FIRST_NAME as "first_name",
