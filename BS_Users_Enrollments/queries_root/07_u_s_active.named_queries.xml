@@ -31,7 +31,7 @@
 				students.last_name as "last_name",
 				'' as "password",
 				1 as "is_active",
-				'Leaner' as "role_name",
+				'Learner' as "role_name",
 				u_studentsuserfields.emailstudent as "email",
 				listagg('Parent'||chr(58)||'P_'||guardian.guardianid, chr(124)) WITHIN GROUP ( ORDER BY Guardian.LastName desc ) as "relationship",
 				'' as "pref_last_name",

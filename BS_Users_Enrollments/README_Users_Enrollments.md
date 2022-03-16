@@ -676,7 +676,7 @@ SELECT
     students.last_name as "last_name",
     '' as "password",
     1 as "is_active",
-    'Leaner' as "role_name",
+    'Learner' as "role_name",
     u_studentsuserfields.emailstudent as "email",
     chr(91)||listagg('{"type"'||chr(58)||'"Parent", "Id"'||chr(58)||'"P_'||guardian.guardianid||'"}', ', ') WITHIN GROUP ( ORDER BY Guardian.LastName desc )||chr(93) as "relationship",
     '' as "pref_last_name",
