@@ -22,12 +22,12 @@
 		<!--SQL query in format <![CDATA[QUERY]]>-->
         <sql>
 			<![CDATA[
-				select 
+			select DISTINCT
 				'user' as "type",
 				'UPDATE' as "action",
 				REGEXP_REPLACE(TEACHERS.EMAIL_ADDR, '(^.*)(@.*)', '\1') as "username",
 				/* prepend a 'T' to make sure there are no studentid/teacherid colissions */
-				'T_'||TEACHERS.ID as "org_defined_id",
+				'T_'||TEACHERS.TEACHERNUMBER as "org_defined_id",
 				TEACHERS.FIRST_NAME as "first_name",
 				TEACHERS.LAST_NAME as "last_name",
 				'' as "password",

@@ -279,7 +279,7 @@ order by "org_defined_id" asc
 
 |Field |Format |example |
 |:-|:-|:-|
-|`org_defined_id`| `T_`_`TEACHERS.ID`_ | T_123456
+|`org_defined_id`| `T_`_`TEACHERS.TEACHERNUMBER`_ | T_123456
 
 **USES FIELDS:**
 
@@ -324,11 +324,11 @@ order by "org_defined_id" asc
 |type| TEACHERS.ID | user | N1 |
 |action| TEACHERS.ID | UPDATE | N1 |
 |username| TEACHERS.EMAIL_ADDR |_foo@ash.nl_ |
-|org_define_id| TEACHERS.ID | _T\_234_ |
+|org_define_id| TEACHERS.TEACHERNUMBER | _T\_234_ |
 |first_name| TEACHERS.FIRST_NAME | _John_ |
 |last_name| TEACHERS.LAST_NAME |_Doe_ | 
 |password| TEACHERS.ID | '' | N1 |
-|role_name| TEACHER.ID | _Learner_ | N1 |
+|role_name| TEACHERS.ID | _Learner_ | N1 |
 |relationships| TEACHERS.ID | TBD | N1 |
 |pref_frist_name| TEACHERS.ID |TBD | N1 |
 |pref_last_name| TEACHERS.ID |TBD | N1 |
@@ -342,8 +342,7 @@ order by "org_defined_id" asc
 
 | Table |
 |-|
-|STUDENTS|
-|U_STUDENTSUSERFIELDS|
+|TEACHERS|
 
 **SQL Query**
 
@@ -352,9 +351,9 @@ Delete staff that are not "active" (STATUS != 1)
 select distinct
     'user' as "type",
     'UPDATE' as "action",
-    REGEXP_REPLACE(TEACHERS.EMAIL_ADDR, '(^.*)(@.*)', '\1') as "username",
+    TEACHERS.EMAIL_ADDR as "username",
     /* prepend a 'T' to make sure there are no studentid/teacherid colisions */
-    'T_'||TEACHERS.ID as "org_defined_id",
+    'T_'||TEACHERS.TEACHERNUMBER as "org_defined_id",
     TEACHERS.FIRST_NAME as "first_name",
     TEACHERS.LAST_NAME as "last_name",
     '' as "password",
@@ -427,7 +426,7 @@ select distinct
 |first_name| TEACHERS.FIRST_NAME | _John_ |
 |last_name| TEACHERS.LAST_NAME |_Doe_ | 
 |password| TEACHERS.ID | '' | N1 |
-|role_name| TEACHER.ID | _Learner_ | N1 |
+|role_name| TEACHERS.ID | _Learner_ | N1 |
 |relationships| TEACHERS.ID | TBD | N1 |
 |pref_frist_name| TEACHERS.ID |TBD | N1 |
 |pref_last_name| TEACHERS.ID |TBD | N1 |
@@ -440,18 +439,17 @@ select distinct
 
 | Table |
 |-|
-|STUDENTS|
-|U_STUDENTSUSERFIELDS|
+|TEACHERS|
 
 **SQL Query**
 
 ```SQL
-select 
+select DISTINCT
     'user' as "type",
     'UPDATE' as "action",
     REGEXP_REPLACE(TEACHERS.EMAIL_ADDR, '(^.*)(@.*)', '\1') as "username",
     /* prepend a 'T' to make sure there are no studentid/teacherid colissions */
-    'T_'||TEACHERS.ID as "org_defined_id",
+    'T_'||TEACHERS.TEACHERNUMBER as "org_defined_id",
     TEACHERS.FIRST_NAME as "first_name",
     TEACHERS.LAST_NAME as "last_name",
     '' as "password",
@@ -757,7 +755,7 @@ ORDER BY "org_defined_id"
 |-|-|-|-|
 |type| TEACHERS.ID | _enrollment_ | N1
 |action| TEACHERS.ID | _UPDATE_ | N1
-|child_code| `T_`_`TEACHERS.ID`_ | _T\_765_
+|child_code| `T_`_`TEACHERS.TEACHERNUMBER`_ | _T\_765_
 |role_name| CC.ID | _Instructor_ | N1
 |parent_code| `cs_`_`cc.schoolid`_`_`_`cc.course_number`_`_`_`cc.termid`_ | _cs_2_E0DNS_3100_ 
 
@@ -773,6 +771,7 @@ ORDER BY "org_defined_id"
 |COURSES|
 |CC|
 |SECTIONS|
+|TEACHERS|
 
 **SQL Query**
 
@@ -780,7 +779,7 @@ ORDER BY "org_defined_id"
 select distinct
     'enrollment' as "type",
     'UPDATE' as "action",
-    'T_'||TEACHERS.ID as "child_code",
+    'T_'||TEACHERS.TEACHERNUMBER as "child_code",
     'Instructor' as "role_name",
     'cs_'||CC.SCHOOLID||'_'||cc.COURSE_NUMBER||'_'||CC.TERMID||'_'||DECODE(substr(cc.expression, 1, 1), 
      1, 'A', 
