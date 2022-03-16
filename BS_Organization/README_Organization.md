@@ -278,7 +278,7 @@ select distinct
 **SQL Query**
 
 ```SQL
-select
+select distinct
   'semester' as "type",
   'UPDATE' as "action",
   'term_'||TERMS.ID as "code",
@@ -386,7 +386,7 @@ select distinct
     COURSES.SCHED_DEPARTMENT as "name",
     '' as "start_date",
     '' as "end_date",
-    '' as "is_active",
+    '1' as "is_active",
     CC.SCHOOLID||'_'||COURSES.SCHED_DEPARTMENT as "department_code",
     '' as "template_code",
     '' as "semester_code",
