@@ -186,7 +186,7 @@ There are two separate Named Queries (NQ) for parents, one for mother and one fo
 
 **NOTE:** Parents file must be processed before student files so relationships can be properly built. Prepend 002 (mother) and 003 (father) to parents CSV filename to ensure this. Students have 200 prepended.
 
-- *Export File Name:* `07-Users_002_mother_active-%d.csv` & `07-Users_003_fother_active-%d.csv`
+- *Export File Name:* `7-Users_002_mother_active-%d.csv` & `7-Users_003_fother_active-%d.csv`
 - *Line Delimiter:* `CR-LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
