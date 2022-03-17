@@ -4,5 +4,7 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"markdown.extension.toc.levels": "2..3"
+	}
 }
