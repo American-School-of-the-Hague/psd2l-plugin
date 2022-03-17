@@ -131,7 +131,7 @@ where U_STUDENTSUSERFIELDS.STUDENTSDCID=STUDENTS.DCID
     and STUDENTS.DCID=GUARDIANSTUDENT.STUDENTSDCID
     /* this requires that the names in guardian and u_studentuserfields 
     match exactly. We're not entirely sure how the guardian fields come to be populated
-    so the sustainability and sustainability of this is questionable 
+    so the sanity and sustainability of this is questionable 
     */
     and trim(guardian.firstname)=trim(u_studentsuserfields.mother_firstname)
     and trim(guardian.lastname)=trim(u_studentsuserfields.mother_lastname)
@@ -258,7 +258,7 @@ where U_STUDENTSUSERFIELDS.STUDENTSDCID=STUDENTS.DCID
     and STUDENTS.DCID=GUARDIANSTUDENT.STUDENTSDCID
     /* this requires that the names in guardian and u_studentuserfields 
     match exactly. We're not entirely sure how the guardian fields come to be populated
-    so the sustainability and sustainability of this is questionable 
+    so the sanity and sustainability of this is questionable 
     */
     and trim(guardian.firstname)=trim(u_studentsuserfields.mother_firstname)
     and trim(guardian.lastname)=trim(u_studentsuserfields.mother_lastname)
