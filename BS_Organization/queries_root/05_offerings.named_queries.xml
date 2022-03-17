@@ -22,7 +22,7 @@
         <sql>
 			<![CDATA[
 			select distinct
-				'department' as "type",
+				'course offering' as "type",
 				'UPDATE' as "action",
 				'Templ_'||CC.SCHOOLID||'_'||COURSES.SCHED_DEPARTMENT as "code",
 				COURSES.SCHED_DEPARTMENT as "name",
