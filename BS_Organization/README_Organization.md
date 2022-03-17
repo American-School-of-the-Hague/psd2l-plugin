@@ -496,7 +496,7 @@ select distinct
     TERMS.FIRSTDAY as "start_date",
     TERMS.LASTDAY as "end_date",
     /* set courses as inactive by default */
-    0 as "is_active",
+    1 as "is_active",
     '' as "department_code",
     'Templ_'||CC.SCHOOLID||'_'||C.SCHED_DEPARTMENT as "template_code",
     'term_'||cc.termid as "semester code",
