@@ -2,14 +2,36 @@
 
 PowerQuery Plugin for exporting the following information from PowerSchool &rarr; BrightSpace. This plugin creates the following exports:
 
-- [`1-Other.csv`](#1-other)
-- [`2-Departments.csv`](#2-departments)
-- [`3-Semesters.csv`](#3-semesters)
-- [`4-Templates.csv`](#4-templates)
-- [`5-Offerings.csv`](#5-offerings)
-- [`6-Sections.csv`](#6-sections)
+- [1 Other](#1-other)
+  - [Fields Provided & Used](#fields-provided--used)
+  - [Data Export Manager Setup](#data-export-manager-setup)
+  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml)
+- [2 Departments](#2-departments)
+  - [Fields Provided & Used](#fields-provided--used-1)
+  - [Data Export Manager Setup](#data-export-manager-setup-1)
+  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-1)
+- [3 Semesters](#3-semesters)
+  - [Fields Provided & Used](#fields-provided--used-2)
+  - [Data Export Manager Setup](#data-export-manager-setup-2)
+  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-2)
+- [4 Templates](#4-templates)
+  - [Fields Provided & Used](#fields-provided--used-3)
+  - [Data Export Manager Setup](#data-export-manager-setup-3)
+  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-3)
+- [5 Offerings](#5-offerings)
+  - [Fields Provided & Used](#fields-provided--used-4)
+  - [Data Export Manager Setup](#data-export-manager-setup-4)
+  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-4)
+- [6 Sections](#6-sections)
+  - [Fields Provided & Used](#fields-provided--used-5)
+  - [Data Export Manager Setup](#data-export-manager-setup-5)
+  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-5)
+- [template](#template)
+  - [Fields Provided & Used](#fields-provided--used-6)
+  - [Data Export Manager Setup](#data-export-manager-setup-6)
+  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-6)
 
-## 1-Other
+## 1 Other
 
 ### Fields Provided & Used
 
@@ -99,7 +121,7 @@ select
  order by "code" asc
 ```
 
-## 2-Departments
+## 2 Departments
 
 ### Fields Provided & Used
 
@@ -204,7 +226,7 @@ select distinct
  order by "code" asc
 ```
 
-## 3-Semesters
+## 3 Semesters
 
 ### Fields Provided & Used
 
@@ -301,7 +323,7 @@ from TERMS TERMS
 order by "code" asc
 ```
 
-## 4-Templates
+## 4 Templates
 
 ### Fields Provided & Used
 
@@ -409,7 +431,7 @@ select distinct
  order by "code" asc
 ```
 
-## 5-Offerings
+## 5 Offerings
 
 ### Fields Provided & Used
 
@@ -520,7 +542,7 @@ where
 order by "semester code" desc
 ```
 
-## 6-Sections
+## 6 Sections
 
 ### Fields Provided & Used
 
@@ -573,15 +595,15 @@ order by "semester code" desc
 |-|-|-|-|
 |type| CC.ID | _course offering_ | N1
 |action| CC.ID | _UPDATE_ | N1
-|code| 'co_'schoolid\_coursenumber\_termid | _co\_3\_MCABAP\_3100_
-|name| C.COURSE_NAME | _MA AP Calculus (AB)_
+|code| 'co_'schoolid\_coursenumber\_termid | _cs\_3\_ITLDROB\_3101\_C_
+|name| C.COURSE_NAME | _IT Robotics I - C Block (S1)_
 |start_date| CC.ID | '' | N1
 |end_date| CC.ID | '' | N1
 |is_active| CC.ID | '' | N1
 |department_code| CC.ID | '' | N1
 |template_code| CC.ID | '' | N1
 |semester_code|   CC.ID | '' | N1
-|offering_code| 'co_'schoolid\_coursenumber | _co\_3\_ITLDPROG1_
+|offering_code| 'co_'schoolid\_coursenumber | _co\_3\_ITLDROB1_
 |custom_code| CC.ID | '' | N1
 
 **NOTES**
@@ -602,7 +624,6 @@ order by "semester code" desc
 select distinct
     'course section' as "type",
     'UPDATE' as "action",
-    /* cs_cc.schoolid_cc.course_number */
     'cs_'||cc.schoolid||'_'||cc.course_number||'_'||cc.TermID||'_'||DECODE(substr(cc.expression, 1, 1), 
      1, 'A', 
      2, 'B', 
@@ -624,7 +645,7 @@ select distinct
      7, 'G', 
      8, 'H', 
      9, 'ADV', 
-     'UNKNOWN')||' Block' as "name",
+     'UNKNOWN')||' Block ('||terms.abbreviation||')' as "name",
     '' as "start_date",
     '' as "end_date",
     '' as "is_active",
