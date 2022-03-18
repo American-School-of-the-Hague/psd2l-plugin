@@ -1,6 +1,12 @@
 # D2L BrightSpace IPSIS exports from PowerSchool SIS
 
-Feb/March 2022, Aaron Ciuffo
+Feb-June 2022 : Aaron Ciuffo : aciuffo@ash.nl : aaron.ciuffo@gmail.com
+- [TO DO](#to-do)
+  - [3 Semesters](#3-semesters)
+  - [4 Templates](#4-templates)
+  - [5 Offerings](#5-offerings)
+  - [6 Sections](#6-sections)
+  - [8 Enrollments](#8-enrollments)
 - [IPSIS Import Errors and Solutions](#ipsis-import-errors-and-solutions)
   - [Course Offerings](#course-offerings)
   - [Users](#users)
@@ -26,6 +32,34 @@ Feb/March 2022, Aaron Ciuffo
   - [sql](#sql)
   - [Sample](#sample-1)
 - [`[name].permission_mappings.xml`](#namepermission_mappingsxml)
+
+## TO DO
+
+### 3 Semesters
+
+- [ ] Deactivate previous year "Semesters"
+  - use termid logic to run a similar query and deactivate 
+
+
+### 4 Templates
+
+- [ ] Deactivate templates that are no longer active
+    - unclear how to find these and remove them
+
+### 5 Offerings
+
+- [ ] Deactivate courses from previous year 
+  - use termid logic to run similar query and deactivate
+
+### 6 Sections
+- [ ] Deactivate sections from previous year
+  - maybe these will just go away when the offerings are deactivated?
+
+### 8 Enrollments
+
+- [ ] handle place holder teachers
+  - exclude all teachers that do not have an email associated 
+  - See `T_UNASSIGNED` in SIS: Search `teachernumber=UNASSIGNED`; this teacher is some sort of placeholder for study periods in the HS
 
 ## IPSIS Import Errors and Solutions
 
