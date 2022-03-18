@@ -862,6 +862,11 @@ select distinct
       when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
       THEN (EXTRACT(year from sysdate)-2000+10)*100
       end
+  /* 
+   exclude any teachers that do not have email addresses
+   this should exclude "bookeeping" teachers that are created
+   to host study blocks 
+  */
   and length( teachers.email_addr) > 0
 order by "child_code" asc, "parent_code" asc
 ```
