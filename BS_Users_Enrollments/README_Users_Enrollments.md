@@ -2,16 +2,59 @@
 
 PowerQuery Plugin for exporting the following information from PowerSchool &rarr; BrightSpace. This plugin creates the following exports:
 
-- [7-Users_Parents_Inactive](#7-usersparentsinactive)
-- [7-Users_Parents_Active](#7-usersparentsactive)
-- [7-Users_Teachers_Inactive](#7-usersteachersinactive)
-- [7-Users_Teachers_Active](#7-usersteachersactive)
-- [7-Users_Students_Inactive](#7usersstudentsinactive)
-- [7-Users_Students_Active](#7usersstudentsactive)
-- [8-Enrollments_Teachers](#8-enrollmentsteachers)
-- [8-Enrollments_Students](#8-enrollmentsstudents)
+- [Important Implementation Notes](#important-implementation-notes)
+  - [User creation](#user-creation)
+- [7 Users Parents Inactive](#7-users-parents-inactive)
+  - [Fields Provided & Used](#fields-provided--used)
+  - [Data Export Manager Setup](#data-export-manager-setup)
+  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml)
+- [7 Users Parents Active](#7-users-parents-active)
+  - [Fields Provided & Used](#fields-provided--used-1)
+  - [Data Export Manager Setup](#data-export-manager-setup-1)
+  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-1)
+- [7 Users Teachers Inactive](#7-users-teachers-inactive)
+  - [Fields Provided & Used](#fields-provided--used-2)
+  - [Data Export Manager Setup](#data-export-manager-setup-2)
+  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-2)
+- [7 Users Teachers Active](#7-users-teachers-active)
+  - [Fields Provided & Used](#fields-provided--used-3)
+  - [Data Export Manager Setup](#data-export-manager-setup-3)
+  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-3)
+- [7 Users Students Inactive](#7-users-students-inactive)
+  - [Fields Provided & Used](#fields-provided--used-4)
+  - [Data Export Manager Setup](#data-export-manager-setup-4)
+  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-4)
+- [7 Users Students Active](#7-users-students-active)
+  - [Fields Provided & Used](#fields-provided--used-5)
+  - [Data Export Manager Setup](#data-export-manager-setup-5)
+  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-5)
+- [8 Enrollments Teachers](#8-enrollments-teachers)
+  - [Fields Provided & Used](#fields-provided--used-6)
+  - [Data Export Manager Setup](#data-export-manager-setup-6)
+  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-6)
+- [8 Enrollments Students](#8-enrollments-students)
+  - [Fields Provided & Used](#fields-provided--used-7)
+  - [Data Export Manager Setup](#data-export-manager-setup-7)
+  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-7)
+- [template](#template)
+  - [Fields Provided & Used](#fields-provided--used-8)
+  - [Data Export Manager Setup](#data-export-manager-setup-8)
+  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-8)
 
-## 7-Users_Parents_Inactive
+## Important Implementation Notes
+
+### User creation
+Usernames for parents and staff are set to their email addresses. Students are set to their @ash.nl address. Parent accounts are created with the guardian email address provided through the e-collect form.
+
+Usernames for teachers are set to the username portion of their @ash.nl email address. This is to prevent username collisions with parent accounts.
+
+User creation must occur in the following order: Parents, Teachers, Students. Student accounts are related to parent accounts through the `relations` field; this field requires the `org_defined_id` from the parents to exist.
+
+D2L IPSIS processes CSV files in alphabetical order. To enforce the proper order, it is critical that the PowerSchool Data Export Manager templates are set with filenames that will sort such that parents come first, teachers second and students last. 
+
+See the *Data Export Manager* section for each Named Query below.
+
+## 7 Users Parents Inactive
 
 There are two separate Named Queries (NQ) for parents, one for mother and one for father.
 
@@ -142,7 +185,7 @@ where U_STUDENTSUSERFIELDS.STUDENTSDCID=STUDENTS.DCID
 order by "org_defined_id" asc
 ```
 
-## 7-Users_Parents_Active
+## 7 Users Parents Active
 
 There are two separate Named Queries (NQ) for parents, one for mother and one for father.
 
@@ -230,7 +273,7 @@ There are two separate Named Queries (NQ) for parents, one for mother and one fo
 
 **SQL Query**
 
-Both mother and father query depend on u_studentuserfields.mother_firstanme|father_firstname be exactly equal to guardian.firstname. u_studentuserfields is populated via an e-collect form by parents. It is unclear how the guardian fields are populated, so this may break in the future. `¯\_(ツ)_/¯`
+Both mother and father query depend on u_studentuserfields.mother_firstanme|father_firstname be exactly equal to guardian.firstname. u_studentuserfields is populated via an e-collect form by parents. It is unclear how the guardian fields are populated, so this may break in the future. `¯\_(ツ)_/¯` May the force be with you, future maintainer.
 
 Remember to update the mother and father Named Query files if any changes are made.
 
@@ -268,7 +311,7 @@ where U_STUDENTSUSERFIELDS.STUDENTSDCID=STUDENTS.DCID
 order by "org_defined_id" asc
 ```
 
-## 7-Users_Teachers_Inactive
+## 7 Users Teachers Inactive
 
 ### Fields Provided & Used
 
@@ -351,7 +394,14 @@ Delete staff that are not "active" (STATUS != 1)
 select distinct
     'user' as "type",
     'UPDATE' as "action",
-    TEACHERS.EMAIL_ADDR as "username",
+    /* 
+    use username portion of teacher/staff email addresses for D2L username.
+    This is necessary because some staff use their @ash.nl email address as
+    their guardian contact information. The parent accounts are created first
+    resulting in a colision between the parent account username and teacher 
+    account username.
+    */
+    regexp_replace(TEACHERS.EMAIL_ADDR, '(@.*)', '') as "username",
     /* prepend a 'T' to make sure there are no studentid/teacherid colisions */
     'T_'||TEACHERS.TEACHERNUMBER as "org_defined_id",
     TEACHERS.FIRST_NAME as "first_name",
@@ -376,7 +426,7 @@ select distinct
     ORDER BY "org_defined_id" asc
 ```
 
-## 7-Users_Teachers_Active
+## 7 Users Teachers Active
 
 ### Fields Provided & Used
 
@@ -447,7 +497,14 @@ select distinct
 select DISTINCT
     'user' as "type",
     'UPDATE' as "action",
-    TEACHERS.EMAIL_ADDR as "username",
+    /* 
+    use username portion of teacher/staff email addresses for D2L username.
+    This is necessary because some staff use their @ash.nl email address as
+    their guardian contact information. The parent accounts are created first
+    resulting in a colision between the parent account username and teacher 
+    account username.
+    */
+    regexp_replace(TEACHERS.EMAIL_ADDR, '(@.*)', '') as "username",
     /* prepend a 'T' to make sure there are no studentid/teacherid colissions */
     'T_'||TEACHERS.TEACHERNUMBER as "org_defined_id",
     TEACHERS.FIRST_NAME as "first_name",
@@ -468,7 +525,7 @@ select DISTINCT
     ORDER BY TEACHERS.LAST_NAME ASC
 ```
 
-## 7_Users_Students_Inactive
+## 7 Users Students Inactive
 
 ### Fields Provided & Used
 
@@ -581,7 +638,7 @@ select
  order by STUDENTS.EXITDATE asc
 ```
 
-## 7_Users_Students_Active
+## 7 Users Students Active
 
 ### Fields Provided & Used
 
@@ -705,7 +762,7 @@ GROUP BY students.student_number, students.first_name, students.last_name, u_stu
 ORDER BY "org_defined_id"
 ```
 
-## 8-Enrollments_Teachers
+## 8 Enrollments Teachers
 
 ### Fields Provided & Used
 
@@ -805,10 +862,11 @@ select distinct
       when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
       THEN (EXTRACT(year from sysdate)-2000+10)*100
       end
+  and length( teachers.email_addr) > 0
 order by "child_code" asc, "parent_code" asc
 ```
 
-## 8-Enrollments_Students
+## 8 Enrollments Students
 
 ### Fields Provided & Used
 
@@ -843,7 +901,7 @@ order by "child_code" asc, "parent_code" asc
 
 **Export Summary and Output Options**
 
-- *Export File Name:* `08-Enrollments_students-%d.csv`
+- *Export File Name:* `8-Enrollments_students-%d.csv`
 - *Line Delimiter:* `CR-LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
