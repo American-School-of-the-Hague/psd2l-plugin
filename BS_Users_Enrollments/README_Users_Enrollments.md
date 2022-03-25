@@ -2,44 +2,45 @@
 
 PowerQuery Plugin for exporting the following information from PowerSchool &rarr; BrightSpace. This plugin creates the following exports:
 
-- [Important Implementation Notes](#important-implementation-notes)
-  - [User creation](#user-creation)
-- [7 Users Parents Inactive](#7-users-parents-inactive)
-  - [Fields Provided & Used](#fields-provided--used)
-  - [Data Export Manager Setup](#data-export-manager-setup)
-  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml)
-- [7 Users Parents Active](#7-users-parents-active)
-  - [Fields Provided & Used](#fields-provided--used-1)
-  - [Data Export Manager Setup](#data-export-manager-setup-1)
-  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-1)
-- [7 Users Teachers Inactive](#7-users-teachers-inactive)
-  - [Fields Provided & Used](#fields-provided--used-2)
-  - [Data Export Manager Setup](#data-export-manager-setup-2)
-  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-2)
-- [7 Users Teachers Active](#7-users-teachers-active)
-  - [Fields Provided & Used](#fields-provided--used-3)
-  - [Data Export Manager Setup](#data-export-manager-setup-3)
-  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-3)
-- [7 Users Students Inactive](#7-users-students-inactive)
-  - [Fields Provided & Used](#fields-provided--used-4)
-  - [Data Export Manager Setup](#data-export-manager-setup-4)
-  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-4)
-- [7 Users Students Active](#7-users-students-active)
-  - [Fields Provided & Used](#fields-provided--used-5)
-  - [Data Export Manager Setup](#data-export-manager-setup-5)
-  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-5)
-- [8 Enrollments Teachers](#8-enrollments-teachers)
-  - [Fields Provided & Used](#fields-provided--used-6)
-  - [Data Export Manager Setup](#data-export-manager-setup-6)
-  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-6)
-- [8 Enrollments Students](#8-enrollments-students)
-  - [Fields Provided & Used](#fields-provided--used-7)
-  - [Data Export Manager Setup](#data-export-manager-setup-7)
-  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-7)
-- [template](#template)
-  - [Fields Provided & Used](#fields-provided--used-8)
-  - [Data Export Manager Setup](#data-export-manager-setup-8)
-  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-8)
+- [BrightSpace D2L User and Enrollments (7-8)](#brightspace-d2l-user-and-enrollments-7-8)
+  - [Important Implementation Notes](#important-implementation-notes)
+    - [User creation](#user-creation)
+  - [7 Users Parents Inactive](#7-users-parents-inactive)
+    - [Fields Provided & Used](#fields-provided--used)
+    - [Data Export Manager Setup](#data-export-manager-setup)
+    - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml)
+  - [7 Users Parents Active](#7-users-parents-active)
+    - [Fields Provided & Used](#fields-provided--used-1)
+    - [Data Export Manager Setup](#data-export-manager-setup-1)
+    - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-1)
+  - [7 Users Teachers Inactive](#7-users-teachers-inactive)
+    - [Fields Provided & Used](#fields-provided--used-2)
+    - [Data Export Manager Setup](#data-export-manager-setup-2)
+    - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-2)
+  - [7 Users Teachers Active](#7-users-teachers-active)
+    - [Fields Provided & Used](#fields-provided--used-3)
+    - [Data Export Manager Setup](#data-export-manager-setup-3)
+    - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-3)
+  - [7 Users Students Inactive](#7-users-students-inactive)
+    - [Fields Provided & Used](#fields-provided--used-4)
+    - [Data Export Manager Setup](#data-export-manager-setup-4)
+    - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-4)
+  - [7 Users Students Active](#7-users-students-active)
+    - [Fields Provided & Used](#fields-provided--used-5)
+    - [Data Export Manager Setup](#data-export-manager-setup-5)
+    - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-5)
+  - [8 Enrollments Teachers](#8-enrollments-teachers)
+    - [Fields Provided & Used](#fields-provided--used-6)
+    - [Data Export Manager Setup](#data-export-manager-setup-6)
+    - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-6)
+  - [8 Enrollments Students](#8-enrollments-students)
+    - [Fields Provided & Used](#fields-provided--used-7)
+    - [Data Export Manager Setup](#data-export-manager-setup-7)
+    - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-7)
+  - [template](#template)
+    - [Fields Provided & Used](#fields-provided--used-8)
+    - [Data Export Manager Setup](#data-export-manager-setup-8)
+    - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-8)
 
 ## Important Implementation Notes
 
@@ -371,7 +372,7 @@ order by "org_defined_id" asc
 |first_name| TEACHERS.FIRST_NAME | _John_ |
 |last_name| TEACHERS.LAST_NAME |_Doe_ | 
 |password| TEACHERS.ID | '' | N1 |
-|role_name| TEACHERS.ID | _Learner_ | N1 |
+|role_name| TEACHERS.ID | _Instructor_ | N1 |
 |relationships| TEACHERS.ID | TBD | N1 |
 |pref_frist_name| TEACHERS.ID |TBD | N1 |
 |pref_last_name| TEACHERS.ID |TBD | N1 |
@@ -733,7 +734,7 @@ SELECT
     1 as "is_active",
     'Learner' as "role_name",
     u_studentsuserfields.emailstudent as "email",
-    chr(91)||listagg('{"type"'||chr(58)||'"Parent", "Id"'||chr(58)||'"P_'||guardian.guardianid||'"}', ', ') WITHIN GROUP ( ORDER BY Guardian.LastName desc )||chr(93) as "relationship",
+    listagg('Parent'||chr(58)||'P_'||guardian.guardianid, chr(124)) WITHIN GROUP ( ORDER BY Guardian.LastName desc ) as "relationship",
     '' as "pref_last_name",
     '' as "pref_first_name"
 FROM 
@@ -755,12 +756,77 @@ ON
 U_STUDENTSUSERFIELDS.STUDENTSDCID = students.dcid
 
 WHERE 
-    Students.enroll_status = 0
-    and students.grade_level >=5
+  Students.enroll_status = 0
+  and students.grade_level >=5
 
 GROUP BY students.student_number, students.first_name, students.last_name, u_studentsuserfields.emailstudent
 ORDER BY "org_defined_id"
 ```
+
+SCRATCH:
+
+Updated query for adding auditors (learning support) to student records:
+```SQL
+select distinct
+        students.lastfirst as lastfirst,
+    
+    listagg('Auditor'||chr(58)||'T_'||CC.teacherID, chr(124)) 
+    WITHIN GROUP (ORDER BY teachers.teachernumber desc) ||chr(124)||
+    listagg('Parent'||chr(58)||'P_'||guardian.guardianid, chr(124)) WITHIN GROUP ( ORDER BY Guardian.LastName desc ) as "relationship"
+    
+    
+    from COURSES COURSES,
+    STUDENTS STUDENTS,
+    CC CC,
+    U_STUDENTSUSERFIELDS U_STUDENTSUSERFIELDS,
+    GUARDIANSTUDENT GUARDIANSTUDENT,
+    teachers teachers,
+    guardian guardian
+ 
+--  INNER JOIN 
+-- GuardianStudent GuardianStudent 
+-- ON 
+-- Guardian.GuardianID = GuardianStudent.GuardianID
+
+-- INNER JOIN 
+-- Students Students 
+-- ON 
+-- GuardianStudent.studentsdcid = Students.dcid
+
+-- INNER JOIN
+-- U_STUDENTSUSERFIELDS U_STUDENTSUSERFIELDS
+-- ON
+-- U_STUDENTSUSERFIELDS.STUDENTSDCID = students.dcid
+
+    
+ 
+ where CC.STUDENTID=STUDENTS.ID
+    and GuardianStudent.studentsdcid = Students.dcid
+    and Guardian.GuardianID = GuardianStudent.GuardianID
+    and U_STUDENTSUSERFIELDS.STUDENTSDCID = students.dcid
+    and cc.teacherid = teachers.id
+
+    and (cc.course_number like 'OLEA' 
+        or courses.sched_department like 'MSLSC' 
+        or courses.sched_department like 'MSEAL' 
+        or courses.course_name like 'ENG English Foundations'
+        or courses.course_name like 'ENG English Foundations')
+    and CC.COURSE_NUMBER=COURSES.COURSE_NUMBER
+    and STUDENTS.ENROLL_STATUS =0
+    and STUDENTS.GRADE_LEVEL >=5
+    and CC.TERMID >= case 
+      when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
+      THEN (EXTRACT(year from sysdate)-2000+9)*100
+      when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
+      THEN (EXTRACT(year from sysdate)-2000+10)*100
+      end    
+ 
+ GROUP BY students.lastfirst, students.grade_level
+ 
+ order by STUDENTS.GRADE_LEVEL DESC
+```
+
+
 
 ## 8 Enrollments Teachers
 
