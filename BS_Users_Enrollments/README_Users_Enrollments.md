@@ -29,18 +29,22 @@ PowerQuery Plugin for exporting the following information from PowerSchool &rarr
     - [Fields Provided & Used](#fields-provided--used-5)
     - [Data Export Manager Setup](#data-export-manager-setup-5)
     - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-5)
-  - [8 Enrollments Teachers](#8-enrollments-teachers)
+  - [7 Users Students Active w/ Auditors](#7-users-students-active-w-auditors)
     - [Fields Provided & Used](#fields-provided--used-6)
     - [Data Export Manager Setup](#data-export-manager-setup-6)
     - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-6)
-  - [8 Enrollments Students](#8-enrollments-students)
+  - [8 Enrollments Teachers](#8-enrollments-teachers)
     - [Fields Provided & Used](#fields-provided--used-7)
     - [Data Export Manager Setup](#data-export-manager-setup-7)
     - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-7)
-  - [template](#template)
+  - [8 Enrollments Students](#8-enrollments-students)
     - [Fields Provided & Used](#fields-provided--used-8)
     - [Data Export Manager Setup](#data-export-manager-setup-8)
     - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-8)
+  - [template](#template)
+    - [Fields Provided & Used](#fields-provided--used-9)
+    - [Data Export Manager Setup](#data-export-manager-setup-9)
+    - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-9)
 
 ## Important Implementation Notes
 
@@ -826,6 +830,192 @@ select distinct
  order by STUDENTS.GRADE_LEVEL DESC
 ```
 
+## 7 Users Students Active w/ Auditors
+
+### Fields Provided & Used
+
+**PROVIDES FIELDS:**
+
+- `org_defined_id` used in [08-Enrollments_Students](#8-enrollments_students) as `child_code` 
+
+|Field |Format |example |
+|:-|:-|:-|
+|`org_defined_id`| `S_`_`STUDENTS.STUDENT_NUMBER`_ | S_123456
+
+**USES FIELDS:**
+
+- `org_definied_id` as `Id` in `relationships` field from [07-Users_Parents_Active](#7-usersparentsactive) for parents
+- `org_defined_id` as `Id` in `relationships` field from [07-Users_Teachers_Active](#7-users-teachers-active) for auditors
+
+|Field |Format |example |
+|:-|:-|:-|
+|`relationships`| `Parent: org_defined_id\|Auditor: org_defined_id` | Parent:P_234123\|Auditor:T_93313
+
+### Data Export Manager Setup
+
+- **Category:** Show All
+- **Export From:**  `NQ com.txoof.brightspace.users.07s_active_w_auditor`
+
+**Labels Used on Export**
+
+| Label |
+|-|
+|type|
+|action|
+|username|
+|org_define_id|
+|first_name|
+|last_name|
+|password|
+|role_name|
+|relationships|
+|pref_first_name |
+|pref_last_name |
+
+**Export Summary and Output Options**
+
+- *Export File Name:* `7-Users_202_Students_Active_W_Auditor.csv`
+- *Line Delimiter:* `CR-LF`
+- *Field Delimiter:* `,`
+- *Character Set:* `UTF-8`
+- *Include Column Headers:* `True`
+
+### Query Setup for `named_queries.xml`
+
+- File: `07_u_s_active_w_auditor.named_queries.xml`
+
+| header | table.field | value | NOTE |
+|-|-|-|-|
+|type| STUDENTS.ID | user | N1 |
+|action| STUDENTS.ID | UPDATE | N1 |
+|username| U_STUDENTSUSERFIELDS.EMAILSTUDENT | _bar@ash.nl_ |
+|org_define_id| STUDENTS.STUDENT_NUMBER | _S\_123456_ |
+|first_name| STUDENTS.FIRST_NAME | _Jane_ |
+|last_name| STUDENTS.LAST_NAME |_Doe_ | 
+|password| STUDENTS.ID | '' | N1 |
+|role_name| STUDENTS.ID | _Learner_ | N1 |
+|relationships| STUDENTS.ID | _Parent:P\_12233\Auditor:T\_12345_ | N1 |
+|pref_frist_name| STUDENTS.ID | '' | N1 |
+|pref_last_name| STUDENTS.ID | '' | N1 |
+
+**NOTES**
+
+**N1:** Field does not appear in database; use a known field such as `<column column=STUDENT.ID>header<\column>` to prevent an "unknown column error"
+
+**Tables Used**
+
+| Table |
+|-|
+|STUDENTS|
+|U_STUDENTSUSERFIELDS|
+|GuardianStudent|
+|Guardian|
+
+**SQL Query**
+
+```SQL
+SELECT
+    'user' as "type",
+    'UPDATE' as "action",
+    u_studentsuserfields.emailstudent as "username",
+    'S_'||students.student_number as "org_defined_id",
+    students.first_name as "first_name",
+    students.last_name as "last_name",
+    '' as "password",
+    1 as "is_active",
+    'Learner' as "role_name",
+    u_studentsuserfields.emailstudent as "email",
+    listagg('Parent'||chr(58)||'P_'||guardian.guardianid, chr(124)) WITHIN GROUP ( ORDER BY Guardian.LastName desc ) as "relationship",
+    '' as "pref_last_name",
+    '' as "pref_first_name"
+FROM 
+Guardian Guardian
+
+INNER JOIN 
+GuardianStudent GuardianStudent 
+ON 
+Guardian.GuardianID = GuardianStudent.GuardianID
+
+INNER JOIN 
+Students Students 
+ON 
+GuardianStudent.studentsdcid = Students.dcid
+
+INNER JOIN
+U_STUDENTSUSERFIELDS U_STUDENTSUSERFIELDS
+ON
+U_STUDENTSUSERFIELDS.STUDENTSDCID = students.dcid
+
+WHERE 
+  Students.enroll_status = 0
+  and students.grade_level >=5
+
+GROUP BY students.student_number, students.first_name, students.last_name, u_studentsuserfields.emailstudent
+ORDER BY "org_defined_id"
+```
+
+SCRATCH:
+
+Updated query for adding auditors (learning support) to student records:
+```SQL
+select distinct
+        students.lastfirst as lastfirst,
+    
+    listagg('Auditor'||chr(58)||'T_'||CC.teacherID, chr(124)) 
+    WITHIN GROUP (ORDER BY teachers.teachernumber desc) ||chr(124)||
+    listagg('Parent'||chr(58)||'P_'||guardian.guardianid, chr(124)) WITHIN GROUP ( ORDER BY Guardian.LastName desc ) as "relationship"
+    
+    
+    from COURSES COURSES,
+    STUDENTS STUDENTS,
+    CC CC,
+    U_STUDENTSUSERFIELDS U_STUDENTSUSERFIELDS,
+    GUARDIANSTUDENT GUARDIANSTUDENT,
+    teachers teachers,
+    guardian guardian
+ 
+--  INNER JOIN 
+-- GuardianStudent GuardianStudent 
+-- ON 
+-- Guardian.GuardianID = GuardianStudent.GuardianID
+
+-- INNER JOIN 
+-- Students Students 
+-- ON 
+-- GuardianStudent.studentsdcid = Students.dcid
+
+-- INNER JOIN
+-- U_STUDENTSUSERFIELDS U_STUDENTSUSERFIELDS
+-- ON
+-- U_STUDENTSUSERFIELDS.STUDENTSDCID = students.dcid
+
+    
+ 
+ where CC.STUDENTID=STUDENTS.ID
+    and GuardianStudent.studentsdcid = Students.dcid
+    and Guardian.GuardianID = GuardianStudent.GuardianID
+    and U_STUDENTSUSERFIELDS.STUDENTSDCID = students.dcid
+    and cc.teacherid = teachers.id
+
+    and (cc.course_number like 'OLEA' 
+        or courses.sched_department like 'MSLSC' 
+        or courses.sched_department like 'MSEAL' 
+        or courses.course_name like 'ENG English Foundations'
+        or courses.course_name like 'ENG English Foundations')
+    and CC.COURSE_NUMBER=COURSES.COURSE_NUMBER
+    and STUDENTS.ENROLL_STATUS =0
+    and STUDENTS.GRADE_LEVEL >=5
+    and CC.TERMID >= case 
+      when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
+      THEN (EXTRACT(year from sysdate)-2000+9)*100
+      when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
+      THEN (EXTRACT(year from sysdate)-2000+10)*100
+      end    
+ 
+ GROUP BY students.lastfirst, students.grade_level
+ 
+ order by STUDENTS.GRADE_LEVEL DESC
+```
 
 
 ## 8 Enrollments Teachers
