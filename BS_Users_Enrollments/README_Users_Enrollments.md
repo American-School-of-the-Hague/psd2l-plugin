@@ -21,30 +21,34 @@ PowerQuery Plugin for exporting the following information from PowerSchool &rarr
     - [Fields Provided & Used](#fields-provided--used-3)
     - [Data Export Manager Setup](#data-export-manager-setup-3)
     - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-3)
-  - [7 Users Students Inactive](#7-users-students-inactive)
+  - [7 Users Teacher-Auditors Active](#7-users-teacher-auditors-active)
     - [Fields Provided & Used](#fields-provided--used-4)
     - [Data Export Manager Setup](#data-export-manager-setup-4)
     - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-4)
-  - [7 Users Students Active](#7-users-students-active)
+  - [7 Users Students Inactive](#7-users-students-inactive)
     - [Fields Provided & Used](#fields-provided--used-5)
     - [Data Export Manager Setup](#data-export-manager-setup-5)
     - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-5)
-  - [7 Users Students Active w/ Auditors](#7-users-students-active-w-auditors)
+  - [7 Users Students Active](#7-users-students-active)
     - [Fields Provided & Used](#fields-provided--used-6)
     - [Data Export Manager Setup](#data-export-manager-setup-6)
     - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-6)
-  - [8 Enrollments Teachers](#8-enrollments-teachers)
+  - [7 Users Students Active w/ Auditors](#7-users-students-active-w-auditors)
     - [Fields Provided & Used](#fields-provided--used-7)
     - [Data Export Manager Setup](#data-export-manager-setup-7)
     - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-7)
-  - [8 Enrollments Students](#8-enrollments-students)
+  - [8 Enrollments Teachers](#8-enrollments-teachers)
     - [Fields Provided & Used](#fields-provided--used-8)
     - [Data Export Manager Setup](#data-export-manager-setup-8)
     - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-8)
-  - [template](#template)
+  - [8 Enrollments Students](#8-enrollments-students)
     - [Fields Provided & Used](#fields-provided--used-9)
     - [Data Export Manager Setup](#data-export-manager-setup-9)
     - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-9)
+  - [template](#template)
+    - [Fields Provided & Used](#fields-provided--used-10)
+    - [Data Export Manager Setup](#data-export-manager-setup-10)
+    - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-10)
 
 ## Important Implementation Notes
 
@@ -433,6 +437,8 @@ select distinct
 
 ## 7 Users Teachers Active
 
+All active staff.
+
 ### Fields Provided & Used
 
 - `org_defined_id` used in [08-Enrollments Students](#8-enrollmentsstudents) as `child_code`
@@ -470,7 +476,50 @@ select distinct
 
 ### Query Setup for `named_queries.xml`
 
-- File: `07_u_t_active.named_queries.xml`
+
+
+## 7 Users Teacher-Auditors Active
+
+All teachers that are Learner Support Auditors. Teachers of EAL and Learning Support classes. These users are linked via the relationship field for students. These roles overwrite the "Instructor" roles.
+
+### Fields Provided & Used
+
+- `org_defined_id` used in [08-Enrollments Students](#8-enrollmentsstudents) as `child_code`
+- `org_defined_id` used in [08-Enrollments Teachers](#8-enrollmentsteachers) as `child_code`
+
+### Data Export Manager Setup
+
+- **Category:** Show All
+- **Export Form:**  `NQ com.txoof.brightspace.users.07t_active_auditors`
+
+**Labels Used on Export**
+
+| Label |
+|-|
+|type|
+|action|
+|username|
+|org_define_id|
+|first_name|
+|last_name|
+|password|
+|role_name|
+|relationships|
+|pref_first_name |
+|pref_last_name |
+
+**Export Summary and Output Options**
+
+- *Export File Name:* `7-Users_102_teachers_active_auditors-%d.csv`
+- *Line Delimiter:* `CR-LF`
+- *Field Delimiter:* `,`
+- *Character Set:* `UTF-8`
+- *Include Column Headers:* `True`
+- *Surround "field values" in Quotes:* TBD
+
+### Query Setup for `named_queries.xml`
+
+- File: `07_u_t_active_auditors.named_queries.xml`
 
 | header | table.field | value | NOTE |
 |-|-|-|-|
@@ -481,7 +530,7 @@ select distinct
 |first_name| TEACHERS.FIRST_NAME | _John_ |
 |last_name| TEACHERS.LAST_NAME |_Doe_ | 
 |password| TEACHERS.ID | '' | N1 |
-|role_name| TEACHERS.ID | _Learner_ | N1 |
+|role_name| TEACHERS.ID | _Learner Support_ | N1 |
 |relationships| TEACHERS.ID | TBD | N1 |
 |pref_frist_name| TEACHERS.ID |TBD | N1 |
 |pref_last_name| TEACHERS.ID |TBD | N1 |
@@ -495,11 +544,15 @@ select distinct
 | Table |
 |-|
 |TEACHERS|
+|CC|
+|STUDENTS|
+|TEACHERS|
+|COURSES|
 
 **SQL Query**
 
 ```SQL
-select DISTINCT
+select distinct
     'user' as "type",
     'UPDATE' as "action",
     /* 
@@ -510,24 +563,49 @@ select DISTINCT
     account username.
     */
     regexp_replace(TEACHERS.EMAIL_ADDR, '(@.*)', '') as "username",
-    /* prepend a 'T' to make sure there are no studentid/teacherid colissions */
+    /* prepend a 'T' to make sure there are no studentid/teacherid colisions */
     'T_'||TEACHERS.TEACHERNUMBER as "org_defined_id",
     TEACHERS.FIRST_NAME as "first_name",
     TEACHERS.LAST_NAME as "last_name",
     '' as "password",
-    TEACHERS.STATUS as "is_active",
-    'Instructor' as "role_name",
+    0 as "is_active",
+    'Lerner Support' as "role_name",
     TEACHERS.EMAIL_ADDR as "email",
     '' as "relationships",
     '' as "pref_first_name",
     '' as "pref_last_name"
-
- from TEACHERS TEACHERS
- where TEACHERS.HOMESCHOOLID = TEACHERS.SCHOOLID 
-    AND TEACHERS.STATUS = 1 
-    /* Ignore all users with no email address */
-    AND LENGTH(TEACHERS.EMAIL_ADDR) > 0
-    ORDER BY TEACHERS.LAST_NAME ASC
+ from COURSES COURSES,
+    CC CC,
+    STUDENTS STUDENTS,
+    TEACHERS TEACHERS 
+ where CC.STUDENTID=STUDENTS.ID
+    and CC.TEACHERID=TEACHERS.ID
+    and COURSES.COURSE_NUMBER=CC.COURSE_NUMBER
+    and TEACHERS.SCHOOLID >=2
+    and CC.TERMID >=3100
+    and STUDENTS.ENROLL_STATUS =0
+    and TEACHERS.STATUS =1
+    /*
+    only include teachers of Learning Support (OLEA, MSLSC), EAL, Special Ed (SSE)
+    and English Foundations 
+    */
+    and (cc.course_number like 'OLEA' 
+        or courses.sched_department like 'MSLSC' 
+        or courses.sched_department like 'MSEAL'
+        /* ms, hs special education */
+        or courses.sched_department like '%SSE%'
+        or courses.course_name like '%ENG English Foundations%'
+        or courses.course_name like '%English as an Addl Language%')
+    and CC.COURSE_NUMBER=COURSES.COURSE_NUMBER
+    and STUDENTS.ENROLL_STATUS =0
+    and STUDENTS.GRADE_LEVEL >=5
+    and CC.TERMID >= case 
+      when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
+      THEN (EXTRACT(year from sysdate)-2000+9)*100
+      when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
+      THEN (EXTRACT(year from sysdate)-2000+10)*100
+      end
+order by "last_name" asc
 ```
 
 ## 7 Users Students Inactive
@@ -644,6 +722,8 @@ select
 ```
 
 ## 7 Users Students Active
+
+This query pulls all active students grade 5 and higher and adds a relationship between students and parents.
 
 ### Fields Provided & Used
 
@@ -767,70 +847,10 @@ GROUP BY students.student_number, students.first_name, students.last_name, u_stu
 ORDER BY "org_defined_id"
 ```
 
-SCRATCH:
-
-Updated query for adding auditors (learning support) to student records:
-```SQL
-select distinct
-        students.lastfirst as lastfirst,
-    
-    listagg('Auditor'||chr(58)||'T_'||CC.teacherID, chr(124)) 
-    WITHIN GROUP (ORDER BY teachers.teachernumber desc) ||chr(124)||
-    listagg('Parent'||chr(58)||'P_'||guardian.guardianid, chr(124)) WITHIN GROUP ( ORDER BY Guardian.LastName desc ) as "relationship"
-    
-    
-    from COURSES COURSES,
-    STUDENTS STUDENTS,
-    CC CC,
-    U_STUDENTSUSERFIELDS U_STUDENTSUSERFIELDS,
-    GUARDIANSTUDENT GUARDIANSTUDENT,
-    teachers teachers,
-    guardian guardian
- 
---  INNER JOIN 
--- GuardianStudent GuardianStudent 
--- ON 
--- Guardian.GuardianID = GuardianStudent.GuardianID
-
--- INNER JOIN 
--- Students Students 
--- ON 
--- GuardianStudent.studentsdcid = Students.dcid
-
--- INNER JOIN
--- U_STUDENTSUSERFIELDS U_STUDENTSUSERFIELDS
--- ON
--- U_STUDENTSUSERFIELDS.STUDENTSDCID = students.dcid
-
-    
- 
- where CC.STUDENTID=STUDENTS.ID
-    and GuardianStudent.studentsdcid = Students.dcid
-    and Guardian.GuardianID = GuardianStudent.GuardianID
-    and U_STUDENTSUSERFIELDS.STUDENTSDCID = students.dcid
-    and cc.teacherid = teachers.id
-
-    and (cc.course_number like 'OLEA' 
-        or courses.sched_department like 'MSLSC' 
-        or courses.sched_department like 'MSEAL' 
-        or courses.course_name like 'ENG English Foundations'
-        or courses.course_name like 'ENG English Foundations')
-    and CC.COURSE_NUMBER=COURSES.COURSE_NUMBER
-    and STUDENTS.ENROLL_STATUS =0
-    and STUDENTS.GRADE_LEVEL >=5
-    and CC.TERMID >= case 
-      when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
-      THEN (EXTRACT(year from sysdate)-2000+9)*100
-      when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
-      THEN (EXTRACT(year from sysdate)-2000+10)*100
-      end    
- 
- GROUP BY students.lastfirst, students.grade_level
- 
- order by STUDENTS.GRADE_LEVEL DESC
-```
-
 ## 7 Users Students Active w/ Auditors
+
+This query includes active students that are enrolled in Learning Support, EAL or English Essentials courses. This query overwrites the previous student query and adds Auditor and Parent relations to the students. Students included are enrolled in courses with course_number "OLEA", sched_department "MSLSC", "MSEAL" and course_name "ENG English Foundations." 
+
 
 ### Fields Provided & Used
 
@@ -914,7 +934,7 @@ select distinct
 **SQL Query**
 
 ```SQL
-SELECT
+select distinct
     'user' as "type",
     'UPDATE' as "action",
     u_studentsuserfields.emailstudent as "username",
@@ -925,71 +945,24 @@ SELECT
     1 as "is_active",
     'Learner' as "role_name",
     u_studentsuserfields.emailstudent as "email",
+    /* add Auditor relation to EAL, Learning Support teachers */
+    listagg('Auditor'||chr(58)||'T_'||teachers.teachernumber, chr(124) )
+        within group (order by teachers.teachernumber desc) ||chr(124)||
     listagg('Parent'||chr(58)||'P_'||guardian.guardianid, chr(124)) WITHIN GROUP ( ORDER BY Guardian.LastName desc ) as "relationship",
     '' as "pref_last_name",
     '' as "pref_first_name"
-FROM 
-Guardian Guardian
-
-INNER JOIN 
-GuardianStudent GuardianStudent 
-ON 
-Guardian.GuardianID = GuardianStudent.GuardianID
-
-INNER JOIN 
-Students Students 
-ON 
-GuardianStudent.studentsdcid = Students.dcid
-
-INNER JOIN
-U_STUDENTSUSERFIELDS U_STUDENTSUSERFIELDS
-ON
-U_STUDENTSUSERFIELDS.STUDENTSDCID = students.dcid
-
-WHERE 
-  Students.enroll_status = 0
-  and students.grade_level >=5
-
-GROUP BY students.student_number, students.first_name, students.last_name, u_studentsuserfields.emailstudent
-ORDER BY "org_defined_id"
-```
-
-SCRATCH:
-
-Updated query for adding auditors (learning support) to student records:
-```SQL
-select distinct
-        students.lastfirst as lastfirst,
-    
-    listagg('Auditor'||chr(58)||'T_'||CC.teacherID, chr(124)) 
-    WITHIN GROUP (ORDER BY teachers.teachernumber desc) ||chr(124)||
-    listagg('Parent'||chr(58)||'P_'||guardian.guardianid, chr(124)) WITHIN GROUP ( ORDER BY Guardian.LastName desc ) as "relationship"
-    
-    
-    from COURSES COURSES,
+ 
+    from 
+    /* this should remove duplicates, but it does not work */
+    (select distinct 
+        teachernumber, id
+        from teachers) teachers,
+    COURSES COURSES,
     STUDENTS STUDENTS,
     CC CC,
     U_STUDENTSUSERFIELDS U_STUDENTSUSERFIELDS,
     GUARDIANSTUDENT GUARDIANSTUDENT,
-    teachers teachers,
     guardian guardian
- 
---  INNER JOIN 
--- GuardianStudent GuardianStudent 
--- ON 
--- Guardian.GuardianID = GuardianStudent.GuardianID
-
--- INNER JOIN 
--- Students Students 
--- ON 
--- GuardianStudent.studentsdcid = Students.dcid
-
--- INNER JOIN
--- U_STUDENTSUSERFIELDS U_STUDENTSUSERFIELDS
--- ON
--- U_STUDENTSUSERFIELDS.STUDENTSDCID = students.dcid
-
-    
  
  where CC.STUDENTID=STUDENTS.ID
     and GuardianStudent.studentsdcid = Students.dcid
@@ -997,10 +970,15 @@ select distinct
     and U_STUDENTSUSERFIELDS.STUDENTSDCID = students.dcid
     and cc.teacherid = teachers.id
 
+    /* 
+    if student is enroled in OLEA, MSLC or Eng Foundations,
+    add their teacher as an auditor
+    */
     and (cc.course_number like 'OLEA' 
         or courses.sched_department like 'MSLSC' 
-        or courses.sched_department like 'MSEAL' 
-        or courses.course_name like 'ENG English Foundations'
+        or courses.sched_department like 'MSEAL'
+        /* ms, hs special education */
+        or courses.sched_department like '%SSE%'
         or courses.course_name like 'ENG English Foundations')
     and CC.COURSE_NUMBER=COURSES.COURSE_NUMBER
     and STUDENTS.ENROLL_STATUS =0
@@ -1012,7 +990,7 @@ select distinct
       THEN (EXTRACT(year from sysdate)-2000+10)*100
       end    
  
- GROUP BY students.lastfirst, students.grade_level
+ GROUP BY students.grade_level, u_studentsuserfields.emailstudent, students.student_number,  students.first_name,  students.last_name
  
  order by STUDENTS.GRADE_LEVEL DESC
 ```
