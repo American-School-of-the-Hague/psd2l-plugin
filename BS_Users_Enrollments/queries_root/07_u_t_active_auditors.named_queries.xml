@@ -39,7 +39,7 @@
 				TEACHERS.LAST_NAME as "last_name",
 				'' as "password",
 				0 as "is_active",
-				'Lerner Support' as "role_name",
+				'Learner Support' as "role_name",
 				TEACHERS.EMAIL_ADDR as "email",
 				'' as "relationships",
 				'' as "pref_first_name",

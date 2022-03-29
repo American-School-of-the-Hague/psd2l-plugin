@@ -569,7 +569,7 @@ select distinct
     TEACHERS.LAST_NAME as "last_name",
     '' as "password",
     0 as "is_active",
-    'Lerner Support' as "role_name",
+    'Learner Support' as "role_name",
     TEACHERS.EMAIL_ADDR as "email",
     '' as "relationships",
     '' as "pref_first_name",
@@ -993,6 +993,72 @@ select distinct
  GROUP BY students.grade_level, u_studentsuserfields.emailstudent, students.student_number,  students.first_name,  students.last_name
  
  order by STUDENTS.GRADE_LEVEL DESC
+```
+SCRATCH: produces heaps of duplicates
+
+```SQL
+with d_teachers
+as (select distinct 
+        teachernumber, id
+        from teachers) 
+        
+SELECT distinct
+    -- 'user' as "type",
+    -- 'UPDATE' as "action",
+      u_studentsuserfields.emailstudent as "username",
+    -- 'S_'||students.student_number as "org_defined_id",
+    -- students.first_name as "first_name",
+    -- students.last_name as "last_name",
+    -- '' as "password",
+    -- 1 as "is_active",
+    -- 'Learner' as "role_name",
+    -- u_studentsuserfields.emailstudent as "email",
+    listagg(d_teachers.teachernumber, ',') within group (order by d_teachers.teachernumber) as "T"
+    -- listagg( 'Auditor'||chr(58)||'T_'||d_teachers.teachernumber, chr(124) )
+    --     within group (order by d_teachers.teachernumber desc) as "relationship",
+    -- -- listagg('Parent'||chr(58)||'P_'||guardian.guardianid, chr(124)) WITHIN GROUP ( ORDER BY Guardian.LastName desc ) as "relationship",
+    -- '' as "pref_last_name",
+    -- '' as "pref_first_name"
+FROM 
+Guardian Guardian,
+guardianstudent guardianstudent,
+u_studentsuserfields u_studentsuserfields,
+students students,
+cc cc,
+courses courses,
+d_teachers d_teachers
+
+WHERE 
+    CC.STUDENTID=STUDENTS.ID
+    and GuardianStudent.studentsdcid = Students.dcid
+    and Guardian.GuardianID = GuardianStudent.GuardianID
+    and U_STUDENTSUSERFIELDS.STUDENTSDCID = students.dcid
+    and cc.teacherid = d_teachers.id
+
+    /* 
+    if student is enroled in OLEA, MSLC or Eng Foundations,
+    add their teacher as an auditor
+    */
+    and (cc.course_number like 'OLEA' 
+        or courses.sched_department like 'MSLSC' 
+        or courses.sched_department like 'MSEAL'
+        /* ms, hs special education */
+        or courses.sched_department like '%SSE%'
+        or courses.course_name like 'ENG English Foundations')
+    and CC.COURSE_NUMBER=COURSES.COURSE_NUMBER
+    and STUDENTS.ENROLL_STATUS =0
+    and STUDENTS.GRADE_LEVEL >=5
+    and CC.TERMID >= case 
+      when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
+      THEN (EXTRACT(year from sysdate)-2000+9)*100
+      when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
+      THEN (EXTRACT(year from sysdate)-2000+10)*100
+      end    
+
+    GROUP BY  u_studentsuserfields.emailstudent
+--  GROUP BY students.grade_level, u_studentsuserfields.emailstudent, students.student_number,  students.first_name,  students.last_name
+-- ORDER BY "org_defined_id"
+--   order by "username" asc
 ```
 
 
