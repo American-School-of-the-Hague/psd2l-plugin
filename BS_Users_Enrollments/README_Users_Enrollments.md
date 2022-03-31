@@ -873,7 +873,7 @@ This query includes all active students with Parent and Auditor relationships.
 ### Data Export Manager Setup
 
 - **Category:** Show All
-- **Export From:**  `NQ com.txoof.brightspace.users.07s_active_w_auditor`
+- **Export From:**  `NQ com.txoof.brightspace.users.07s_active`
 
 **Labels Used on Export**
 
@@ -893,7 +893,7 @@ This query includes all active students with Parent and Auditor relationships.
 
 **Export Summary and Output Options**
 
-- *Export File Name:* `7-Users_202_Students_Active_W_Auditor.csv`
+- *Export File Name:* `7-Users_201_Students_Active_W_Auditor.csv`
 - *Line Delimiter:* `CR-LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
@@ -1010,148 +1010,6 @@ WHERE
     AND COALESCE(Auditors.Auditors,Parents.Parents) IS NOT NULL
 ORDER BY
     U_StudentsUserFields.EmailStudent
-```
-
-NOPE NOPE NOPE NOPE NOPE Tons of duplicates
-
-```SQL
-SELECT
-    'user' as "type",
-    'UPDATE' as "action",
-    U_StudentsUserFields.EmailStudent AS "username",
-    'S_'||students.student_number as "org_defined_id",
-    students.first_name as "first_name",
-    students.last_name as "last_name",
-    '' as "password",
-    1 as "is_active",
-    'Learner' as "role_name",
-    u_studentsuserfields.emailstudent as "email",
-    CASE
-        WHEN Auditors.Auditors IS NOT NULL AND Parents.Parents IS NOT NULL
-        THEN Auditors.Auditors || '|' || Parents.Parents
-        ELSE COALESCE(Auditors.Auditors,Parents.Parents)
-    END AS "relationship",
-    '' as "pref_first_name",
-    '' as "pref_last_name"
-FROM
-    Students
-    JOIN U_StudentsUserFields ON Students.DCID = U_StudentsUserFields.StudentsDCID
-    LEFT JOIN (
-        SELECT
-            Helper.StudentID,
-            LISTAGG('Auditor'||CHR(58)||'T_'||Helper.TeacherNumber,'|')
-                WITHIN GROUP (ORDER BY Helper.TeacherNumber DESC) AS Auditors
-        FROM ( /* Oracle 12c method to deduplicate the LISTAGG */
-            SELECT DISTINCT
-                CC.StudentID,
-                Teachers.TeacherNumber
-            FROM
-                CC
-                JOIN Courses ON CC.Course_Number = Courses.Course_Number
-                JOIN Teachers ON CC.TeacherID = Teachers.ID
-            WHERE
-                (
-                    Courses.Course_Name LIKE 'ENG English Foundations%'
-                    OR CC.Course_Number = 'OLEA'
-                    OR Courses.Sched_Department IN ('MSEAL','MSLSC')
-                )
-                     and CC.TERMID >= case 
-                        when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
-                        THEN (EXTRACT(year from sysdate)-2000+9)*100
-                        when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
-                        THEN (EXTRACT(year from sysdate)-2000+10)*100
-                     end
-        ) Helper
-        GROUP BY
-            Helper.StudentID
-    ) Auditors ON Students.ID = Auditors.StudentID
-    LEFT JOIN ( /* I didn't deduplicate here because there shouldn't be duplicate
-        parent accounts, but you could use that same approach here if needed. */
-        SELECT
-            GuardianStudent.StudentsDCID,
-            LISTAGG('Parent' || CHR(58) || 'P_' || GuardianID,'|')
-                WITHIN GROUP (ORDER BY Guardian.LastName DESC) AS Parents
-        FROM
-            Guardian
-            JOIN GuardianStudent USING(GuardianID)
-        GROUP BY
-            GuardianStudent.StudentsDCID
-    ) Parents ON Students.DCID = Parents.StudentsDCID
-WHERE
-    Students.Enroll_Status = 0
-    AND Students.Grade_Level >= 5
-    AND U_StudentsUserFields.EmailStudent IS NOT NULL
-    /* Only pull students that have some kind of relationship */
-    AND COALESCE(Auditors.Auditors,Parents.Parents) IS NOT NULL
-ORDER BY
-    U_StudentsUserFields.EmailStudent
-```
-
-SCRATCH: produces heaps of duplicates
-
-```SQL
-with d_teachers
-as (select distinct 
-        teachernumber, id
-        from teachers) 
-        
-SELECT distinct
-    -- 'user' as "type",
-    -- 'UPDATE' as "action",
-      u_studentsuserfields.emailstudent as "username",
-    -- 'S_'||students.student_number as "org_defined_id",
-    -- students.first_name as "first_name",
-    -- students.last_name as "last_name",
-    -- '' as "password",
-    -- 1 as "is_active",
-    -- 'Learner' as "role_name",
-    -- u_studentsuserfields.emailstudent as "email",
-    listagg(d_teachers.teachernumber, ',') within group (order by d_teachers.teachernumber) as "T"
-    -- listagg( 'Auditor'||chr(58)||'T_'||d_teachers.teachernumber, chr(124) )
-    --     within group (order by d_teachers.teachernumber desc) as "relationship",
-    -- -- listagg('Parent'||chr(58)||'P_'||guardian.guardianid, chr(124)) WITHIN GROUP ( ORDER BY Guardian.LastName desc ) as "relationship",
-    -- '' as "pref_last_name",
-    -- '' as "pref_first_name"
-FROM 
-Guardian Guardian,
-guardianstudent guardianstudent,
-u_studentsuserfields u_studentsuserfields,
-students students,
-cc cc,
-courses courses,
-d_teachers d_teachers
-
-WHERE 
-    CC.STUDENTID=STUDENTS.ID
-    and GuardianStudent.studentsdcid = Students.dcid
-    and Guardian.GuardianID = GuardianStudent.GuardianID
-    and U_STUDENTSUSERFIELDS.STUDENTSDCID = students.dcid
-    and cc.teacherid = d_teachers.id
-
-    /* 
-    if student is enroled in OLEA, MSLC or Eng Foundations,
-    add their teacher as an auditor
-    */
-    and (cc.course_number like 'OLEA' 
-        or courses.sched_department like 'MSLSC' 
-        or courses.sched_department like 'MSEAL'
-        /* ms, hs special education */
-        or courses.sched_department like '%SSE%'
-        or courses.course_name like 'ENG English Foundations')
-    and CC.COURSE_NUMBER=COURSES.COURSE_NUMBER
-    and STUDENTS.ENROLL_STATUS =0
-    and STUDENTS.GRADE_LEVEL >=5
-    and CC.TERMID >= case 
-      when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
-      THEN (EXTRACT(year from sysdate)-2000+9)*100
-      when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
-      THEN (EXTRACT(year from sysdate)-2000+10)*100
-      end    
-
-    GROUP BY  u_studentsuserfields.emailstudent
---  GROUP BY students.grade_level, u_studentsuserfields.emailstudent, students.student_number,  students.first_name,  students.last_name
--- ORDER BY "org_defined_id"
---   order by "username" asc
 ```
 
 
