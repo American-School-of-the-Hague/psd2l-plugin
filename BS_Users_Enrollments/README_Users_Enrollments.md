@@ -29,11 +29,11 @@ PowerQuery Plugin for exporting the following information from PowerSchool &rarr
     - [Fields Provided & Used](#fields-provided--used-5)
     - [Data Export Manager Setup](#data-export-manager-setup-5)
     - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-5)
-  - [7 Users Students Active](#7-users-students-active)
+  - [**DEPRICATED** 7 Users Students Active](#depricated-7-users-students-active)
     - [Fields Provided & Used](#fields-provided--used-6)
     - [Data Export Manager Setup](#data-export-manager-setup-6)
     - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-6)
-  - [7 Users Students Active w/ Auditors](#7-users-students-active-w-auditors)
+  - [7 Users Students Active](#7-users-students-active)
     - [Fields Provided & Used](#fields-provided--used-7)
     - [Data Export Manager Setup](#data-export-manager-setup-7)
     - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-7)
@@ -721,7 +721,7 @@ select
  order by STUDENTS.EXITDATE asc
 ```
 
-## 7 Users Students Active
+## **DEPRICATED** 7 Users Students Active
 
 This query pulls all active students grade 5 and higher and adds a relationship between students and parents.
 
@@ -847,10 +847,9 @@ GROUP BY students.student_number, students.first_name, students.last_name, u_stu
 ORDER BY "org_defined_id"
 ```
 
-## 7 Users Students Active w/ Auditors
+## 7 Users Students Active 
 
-This query includes active students that are enrolled in Learning Support, EAL or English Essentials courses. This query overwrites the previous student query and adds Auditor and Parent relations to the students. Students included are enrolled in courses with course_number "OLEA", sched_department "MSLSC", "MSEAL" and course_name "ENG English Foundations." 
-
+This query includes all active students with Parent and Auditor relationships.
 
 ### Fields Provided & Used
 
@@ -869,7 +868,7 @@ This query includes active students that are enrolled in Learning Support, EAL o
 
 |Field |Format |example |
 |:-|:-|:-|
-|`relationships`| `Parent: org_defined_id\|Auditor: org_defined_id` | Parent:P_234123\|Auditor:T_93313
+|`relationships`| `Parent: org_defined_id|Auditor: org_defined_id` | Parent:P_234123|Auditor:T_93313
 
 ### Data Export Manager Setup
 
@@ -902,7 +901,7 @@ This query includes active students that are enrolled in Learning Support, EAL o
 
 ### Query Setup for `named_queries.xml`
 
-- File: `07_u_s_active_w_auditor.named_queries.xml`
+- File: `07_u_s_active.named_queries.xml`
 
 | header | table.field | value | NOTE |
 |-|-|-|-|
@@ -930,14 +929,20 @@ This query includes active students that are enrolled in Learning Support, EAL o
 |U_STUDENTSUSERFIELDS|
 |GuardianStudent|
 |Guardian|
+|Courses|
+|Teachers|
 
 **SQL Query**
 
 ```SQL
-select distinct
+/*
+based entirely on solution provided by Vance M. Allen
+https://support.powerschool.com/thread/23796?94834
+*/
+SELECT
     'user' as "type",
     'UPDATE' as "action",
-    u_studentsuserfields.emailstudent as "username",
+    U_StudentsUserFields.EmailStudent AS "username",
     'S_'||students.student_number as "org_defined_id",
     students.first_name as "first_name",
     students.last_name as "last_name",
@@ -945,55 +950,143 @@ select distinct
     1 as "is_active",
     'Learner' as "role_name",
     u_studentsuserfields.emailstudent as "email",
-    /* add Auditor relation to EAL, Learning Support teachers */
-    listagg('Auditor'||chr(58)||'T_'||teachers.teachernumber, chr(124) )
-        within group (order by teachers.teachernumber desc) ||chr(124)||
-    listagg('Parent'||chr(58)||'P_'||guardian.guardianid, chr(124)) WITHIN GROUP ( ORDER BY Guardian.LastName desc ) as "relationship",
-    '' as "pref_last_name",
-    '' as "pref_first_name"
- 
-    from 
-    /* this should remove duplicates, but it does not work */
-    (select distinct 
-        teachernumber, id
-        from teachers) teachers,
-    COURSES COURSES,
-    STUDENTS STUDENTS,
-    CC CC,
-    U_STUDENTSUSERFIELDS U_STUDENTSUSERFIELDS,
-    GUARDIANSTUDENT GUARDIANSTUDENT,
-    guardian guardian
- 
- where CC.STUDENTID=STUDENTS.ID
-    and GuardianStudent.studentsdcid = Students.dcid
-    and Guardian.GuardianID = GuardianStudent.GuardianID
-    and U_STUDENTSUSERFIELDS.STUDENTSDCID = students.dcid
-    and cc.teacherid = teachers.id
-
-    /* 
-    if student is enroled in OLEA, MSLC or Eng Foundations,
-    add their teacher as an auditor
-    */
-    and (cc.course_number like 'OLEA' 
-        or courses.sched_department like 'MSLSC' 
-        or courses.sched_department like 'MSEAL'
-        /* ms, hs special education */
-        or courses.sched_department like '%SSE%'
-        or courses.course_name like 'ENG English Foundations')
-    and CC.COURSE_NUMBER=COURSES.COURSE_NUMBER
-    and STUDENTS.ENROLL_STATUS =0
-    and STUDENTS.GRADE_LEVEL >=5
-    and CC.TERMID >= case 
-      when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
-      THEN (EXTRACT(year from sysdate)-2000+9)*100
-      when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
-      THEN (EXTRACT(year from sysdate)-2000+10)*100
-      end    
- 
- GROUP BY students.grade_level, u_studentsuserfields.emailstudent, students.student_number,  students.first_name,  students.last_name
- 
- order by STUDENTS.GRADE_LEVEL DESC
+    CASE
+        WHEN Auditors.Auditors IS NOT NULL AND Parents.Parents IS NOT NULL
+        THEN Auditors.Auditors || '|' || Parents.Parents
+        ELSE COALESCE(Auditors.Auditors,Parents.Parents)
+    END AS "relationship",
+    '' as "pref_first_name",
+    '' as "pref_last_name"
+FROM
+    Students
+    JOIN U_StudentsUserFields ON Students.DCID = U_StudentsUserFields.StudentsDCID
+    LEFT JOIN (
+        SELECT
+            Helper.StudentID,
+            LISTAGG('Auditor'||CHR(58)||'T_'||Helper.TeacherNumber,'|')
+                WITHIN GROUP (ORDER BY Helper.TeacherNumber DESC) AS Auditors
+        FROM ( /* Oracle 12c method to deduplicate the LISTAGG */
+            SELECT DISTINCT
+                CC.StudentID,
+                Teachers.TeacherNumber
+            FROM
+                CC
+                JOIN Courses ON CC.Course_Number = Courses.Course_Number
+                JOIN Teachers ON CC.TeacherID = Teachers.ID
+            WHERE
+                (
+                    Courses.Course_Name LIKE 'ENG English Foundations%'
+                    OR Courses.Course_name LIKE 'Grade%English Essentials%'
+                    OR CC.Course_Number = 'OLEA'
+                    OR Courses.Sched_Department IN ('MSEAL','MSLSC')
+                )
+                     and CC.TERMID >= case 
+                        when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
+                        THEN (EXTRACT(year from sysdate)-2000+9)*100
+                        when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
+                        THEN (EXTRACT(year from sysdate)-2000+10)*100
+                     end
+        ) Helper
+        GROUP BY
+            Helper.StudentID
+    ) Auditors ON Students.ID = Auditors.StudentID
+    LEFT JOIN ( /* I didn't deduplicate here because there shouldn't be duplicate
+        parent accounts, but you could use that same approach here if needed. */
+        SELECT
+            GuardianStudent.StudentsDCID,
+            LISTAGG('Parent' || CHR(58) || 'P_' || GuardianID,'|')
+                WITHIN GROUP (ORDER BY Guardian.LastName DESC) AS Parents
+        FROM
+            Guardian
+            JOIN GuardianStudent USING(GuardianID)
+        GROUP BY
+            GuardianStudent.StudentsDCID
+    ) Parents ON Students.DCID = Parents.StudentsDCID
+WHERE
+    Students.Enroll_Status = 0
+    AND Students.Grade_Level >= 5
+    AND U_StudentsUserFields.EmailStudent IS NOT NULL
+    /* Only pull students that have some kind of relationship */
+    AND COALESCE(Auditors.Auditors,Parents.Parents) IS NOT NULL
+ORDER BY
+    U_StudentsUserFields.EmailStudent
 ```
+
+NOPE NOPE NOPE NOPE NOPE Tons of duplicates
+
+```SQL
+SELECT
+    'user' as "type",
+    'UPDATE' as "action",
+    U_StudentsUserFields.EmailStudent AS "username",
+    'S_'||students.student_number as "org_defined_id",
+    students.first_name as "first_name",
+    students.last_name as "last_name",
+    '' as "password",
+    1 as "is_active",
+    'Learner' as "role_name",
+    u_studentsuserfields.emailstudent as "email",
+    CASE
+        WHEN Auditors.Auditors IS NOT NULL AND Parents.Parents IS NOT NULL
+        THEN Auditors.Auditors || '|' || Parents.Parents
+        ELSE COALESCE(Auditors.Auditors,Parents.Parents)
+    END AS "relationship",
+    '' as "pref_first_name",
+    '' as "pref_last_name"
+FROM
+    Students
+    JOIN U_StudentsUserFields ON Students.DCID = U_StudentsUserFields.StudentsDCID
+    LEFT JOIN (
+        SELECT
+            Helper.StudentID,
+            LISTAGG('Auditor'||CHR(58)||'T_'||Helper.TeacherNumber,'|')
+                WITHIN GROUP (ORDER BY Helper.TeacherNumber DESC) AS Auditors
+        FROM ( /* Oracle 12c method to deduplicate the LISTAGG */
+            SELECT DISTINCT
+                CC.StudentID,
+                Teachers.TeacherNumber
+            FROM
+                CC
+                JOIN Courses ON CC.Course_Number = Courses.Course_Number
+                JOIN Teachers ON CC.TeacherID = Teachers.ID
+            WHERE
+                (
+                    Courses.Course_Name LIKE 'ENG English Foundations%'
+                    OR CC.Course_Number = 'OLEA'
+                    OR Courses.Sched_Department IN ('MSEAL','MSLSC')
+                )
+                     and CC.TERMID >= case 
+                        when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
+                        THEN (EXTRACT(year from sysdate)-2000+9)*100
+                        when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
+                        THEN (EXTRACT(year from sysdate)-2000+10)*100
+                     end
+        ) Helper
+        GROUP BY
+            Helper.StudentID
+    ) Auditors ON Students.ID = Auditors.StudentID
+    LEFT JOIN ( /* I didn't deduplicate here because there shouldn't be duplicate
+        parent accounts, but you could use that same approach here if needed. */
+        SELECT
+            GuardianStudent.StudentsDCID,
+            LISTAGG('Parent' || CHR(58) || 'P_' || GuardianID,'|')
+                WITHIN GROUP (ORDER BY Guardian.LastName DESC) AS Parents
+        FROM
+            Guardian
+            JOIN GuardianStudent USING(GuardianID)
+        GROUP BY
+            GuardianStudent.StudentsDCID
+    ) Parents ON Students.DCID = Parents.StudentsDCID
+WHERE
+    Students.Enroll_Status = 0
+    AND Students.Grade_Level >= 5
+    AND U_StudentsUserFields.EmailStudent IS NOT NULL
+    /* Only pull students that have some kind of relationship */
+    AND COALESCE(Auditors.Auditors,Parents.Parents) IS NOT NULL
+ORDER BY
+    U_StudentsUserFields.EmailStudent
+```
+
 SCRATCH: produces heaps of duplicates
 
 ```SQL
