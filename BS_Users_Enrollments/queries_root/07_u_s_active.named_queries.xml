@@ -81,11 +81,11 @@
 					parent accounts, but you could use that same approach here if needed. */
 					SELECT
 						GuardianStudent.StudentsDCID,
-						LISTAGG('Parent' || CHR(58) || 'P_' || GuardianID,'|')
+						LISTAGG('Parent' || CHR(58) || 'P_' || guardianstudent.GuardianID, '|')
 							WITHIN GROUP (ORDER BY Guardian.LastName DESC) AS Parents
 					FROM
 						Guardian
-						JOIN GuardianStudent USING(GuardianID)
+						JOIN GuardianStudent on guardianstudent.GuardianID = guardian.guardianid
 					GROUP BY
 						GuardianStudent.StudentsDCID
 				) Parents ON Students.DCID = Parents.StudentsDCID
