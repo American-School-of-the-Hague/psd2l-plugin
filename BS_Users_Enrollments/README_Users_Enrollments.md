@@ -476,7 +476,69 @@ All active staff.
 
 ### Query Setup for `named_queries.xml`
 
+- File: `07_u_t_active.named_queries.xml`
 
+| header | table.field | value | NOTE |
+|-|-|-|-|
+|type| TEACHERS.ID | user | N1 |
+|action| TEACHERS.ID | UPDATE | N1 |
+|username| TEACHERS.EMAIL_ADDR |_foo@ash.nl_ |
+|org_define_id| TEACHERS.ID | _T\_234_ |
+|first_name| TEACHERS.FIRST_NAME | _John_ |
+|last_name| TEACHERS.LAST_NAME |_Doe_ | 
+|password| TEACHERS.ID | '' | N1 |
+|role_name| TEACHERS.ID | _Instructor_ | N1 |
+|relationships| TEACHERS.ID | TBD | N1 |
+|pref_frist_name| TEACHERS.ID |TBD | N1 |
+|pref_last_name| TEACHERS.ID |TBD | N1 |
+
+**NOTES**
+
+**N1:** Field does not appear in database; use a known field such as `<column column=STUDENT.ID>header<\column>` to prevent an "unknown column error"
+
+**Tables Used**
+
+| Table |
+|-|
+|TEACHERS|
+|CC|
+|STUDENTS|
+|TEACHERS|
+|COURSES|
+
+**SQL Query**
+
+```SQL
+select DISTINCT
+    'user' as "type",
+    'UPDATE' as "action",
+    /* 
+    use username portion of teacher/staff email addresses for D2L username.
+    This is necessary because some staff use their @ash.nl email address as
+    their guardian contact information. The parent accounts are created first
+    resulting in a colision between the parent account username and teacher 
+    account username.
+    */
+    regexp_replace(TEACHERS.EMAIL_ADDR, '(@.*)', '') as "username",
+    /* prepend a 'T' to make sure there are no studentid/teacherid colissions */
+    'T_'||TEACHERS.TEACHERNUMBER as "org_defined_id",
+    TEACHERS.FIRST_NAME as "first_name",
+    TEACHERS.LAST_NAME as "last_name",
+    '' as "password",
+    TEACHERS.STATUS as "is_active",
+    'Instructor' as "role_name",
+    TEACHERS.EMAIL_ADDR as "email",
+    '' as "relationships",
+    '' as "pref_first_name",
+    '' as "pref_last_name"
+
+from TEACHERS TEACHERS
+where TEACHERS.HOMESCHOOLID = TEACHERS.SCHOOLID 
+    AND TEACHERS.STATUS = 1 
+    /* Ignore all users with no email address */
+    AND LENGTH(TEACHERS.EMAIL_ADDR) > 0
+    ORDER BY TEACHERS.LAST_NAME ASC
+```
 
 ## 7 Users Teacher-Auditors Active
 
@@ -1120,6 +1182,41 @@ select distinct
   */
   and length( teachers.email_addr) > 0
 order by "child_code" asc, "parent_code" asc
+```
+
+SCRATCH Query for adding all co-teachers
+
+```SQL
+select distinct
+    COURSES.COURSE_NAME as COURSE_NAME,
+    'T_'||teachers.teachernumber as "child_code",
+    'Instructor' as "role_name",
+    TEACHERS.LASTFIRST as LASTFIRST,
+    'cs_'||CC.SCHOOLID||'_'||cc.COURSE_NUMBER||'_'||CC.TERMID||'_'||DECODE(substr(cc.expression, 1, 1), 
+     1, 'A', 
+     2, 'B', 
+     3, 'C', 
+     4, 'D', 
+     5, 'E', 
+     6, 'F', 
+     7, 'G', 
+     8, 'H', 
+     9, 'ADV', 
+     'UNKNOWN') as "parent_code"
+ from TEACHERS TEACHERS,
+    SECTIONTEACHER SECTIONTEACHER,
+    STUDENTS STUDENTS,
+    CC CC,
+    COURSES COURSES 
+ where STUDENTS.ID=CC.STUDENTID
+    and CC.COURSE_NUMBER=COURSES.COURSE_NUMBER
+    and CC.SECTIONID=SECTIONTEACHER.SECTIONID
+    and SECTIONTEACHER.TEACHERID=TEACHERS.ID
+    and STUDENTS.ENROLL_STATUS =0
+    and CC.TERMID =3100
+    -- and courses.course_name like '%Band%'
+    and STUDENTS.GRADE_LEVEL >=5
+ order by COURSES.COURSE_NAME asc
 ```
 
 ## 8 Enrollments Students
