@@ -1146,6 +1146,45 @@ ORDER BY
 **SQL Query**
 
 ```SQL
+/*
+enroll all section teachers (including primary and co-teachers) into sections/courses
+*/
+select distinct
+    'enrollment' as "type",
+    'UPDATE' as "action",
+    'T_'||teachers.teachernumber as "child_code",
+    'Instructor' as "role_name",
+    'cs_'||CC.SCHOOLID||'_'||cc.COURSE_NUMBER||'_'||CC.TERMID||'_'||DECODE(substr(cc.expression, 1, 1), 
+     1, 'A', 
+     2, 'B', 
+     3, 'C', 
+     4, 'D', 
+     5, 'E', 
+     6, 'F', 
+     7, 'G', 
+     8, 'H', 
+     9, 'ADV', 
+     'UNKNOWN') as "parent_code"
+ from TEACHERS TEACHERS,
+    SECTIONTEACHER SECTIONTEACHER,
+    STUDENTS STUDENTS,
+    CC CC,
+    COURSES COURSES 
+ where STUDENTS.ID=CC.STUDENTID
+    and CC.COURSE_NUMBER=COURSES.COURSE_NUMBER
+    and CC.SECTIONID=SECTIONTEACHER.SECTIONID
+    and SECTIONTEACHER.TEACHERID=TEACHERS.ID
+    and STUDENTS.ENROLL_STATUS =0
+    and CC.TERMID =3100
+    -- and courses.course_name like '%Band%'
+    and STUDENTS.GRADE_LEVEL >=5
+ order by COURSES.COURSE_NAME asc
+```
+
+```SQL
+/*
+Depricated -- enrol primary teacher into course (no co-teachers)
+*/
 select distinct
     'enrollment' as "type",
     'UPDATE' as "action",
