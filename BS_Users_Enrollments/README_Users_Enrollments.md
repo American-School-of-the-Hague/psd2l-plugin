@@ -1176,9 +1176,8 @@ select distinct
     and SECTIONTEACHER.TEACHERID=TEACHERS.ID
     and STUDENTS.ENROLL_STATUS =0
     and CC.TERMID =3100
-    -- and courses.course_name like '%Band%'
     and STUDENTS.GRADE_LEVEL >=5
- order by COURSES.COURSE_NAME asc
+ order by teachers.teachernumber asc
 ```
 
 ```SQL

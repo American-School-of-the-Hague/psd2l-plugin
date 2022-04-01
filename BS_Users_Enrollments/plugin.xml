@@ -4,7 +4,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		description="BrightSpace User and Enrolment Export (Users, Enrollment) see https://github.com/txoof/PowerQuery"
 		name="BrightSpace User, Enrollment Export"
-		version="1.1.1.20220331"
+		version="1.1.4.20220401"
 		xsi:schemaLocation="http://plugin.powerschool.pearson.com plugin.xsd">
 		
 	<publisher name="Aaron Ciuffo">
