@@ -437,7 +437,7 @@ select distinct
 
 ## 7 Users Teachers Active
 
-All active staff.
+All active staff updated as role "Instructors".
 
 ### Fields Provided & Used
 
@@ -542,7 +542,7 @@ where TEACHERS.HOMESCHOOLID = TEACHERS.SCHOOLID
 
 ## 7 Users Teacher-Auditors Active
 
-All teachers that are Learner Support Auditors. Teachers of EAL and Learning Support classes. These users are linked via the relationship field for students. These roles overwrite the "Instructor" roles.
+All teachers that are memberts of the "Learner Support" auditors role. Teachers of EAL and Learning Support classes. These users are linked via the relationship field for students. These roles overwrite the "Instructor" roles.
 
 ### Fields Provided & Used
 
