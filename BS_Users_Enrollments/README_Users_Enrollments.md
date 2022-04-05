@@ -508,7 +508,46 @@ All active staff updated as role "Instructors".
 
 **SQL Query**
 
+All active staff
+
 ```SQL
+select DISTINCT
+    'user' as "type",
+    'UPDATE' as "action",
+    /* 
+    use username portion of teacher/staff email addresses for D2L username.
+    This is necessary because some staff use their @ash.nl email address as
+    their guardian contact information. The parent accounts are created first
+    resulting in a colision between the parent account username and teacher 
+    account username.
+    */
+    regexp_replace(users.EMAIL_ADDR, '(@.*)', '') as "username",
+    /* prepend a 'T' to make sure there are no studentid/teacherid colissions */
+    'T_'||users.TEACHERNUMBER as "org_defined_id",
+    users.FIRST_NAME as "first_name",
+    users.LAST_NAME as "last_name",
+    '' as "password",
+    schoolstaff.STATUS as "is_active",
+    'Instructor' as "role_name",
+    users.EMAIL_ADDR as "email",
+    '' as "relationships",
+    '' as "pref_first_name",
+    '' as "pref_last_name"
+
+from 
+    users users,
+    schoolstaff schoolstaff
+where SCHOOLSTAFF.USERS_DCID=USERS.DCID
+    /* Ignore all users with no email address */
+    AND LENGTH(users.EMAIL_ADDR) > 0
+    and schoolstaff.status=1
+ORDER BY users.last_name asc
+```
+
+
+**DEPRECATED** uses TEACHERS table that is no longer supported
+
+```SQL 
 select DISTINCT
     'user' as "type",
     'UPDATE' as "action",
@@ -1373,6 +1412,7 @@ select
 
 
 ## template
+
 ### Fields Provided & Used
 
 
