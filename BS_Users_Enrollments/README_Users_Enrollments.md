@@ -21,7 +21,7 @@ PowerQuery Plugin for exporting the following information from PowerSchool &rarr
     - [Fields Provided & Used](#fields-provided--used-3)
     - [Data Export Manager Setup](#data-export-manager-setup-3)
     - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-3)
-  - [7 Users Teacher-Auditors Active](#7-users-teacher-auditors-active)
+  - [**DEPRICATED** 7 Users Teacher-Auditors Active](#depricated-7-users-teacher-auditors-active)
     - [Fields Provided & Used](#fields-provided--used-4)
     - [Data Export Manager Setup](#data-export-manager-setup-4)
     - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-4)
@@ -540,7 +540,9 @@ where TEACHERS.HOMESCHOOLID = TEACHERS.SCHOOLID
     ORDER BY TEACHERS.LAST_NAME ASC
 ```
 
-## 7 Users Teacher-Auditors Active
+## **DEPRICATED** 7 Users Teacher-Auditors Active
+
+The relationship built in the Active-Students query builds the relationships. This is not needed.
 
 All teachers that are memberts of the "Learner Support" auditors role. Teachers of EAL and Learning Support classes. These users are linked via the relationship field for students. These roles overwrite the "Instructor" roles.
 
