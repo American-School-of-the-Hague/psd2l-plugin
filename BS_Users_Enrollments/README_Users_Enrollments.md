@@ -1,54 +1,54 @@
+<!-- omit in toc -->
 # BrightSpace D2L User and Enrollments (7-8)
 
 PowerQuery Plugin for exporting the following information from PowerSchool &rarr; BrightSpace. This plugin creates the following exports:
 
-- [BrightSpace D2L User and Enrollments (7-8)](#brightspace-d2l-user-and-enrollments-7-8)
-  - [Important Implementation Notes](#important-implementation-notes)
-    - [User creation](#user-creation)
-  - [7 Users Parents Inactive](#7-users-parents-inactive)
-    - [Fields Provided & Used](#fields-provided--used)
-    - [Data Export Manager Setup](#data-export-manager-setup)
-    - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml)
-  - [7 Users Parents Active](#7-users-parents-active)
-    - [Fields Provided & Used](#fields-provided--used-1)
-    - [Data Export Manager Setup](#data-export-manager-setup-1)
-    - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-1)
-  - [7 Users Teachers Inactive](#7-users-teachers-inactive)
-    - [Fields Provided & Used](#fields-provided--used-2)
-    - [Data Export Manager Setup](#data-export-manager-setup-2)
-    - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-2)
-  - [7 Users Teachers Active](#7-users-teachers-active)
-    - [Fields Provided & Used](#fields-provided--used-3)
-    - [Data Export Manager Setup](#data-export-manager-setup-3)
-    - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-3)
-  - [**DEPRICATED** 7 Users Teacher-Auditors Active](#depricated-7-users-teacher-auditors-active)
-    - [Fields Provided & Used](#fields-provided--used-4)
-    - [Data Export Manager Setup](#data-export-manager-setup-4)
-    - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-4)
-  - [7 Users Students Inactive](#7-users-students-inactive)
-    - [Fields Provided & Used](#fields-provided--used-5)
-    - [Data Export Manager Setup](#data-export-manager-setup-5)
-    - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-5)
-  - [**DEPRICATED** 7 Users Students Active](#depricated-7-users-students-active)
-    - [Fields Provided & Used](#fields-provided--used-6)
-    - [Data Export Manager Setup](#data-export-manager-setup-6)
-    - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-6)
-  - [7 Users Students Active](#7-users-students-active)
-    - [Fields Provided & Used](#fields-provided--used-7)
-    - [Data Export Manager Setup](#data-export-manager-setup-7)
-    - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-7)
-  - [8 Enrollments Teachers](#8-enrollments-teachers)
-    - [Fields Provided & Used](#fields-provided--used-8)
-    - [Data Export Manager Setup](#data-export-manager-setup-8)
-    - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-8)
-  - [8 Enrollments Students](#8-enrollments-students)
-    - [Fields Provided & Used](#fields-provided--used-9)
-    - [Data Export Manager Setup](#data-export-manager-setup-9)
-    - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-9)
-  - [template](#template)
-    - [Fields Provided & Used](#fields-provided--used-10)
-    - [Data Export Manager Setup](#data-export-manager-setup-10)
-    - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-10)
+- [Important Implementation Notes](#important-implementation-notes)
+  - [User creation](#user-creation)
+- [7 Users Parents Inactive](#7-users-parents-inactive)
+  - [Fields Provided & Used](#fields-provided--used)
+  - [Data Export Manager Setup](#data-export-manager-setup)
+  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml)
+- [7 Users Parents Active](#7-users-parents-active)
+  - [Fields Provided & Used](#fields-provided--used-1)
+  - [Data Export Manager Setup](#data-export-manager-setup-1)
+  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-1)
+- [7 Users Teachers Inactive](#7-users-teachers-inactive)
+  - [Fields Provided & Used](#fields-provided--used-2)
+  - [Data Export Manager Setup](#data-export-manager-setup-2)
+  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-2)
+- [7 Users Teachers Active](#7-users-teachers-active)
+  - [Fields Provided & Used](#fields-provided--used-3)
+  - [Data Export Manager Setup](#data-export-manager-setup-3)
+  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-3)
+- [**DEPRICATED** 7 Users Teacher-Auditors Active](#depricated-7-users-teacher-auditors-active)
+  - [Fields Provided & Used](#fields-provided--used-4)
+  - [Data Export Manager Setup](#data-export-manager-setup-4)
+  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-4)
+- [7 Users Students Inactive](#7-users-students-inactive)
+  - [Fields Provided & Used](#fields-provided--used-5)
+  - [Data Export Manager Setup](#data-export-manager-setup-5)
+  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-5)
+- [**DEPRICATED** 7 Users Students Active](#depricated-7-users-students-active)
+  - [Fields Provided & Used](#fields-provided--used-6)
+  - [Data Export Manager Setup](#data-export-manager-setup-6)
+  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-6)
+- [7 Users Students Active](#7-users-students-active)
+  - [Fields Provided & Used](#fields-provided--used-7)
+  - [Data Export Manager Setup](#data-export-manager-setup-7)
+  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-7)
+- [8 Enrollments Teachers](#8-enrollments-teachers)
+  - [Fields Provided & Used](#fields-provided--used-8)
+  - [Data Export Manager Setup](#data-export-manager-setup-8)
+  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-8)
+- [8 Enrollments Students](#8-enrollments-students)
+  - [Fields Provided & Used](#fields-provided--used-9)
+  - [Data Export Manager Setup](#data-export-manager-setup-9)
+  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-9)
+- [template](#template)
+  - [Fields Provided & Used](#fields-provided--used-10)
+  - [Data Export Manager Setup](#data-export-manager-setup-10)
+  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-10)
 
 ## Important Implementation Notes
 
@@ -787,6 +787,8 @@ select
 
 ## **DEPRICATED** 7 Users Students Active
 
+Replaced with more complex query that adds auditors and parent relations. **DO NOT USE**
+
 This query pulls all active students grade 5 and higher and adds a relationship between students and parents.
 
 ### Fields Provided & Used
@@ -911,7 +913,7 @@ GROUP BY students.student_number, students.first_name, students.last_name, u_stu
 ORDER BY "org_defined_id"
 ```
 
-## 7 Users Students Active 
+## 7 Users Students Active
 
 This query includes all active students with Parent and Auditor relationships.
 
@@ -1075,7 +1077,6 @@ WHERE
 ORDER BY
     U_StudentsUserFields.EmailStudent
 ```
-
 
 ## 8 Enrollments Teachers
 
