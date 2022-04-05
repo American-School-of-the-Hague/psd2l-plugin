@@ -543,11 +543,8 @@ All active staff updated as role "Instructors".
 
 | Table |
 |-|
-|TEACHERS|
-|CC|
-|STUDENTS|
-|TEACHERS|
-|COURSES|
+|USERS|
+|SCHOOLSTAFF|
 
 **SQL Query**
 
@@ -1230,6 +1227,8 @@ ORDER BY
 
 **SQL Query**
 
+Add all teachers and co-teachers -- need to remove the "TEACHERS" table dependency
+
 ```SQL
 /*
 enroll all section teachers (including primary and co-teachers) into sections/courses
@@ -1264,6 +1263,8 @@ select distinct
     and STUDENTS.GRADE_LEVEL >=5
  order by teachers.teachernumber asc
 ```
+
+**DEPRECATED** only enrolls primary teacher does not add co-teachers
 
 ```SQL
 /*
