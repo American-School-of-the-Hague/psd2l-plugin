@@ -5,19 +5,19 @@
         <description>export all active teachers for use with a BrightSpace 7-User import</description>
 		<!--number of columns here must match number sql returns-->
         <columns>
-			<column column="TEACHERS.ID">type</column> <!-- for columns not in database use a core filed-->
-			<column column="TEACHERS.ID">action</column> <!-- for columns not in database use a core filed-->
+			<column column="TEACHERS.TEACHERNUMBER">type</column> <!-- for columns not in database use a core filed-->
+			<column column="TEACHERS.TEACHERNUMBER">action</column> <!-- for columns not in database use a core filed-->
 			<column column="TEACHERS.EMAIL_ADDR">username</column> 
-			<column column="TEACHERS.ID">org_defined_id</column>
+			<column column="TEACHERS.TEACHERNUMBER">org_defined_id</column>
 			<column column="TEACHERS.FIRST_NAME">first_name</column>
 			<column column="TEACHERS.LAST_NAME">last_name</column>
-			<column column="TEACHERS.ID">password</column>
-			<column column="STUDENTS.ENROLL_STATUS">is_active</column>
-			<column column="TEACHERS.ID">role_name</column>
+			<column column="TEACHERS.TEACHERNUMBER">password</column>
+			<column column="TEACHERS.STATUS">is_active</column>
+			<column column="TEACHERS.TEACHERNUMBER">role_name</column>
 			<column column="TEACHERS.EMAIL_ADDR">email</column>
-			<column column="TEACHERS.ID">relationships</column>
-			<column column="TEACHERS.ID">pref_first_name</column>
-			<column column="TEACHERS.ID">pref_last_name</column>
+			<column column="TEACHERS.TEACHERNUMBER">relationships</column>
+			<column column="TEACHERS.TEACHERNUMBER">pref_first_name</column>
+			<column column="TEACHERS.TEACHERNUMBER">pref_last_name</column>
  		</columns>
 		<!--SQL query in format <![CDATA[QUERY]]>-->
         <sql>

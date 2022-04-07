@@ -65,7 +65,7 @@ See the *Data Export Manager* section for each Named Query below.
 
 ## 7 Users Parents Inactive
 
-There are two separate Named Queries (NQ) for parents, one for mother and one for father.
+There are two separate Named Queries (NQ) for parents, one for mother and one for father. These are listed as m_inactive and f_inactive respectively. These could potentially be combined in the future.
 
 ### Fields Provided & Used
 
@@ -196,8 +196,7 @@ order by "org_defined_id" asc
 
 ## 7 Users Parents Active
 
-There are two separate Named Queries (NQ) for parents, one for mother and one for father.
-
+There are two separate Named Queries (NQ) for parents, one for mother and one for father. These are listed as m_inactive and f_inactive respectively. These could potentially be combined in the future.
 
 ### Fields Provided & Used
 
@@ -331,7 +330,7 @@ order by "org_defined_id" asc
 
 |Field |Format |example |
 |:-|:-|:-|
-|`org_defined_id`| `T_`_`TEACHERS.TEACHERNUMBER`_ | T_123456
+|`org_defined_id`| `T_`_`USERS.TEACHERNUMBER`_ | T_123456
 
 **USES FIELDS:**
 
@@ -373,17 +372,17 @@ order by "org_defined_id" asc
 
 | header | table.field | value | NOTE |
 |-|-|-|-|
-|type| TEACHERS.ID | user | N1 |
-|action| TEACHERS.ID | UPDATE | N1 |
+|type| TEACHERS.TEACHERNUMBER | user | N1 |
+|action| TEACHERS.TEACHERNUMBER | UPDATE | N1 |
 |username| TEACHERS.EMAIL_ADDR |_foo@ash.nl_ |
 |org_define_id| TEACHERS.TEACHERNUMBER | _T\_234_ |
-|first_name| TEACHERS.FIRST_NAME | _John_ |
+|first_name|TEACHERS.FIRST_NAME | _John_ |
 |last_name| TEACHERS.LAST_NAME |_Doe_ | 
-|password| TEACHERS.ID | '' | N1 |
-|role_name| TEACHERS.ID | _Instructor_ | N1 |
-|relationships| TEACHERS.ID | TBD | N1 |
-|pref_frist_name| TEACHERS.ID |TBD | N1 |
-|pref_last_name| TEACHERS.ID |TBD | N1 |
+|password| TEACHERS.TEACHERNUMBER | '' | N1 |
+|role_name| TEACHERS.TEACHERNUMBER | _Instructor_ | N1 |
+|relationships| TEACHERS.TEACHERNUMBER | TBD | N1 |
+|pref_frist_name| TEACHERS.TEACHERNUMBER |TBD | N1 |
+|pref_last_name| TEACHERS.TEACHERNUMBER |TBD | N1 |
 
 
 **NOTES**
@@ -395,53 +394,11 @@ order by "org_defined_id" asc
 | Table |
 |-|
 |TEACHERS|
+|LOGINS|
 
 **SQL Query**
 
-Disable staff that are no longer active -- this is not quite accurate and is pulling an odd set of staff.
-
-```SQL
-select DISTINCT
-    'user' as "type",
-    'UPDATE' as "action",
-    /* 
-    use username portion of teacher/staff email addresses for D2L username.
-    This is necessary because some staff use their @ash.nl email address as
-    their guardian contact information. The parent accounts are created first
-    resulting in a colision between the parent account username and teacher 
-    account username.
-    */
-    regexp_replace(users.EMAIL_ADDR, '(@.*)', '') as "username",
-    /* prepend a 'T' to make sure there are no studentid/teacherid colissions */
-    'T_'||users.TEACHERNUMBER as "org_defined_id",
-    users.FIRST_NAME as "first_name",
-    users.LAST_NAME as "last_name",
-    '' as "password",
-    schoolstaff.STATUS as "is_active",
-    'Instructor' as "role_name",
-    users.EMAIL_ADDR as "email",
-    '' as "relationships",
-    '' as "pref_first_name",
-    '' as "pref_last_name"
-
-from 
-    users users,
-    schoolstaff schoolstaff,
-    logins logins
-where SCHOOLSTAFF.USERS_DCID=USERS.DCID
-    and USERS.DCID=LOGINS.USERID
-    and users.homeschoolid=schoolstaff.schoolid
-    /* Ignore all users with no email address */
-    AND LENGTH(users.EMAIL_ADDR) > 0
-    and schoolstaff.status!=1
-    /* deactivate anyone that is status !=1 and has not logged in in 5 months (150 days) */
-    AND (trunc(sysdate) - trunc(LOGINS.LOGINDATE) > 150)
-ORDER BY users.last_name asc
-```
-
-**DEPRECATED** This query uses the `TEACHERS` table that is no longer supported.
-
-Delete staff that are not "active" (STATUS != 1) 
+Disable staff that are not "active" (STATUS != 1)
 ```SQL
 select distinct
     'user' as "type",
@@ -473,8 +430,9 @@ select distinct
     /* Ignore all users with no email address */
     AND LENGTH(TEACHERS.EMAIL_ADDR) > 0
     AND TEACHERS.STATUS != 1
-    /* deactivate anyone that is status !=1 and has not logged in in 5 months (150 days) */
-    AND trunc(sysdate) - trunc(LOGINS.LOGINDATE) > 150
+    /* deactivate anyone that is status !=1 and has not logged in in 5 days. This helps ensure that 
+     */
+    AND trunc(sysdate) - trunc(LOGINS.LOGINDATE) > 5
     ORDER BY "org_defined_id" asc
 ```
 
@@ -544,11 +502,12 @@ All active staff updated as role "Instructors".
 | Table |
 |-|
 |USERS|
-|SCHOOLSTAFF|
+|TEACHERS|
+|U_SCHOOLSTAFFUSERFIELDS|
 
 **SQL Query**
 
-All active staff
+All active staff with Brightspace Roles assigned
 
 ```SQL
 select DISTINCT
@@ -558,7 +517,7 @@ select DISTINCT
     use username portion of teacher/staff email addresses for D2L username.
     This is necessary because some staff use their @ash.nl email address as
     their guardian contact information. The parent accounts are created first
-    resulting in a colision between the parent account username and teacher 
+    resulting in a collision between the parent account username and teacher 
     account username.
     */
     regexp_replace(users.EMAIL_ADDR, '(@.*)', '') as "username",
@@ -568,26 +527,37 @@ select DISTINCT
     users.LAST_NAME as "last_name",
     '' as "password",
     schoolstaff.STATUS as "is_active",
-    'Instructor' as "role_name",
+    -- 'Instructor' as "role_name",
+    case 
+        when U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE is Null or lower(trim(U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE)) = lower('NONE')
+        Then 'Instructor'
+        ELSE trim(U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE)
+    end as"role_name",
     users.EMAIL_ADDR as "email",
     '' as "relationships",
     '' as "pref_first_name",
     '' as "pref_last_name"
-
 from 
     users users,
-    schoolstaff schoolstaff
+    schoolstaff schoolstaff,
+    U_SCHOOLSTAFFUSERFIELDS U_SCHOOLSTAFFUSERFIELDS 
+
 where SCHOOLSTAFF.USERS_DCID=USERS.DCID
+    /* only the homeschool information for each user; 
+    this prevents multiple entries
+    */
+    and users.homeschoolid=schoolstaff.schoolid
+    and SCHOOLSTAFF.DCID=U_SCHOOLSTAFFUSERFIELDS.SCHOOLSTAFFDCID(+)
     /* Ignore all users with no email address */
     AND LENGTH(users.EMAIL_ADDR) > 0
+    /* only active staff */
     and schoolstaff.status=1
 ORDER BY users.last_name asc
 ```
 
+**Depricated** does not include Role assignment
 
-**DEPRECATED** uses TEACHERS table that is no longer supported
-
-```SQL 
+```SQL
 select DISTINCT
     'user' as "type",
     'UPDATE' as "action",
@@ -1227,7 +1197,7 @@ ORDER BY
 
 **SQL Query**
 
-Add all teachers and co-teachers -- need to remove the "TEACHERS" table dependency
+Add all teachers and co-teachers
 
 ```SQL
 /*
