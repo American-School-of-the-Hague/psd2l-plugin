@@ -41,14 +41,17 @@ PowerQuery Plugin for exporting the following information from PowerSchool &rarr
   - [Fields Provided & Used](#fields-provided--used-8)
   - [Data Export Manager Setup](#data-export-manager-setup-8)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-8)
-- [8 Enrollments Students](#8-enrollments-students)
+- [8 Enrollments Teachers - School Level](#8-enrollments-teachers---school-level)
   - [Fields Provided & Used](#fields-provided--used-9)
   - [Data Export Manager Setup](#data-export-manager-setup-9)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-9)
-- [template](#template)
+- [8 Enrollments Students](#8-enrollments-students)
   - [Fields Provided & Used](#fields-provided--used-10)
   - [Data Export Manager Setup](#data-export-manager-setup-10)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-10)
+  - [Fields Provided & Used](#fields-provided--used-11)
+  - [Data Export Manager Setup](#data-export-manager-setup-11)
+  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-11)
 
 ## Important Implementation Notes
 
@@ -1278,39 +1281,92 @@ select distinct
 order by "child_code" asc, "parent_code" asc
 ```
 
-SCRATCH Query for adding all co-teachers
+## 8 Enrollments Teachers - School Level
+
+Enrols staff at the school level matching their powerschool schoolid value. All staff are added to at least one school as an instructor. This allows creating [Intelligent Agents](https://documentation.brightspace.com/EN/le/intelligent_agents/instructor/create_agent.htm?Highlight=intelligent%20agents) that can be used for auto-enroling teachers into courses such as HS and MS Library.
+
+### Fields Provided & Used
+
+**PROVIDES FIELDS:**
+
+- `child_code` used in ?? as `??` 
+
+|Field |Format |example |
+|:-|:-|:-|
+|`child_code`| `teachers.homeschoolid` | 2
+
+**USES FIELDS:**
+
+- `org_defined_id` from [07-Users_Teachers_Active](#7-usersteachersactive) as `child_code`
+- `code` from [06-Sections](../BS_Organization/README_Organization.md/#6-sections) as `parent_code`
+- ALTERNATIVE: `code` from [05-Offerings](../BS_Organization/README_Organization.md/#5-offerings) as `parent_code`
+
+### Data Export Manager Setup
+
+- **Category:** Show All
+- **Export From:**  `NQ com.txoof.brightspace.enroll.08_teacher_school`
+
+**Labels Used on Export**
+
+| Label |
+|-|
+|type|
+|action|
+|child_code|
+|role_name|
+|parent_code|
+
+**Export Summary and Output Options**
+
+- *Export File Name:* `8-Enrollments_teachers_school-%d.csv`
+- *Line Delimiter:* `CR-LF`
+- *Field Delimiter:* `,`
+- *Character Set:* `UTF-8`
+- *Include Column Headers:* `True`
+- *Surround "field values" in Quotes:* TBD
+
+### Query Setup for `named_queries.xml`
+
+- File: `08_e_t_school.named_queries.xml`
+
+| header | table.field | value | NOTE |
+|-|-|-|-|
+|type| TEACHERS.ID | _enrollment_ | N1
+|action| TEACHERS.ID | _UPDATE_ | N1
+|child_code| TEACHERS.TEACHERNUMBER | _T\_765_
+|role_name| TEACHERS.ID | _Instructor_ | N1
+|parent_code| TEACHERS.HOMESCHOOLID | _2_ 
+
+**NOTES**
+
+**N1:** Field does not appear in database; use a known field such as `<column column=STUDENT.ID>header<\column>` to prevent an "unknown column error"
+
+**Tables Used**
+
+| Table |
+|-|
+|TEACHERS|
+
+**SQL Query**
+
+Add all teachers and co-teachers
 
 ```SQL
+/*
+Enrol all teachers and other staff into school level orgunits based
+on their home school id
+    - ECC, ES, MS, HS and District Office
+*/
 select distinct
-    COURSES.COURSE_NAME as COURSE_NAME,
+    'enrollment' as "type",
+    'UPDATE' as "action",
     'T_'||teachers.teachernumber as "child_code",
     'Instructor' as "role_name",
-    TEACHERS.LASTFIRST as LASTFIRST,
-    'cs_'||CC.SCHOOLID||'_'||cc.COURSE_NUMBER||'_'||CC.TERMID||'_'||DECODE(substr(cc.expression, 1, 1), 
-     1, 'A', 
-     2, 'B', 
-     3, 'C', 
-     4, 'D', 
-     5, 'E', 
-     6, 'F', 
-     7, 'G', 
-     8, 'H', 
-     9, 'ADV', 
-     'UNKNOWN') as "parent_code"
- from TEACHERS TEACHERS,
-    SECTIONTEACHER SECTIONTEACHER,
-    STUDENTS STUDENTS,
-    CC CC,
-    COURSES COURSES 
- where STUDENTS.ID=CC.STUDENTID
-    and CC.COURSE_NUMBER=COURSES.COURSE_NUMBER
-    and CC.SECTIONID=SECTIONTEACHER.SECTIONID
-    and SECTIONTEACHER.TEACHERID=TEACHERS.ID
-    and STUDENTS.ENROLL_STATUS =0
-    and CC.TERMID =3100
-    -- and courses.course_name like '%Band%'
-    and STUDENTS.GRADE_LEVEL >=5
- order by COURSES.COURSE_NAME asc
+    teachers.homeschoolid as "parent_code"
+ from TEACHERS TEACHERS
+ where teachers.status =1
+    and length(teachers.email_addr) >0
+ order by teachers.homeschoolid asc
 ```
 
 ## 8 Enrollments Students
@@ -1425,6 +1481,8 @@ select
 ```
 
 
+
+<!-- omit in toc -->
 ## template
 
 ### Fields Provided & Used
