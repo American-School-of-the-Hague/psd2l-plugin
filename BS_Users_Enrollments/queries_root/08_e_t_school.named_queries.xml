@@ -1,0 +1,36 @@
+<queries>
+    <!--set name here (also applies to permissions_root-->
+    <query name="com.txoof.brightspace.enroll.08_teacher_school" coreTable="TEACHERS" flattened="false">
+        <!--add description here-->
+        <description>enroll teachers</description>
+        <!--number of columns here must match number sql returns-->
+        <columns>
+            <column column="TEACHERS.ID">type</column>
+            <column column="TEACHERS.ID">action</column>
+            <column column="TEACHERS.TEACHERNUMBER">child_code</column>
+            <column column="TEACHERS.ID">role_name</column>
+            <column column="TEACHERS.HOMESCHOOLID">parent_code</column>
+         </columns>
+        <!--SQL query in format <![CDATA[QUERY]]>-->
+        <sql>
+            <![CDATA[
+            /*
+            Enrol all teachers and other staff into school level orgunits based
+            on their home school id
+                - ECC, ES, MS, HS and District Office
+            */
+            select distinct
+                'enrollment' as "type",
+                'UPDATE' as "action",
+                'T_'||teachers.teachernumber as "child_code",
+                'Instructor' as "role_name",
+                teachers.homeschoolid as "parent_code"
+             from TEACHERS TEACHERS
+             where teachers.status =1
+                and length(teachers.email_addr) >0
+             order by teachers.homeschoolid asc
+            ]]>
+        </sql>
+    </query>
+
+</queries>
