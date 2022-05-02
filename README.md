@@ -3,11 +3,11 @@
 
 Feb-June 2022 : Aaron Ciuffo : aciuffo@ash.nl : aaron.ciuffo@gmail.com
 - [Implementation Notes](#implementation-notes)
-- [Setup and Installation](#setup-and-installation)
+- [PowerSchool Setup and Installation](#powerschool-setup-and-installation)
   - [SIS Installation](#sis-installation)
   - [Data Export Manager Configuration](#data-export-manager-configuration)
 - [Automated Exports from PSL to BrightSpace](#automated-exports-from-psl-to-brightspace)
-  - [In Progress Notes](#in-progress-notes)
+  - [IPSIS Upload](#ipsis-upload)
 - [List of Plugins and Functions](#list-of-plugins-and-functions)
 - [Plugin Errors & Resolutions](#plugin-errors--resolutions)
   - [Data Export Manager](#data-export-manager)
@@ -21,9 +21,18 @@ Feb-June 2022 : Aaron Ciuffo : aciuffo@ash.nl : aaron.ciuffo@gmail.com
 
 ## Implementation Notes
 
-Exports are managed through PowerSchool PowerQuery Plugins. Plugins follow the structure outlined below. Each CSV Export for BrightSpace is managed through an individual plugin. Each plugin contains an SQL query that matches the required fields for the CSV.
+Automated exports are managed through PowerSchool PowerQuery Plugins. Plugins follow the structure outlined below.
 
-## Setup and Installation
+Each CSV Export for Brightspace is managed through an individual plugin. Each plugin contains an SQL query that matches the required fields for the CSV. See the [Automated Exports from PSL to Brightspace](#automated-exports-from-psl-to-brightspace) section for more information.
+
+## PowerSchool Setup and Installation
+
+PowerQuery Plugin exports are scheduled through the Data Export Manager [(DEM) in PowerSchool > My Templates](https://powerschool.ash.nl/admin/datamgmt/exporttemplates.html#export-template-content). Create the template using the instructions under the *Data Export Manager Setup* section for each plugin in the documentation. 
+
+**It is critical that the exact filename listed under *Export File Name* is used.** The order in which the files is processed is important and governed by the filenames.
+
+* [Organization Plugins](./BS_Organization/README_Organization.md)
+* [Users and Enrollments Plugin](./BS_Users_Enrollments/README_Users_Enrollments.md)
 
 ### SIS Installation
 
@@ -65,19 +74,30 @@ The basic settings are as follows:
 
 ## Automated Exports from PSL to BrightSpace
 
-### In Progress Notes
+Data is uploaded to Brightspace via the [IPSIS interface](https://lms.ash.nl/d2l/im/ipsis/admin/console/integration/3/dashboard). The data upload is managed from the PowerSchool Windows server using a scheduled task and is executed via a windows BATCH file.
 
-BrightSpace accepts imports via IPSIS. IPSIS expects flat zip files with at minimum 8 CSV files (1-Other, 2-Departments, 3-Semesters, 4-Templates, 5-Offerings, 6-Sections, 7-Users, 8-Enrollments) and a `manifest.json`. 
+* [batch_upload.bat](./Automation/batch_upload.bat)
 
-`manifest.json`
+The automated uploads should be scheduled at the following times:
+* 07:30
+* 12:00
+* 16:00
+* 19:00
+  
 
-```JSON
-{
-  "version":"2.0"
-}
-```
 
-Files are sent to IPSIS via SFTP. Find SFTP details within the platform [here](https://lms.ash.nl/d2l/im/ipsis/admin/console/integration/3/dashboard)
+The batch file depends on the following software:
+* [Win-SCP](https://winscp.net/eng/download.php)
+  * **DO NOT** use the "endurance" setting in Win-SCP; this is incompatible with the IPSIS SFTP server
+* [7-Zip](https://www.7-zip.org/)
+
+### IPSIS Upload
+
+BrightSpace accepts imports via IPSIS. IPSIS expects flat zip files with at minimum 2 files: 1 CSV and a [`manifest.json` V2.0](./resources/manifest.json). 
+
+
+
+Files are sent to IPSIS via SFTP. Find SFTP details within the platform [here](https://lms.ash.nl/d2l/im/ipsis/admin/console/integration/3/dashboard).
 
 
 ## List of Plugins and Functions
