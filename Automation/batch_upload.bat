@@ -19,6 +19,8 @@ echo { "version":"2.0" } > C:\BrightSpace\Exports\manifest.json
 
 "C:\Program Files\7-Zip\7z.exe" a -tzip D:\BS_Script\%SUBFILENAME%.zip C:\BrightSpace\Exports\*
 
+REM Update the URL and Password in this portion of the script to match the password found
+REM in the IPSIS configuration screen: https://lms.ash.nl/d2l/im/ipsis/admin/console/integration/3/configuration
 "C:\Program Files (x86)\WinSCP\WinSCP.com" ^
   /log="D:\BS_Script\WinSCP.log" /ini=nul ^
   /command ^

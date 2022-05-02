@@ -96,8 +96,7 @@ The batch file depends on the following software:
 BrightSpace accepts imports via IPSIS. IPSIS expects flat zip files with at minimum 2 files: 1 CSV and a [`manifest.json` V2.0](./resources/manifest.json). 
 
 
-
-Files are sent to IPSIS via SFTP. Find SFTP details within the platform [here](https://lms.ash.nl/d2l/im/ipsis/admin/console/integration/3/dashboard).
+Files are sent to IPSIS via SFTP. Find SFTP details within the platform [here](https://lms.ash.nl/d2l/im/ipsis/admin/console/integration/3/dashboard). **NOTE:** the username and password in the [`batch_upload.bat` file](./Automation/batch_upload.bat) need to be updated to match the credentials in the [IPSIS configuration screen](https://lms.ash.nl/d2l/im/ipsis/admin/console/integration/3/configuration)
 
 
 ## List of Plugins and Functions
