@@ -1,0 +1,57 @@
+<queries>
+    <!--set name here (also applies to permissions_root-->
+    <query name="com.txoof.brightspace.org.05ath_offerings" coreTable="cc" flattened="false">
+        <!--add description here-->
+        <description>athletics offerings</description>
+        <!--number of columns here must match number sql returns-->
+        <columns>
+            <column column="GEN.ID">type</column> <!-- for columns not in database use a core filed-->
+            <column column="GEN.ID">action</column>
+            <column column="GEN.NAME">code</column>
+            <column column="GEN.NAME">name</column>
+            <column column="GEN.ID">start_date</column>
+            <column column="GEN.ID">end_date</column>
+            <column column="GEN.ID">is_active</column>
+            <column column="GEN.ID">department_code</column>
+            <column column="GEN.ID">template_code</column>
+            <column column="GEN.ID">semester_code</column>
+            <column column="GEN.ID">offering_code</column>
+            <column column="GEN.ID">custom_code</column>
+         </columns>
+        <!--SQL query in format <![CDATA[QUERY]]>-->
+        <sql>
+            <![CDATA[
+            SELECT distinct
+                'course offering' as "type",
+                'UPDATE' as "action",
+                'co_ath_'||Gen.Name AS "code",
+                Gen.Name as "name",
+                '' as "start_date",
+                '' as "end_date",
+                1 as "is_active",
+                '' as "department_code",
+                'Templ_ath' as "template_code",
+                /*
+                Athletics classes will not be tied to a term -- all classes
+                will run indefinitely
+                */
+                'term_ATH' as "semester_code",
+                '' as "offering_code",
+                '' as "custom_code"
+
+            FROM
+                Students
+                JOIN Gen ON Gen.cat='activity'
+            WHERE
+                Students.Enroll_Status = 0
+                and STUDENTS.GRADE_LEVEL >=5
+                AND PS_CustomFields.GetStudentsCF(Students.ID,Gen.Value) IS NOT NULL
+                AND PS_CustomFields.GetStudentsCF(Students.ID,Gen.Value) >=1
+                AND Gen.Name LIKE '%Athletics - %'
+            ORDER BY
+                Gen.Name
+            ]]>
+        </sql>
+    </query>
+
+</queries>

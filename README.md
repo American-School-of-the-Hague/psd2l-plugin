@@ -118,7 +118,12 @@ Files are sent to IPSIS via SFTP. Find SFTP details within the platform [here](h
 
 **ERROR:** `An unexpected error occurred while communicating with the server. Please contact your administrator.`
 
-**RESOLUTION:** Ensure that all `sort by` statements in the SQL query are fields that are directly represented in the `select` section. 
+**RESOLUTIONS:** 
+
+* Ensure that all `order by` statements in the SQL query are fields that are directly represented in the `select` section. 
+* Entirely remove the `order by` statements -- in some cases this resolves the above error entirely
+
+
 
 **NON FUNCTIONAL EXAMPLE:**
 

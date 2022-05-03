@@ -2,34 +2,39 @@
 
 PowerQuery Plugin for exporting the following information from PowerSchool &rarr; BrightSpace. This plugin creates the following exports:
 
-- [1 Other](#1-other)
-  - [Fields Provided & Used](#fields-provided--used)
-  - [Data Export Manager Setup](#data-export-manager-setup)
-  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml)
-- [2 Departments](#2-departments)
-  - [Fields Provided & Used](#fields-provided--used-1)
-  - [Data Export Manager Setup](#data-export-manager-setup-1)
-  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-1)
-- [3 Semesters](#3-semesters)
-  - [Fields Provided & Used](#fields-provided--used-2)
-  - [Data Export Manager Setup](#data-export-manager-setup-2)
-  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-2)
-- [4 Templates](#4-templates)
-  - [Fields Provided & Used](#fields-provided--used-3)
-  - [Data Export Manager Setup](#data-export-manager-setup-3)
-  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-3)
-- [5 Offerings](#5-offerings)
-  - [Fields Provided & Used](#fields-provided--used-4)
-  - [Data Export Manager Setup](#data-export-manager-setup-4)
-  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-4)
-- [6 Sections](#6-sections)
-  - [Fields Provided & Used](#fields-provided--used-5)
-  - [Data Export Manager Setup](#data-export-manager-setup-5)
-  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-5)
-- [template](#template)
-  - [Fields Provided & Used](#fields-provided--used-6)
-  - [Data Export Manager Setup](#data-export-manager-setup-6)
-  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-6)
+- [BrightSpace D2L Organization Plugin](#brightspace-d2l-organization-plugin)
+  - [1 Other](#1-other)
+    - [Fields Provided & Used](#fields-provided--used)
+    - [Data Export Manager Setup](#data-export-manager-setup)
+    - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml)
+  - [2 Departments](#2-departments)
+    - [Fields Provided & Used](#fields-provided--used-1)
+    - [Data Export Manager Setup](#data-export-manager-setup-1)
+    - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-1)
+  - [3 Semesters](#3-semesters)
+    - [Fields Provided & Used](#fields-provided--used-2)
+    - [Data Export Manager Setup](#data-export-manager-setup-2)
+    - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-2)
+  - [4 Templates](#4-templates)
+    - [Fields Provided & Used](#fields-provided--used-3)
+    - [Data Export Manager Setup](#data-export-manager-setup-3)
+    - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-3)
+  - [5 Offerings](#5-offerings)
+    - [Fields Provided & Used](#fields-provided--used-4)
+    - [Data Export Manager Setup](#data-export-manager-setup-4)
+    - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-4)
+  - [5 Athletic Offerings](#5-athletic-offerings)
+    - [Fields Provided & Used](#fields-provided--used-5)
+    - [Data Export Manager Setup](#data-export-manager-setup-5)
+    - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-5)
+  - [6 Sections](#6-sections)
+    - [Fields Provided & Used](#fields-provided--used-6)
+    - [Data Export Manager Setup](#data-export-manager-setup-6)
+    - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-6)
+  - [template](#template)
+    - [Fields Provided & Used](#fields-provided--used-7)
+    - [Data Export Manager Setup](#data-export-manager-setup-7)
+    - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-7)
 
 ## 1 Other
 
@@ -471,7 +476,7 @@ select distinct
 
 **Export Summary and Output Options**
 
-- *Export File Name:* `5-Offerings-%d.csv`
+- *Export File Name:* `5-Offerings_500-%d.csv`
 - *Line Delimiter:* `CR-LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
@@ -514,14 +519,14 @@ select distinct
     'UPDATE' as "action",
     /* co_cc.schoolid_cc.course_number */
     'co_'||cc.schoolid||'_'||cc.course_number as "code",
-    c.course_name as "name",
+    cc.course_name as "name",
     TERMS.FIRSTDAY as "start_date",
     TERMS.LASTDAY as "end_date",
     /* set courses as inactive by default */
     1 as "is_active",
     '' as "department_code",
     'Templ_'||CC.SCHOOLID||'_'||C.SCHED_DEPARTMENT as "template_code",
-    'term_'||cc.termid as "semester code",
+    'term_'||cc.termid as "semester_code",
     '' as "offering_code",
     '' as "custom_code"
 from 
@@ -541,6 +546,117 @@ where
             end
 order by "semester code" desc
 ```
+
+## 5 Athletic Offerings
+
+### Fields Provided & Used
+
+**PROVIDES FIELDS**
+`code` used in [6-Sections](#6-sections) as `offering_code` 
+
+|Field |Format |example |
+|:-|:-|:-|
+|`code`| `co_athl_`_`Gen.Name`_| co_athl_Athletics - Baseball - MS
+
+**USES FIELDS:**
+
+***REVIEW THIS***
+
+- `code` from [3-Semesters](#3-semesters) as `semester_code`
+- `code` from [4-Templates](#4-templates) as `template_code`
+
+### Data Export Manager Setup
+
+- **Category:** Show All
+- **Export From:**  `NQ com.txoof.brightspace.org.05ath_offerings`
+
+**Labels Used on Export**
+
+| Label |
+|-|
+|type|
+|action|
+|code|
+|name|
+|start_date|
+|end_date|
+|is_active|
+|department_code|
+|template_code|
+|semester_code|
+|offering_code|
+|custom_code|
+
+**Export Summary and Output Options**
+
+- *Export File Name:* `5-Offerings_501_Ath-%d.csv`
+- *Line Delimiter:* `CR-LF`
+- *Field Delimiter:* `,`
+- *Character Set:* `UTF-8`
+- *Include Column Headers:* `True`
+- *Surround "field values" in Quotes:* TBD
+
+### Query Setup for `named_queries.xml`
+| header | table.field | value | NOTE |
+|-|-|-|-|
+|type| GEN.ID | _course offering_ | N1
+|action| GEN.ID | _UPDATE_ | N1
+|code| GEN.name | _co\_ath\_Athletics - Baseball - MS_
+|name| GEN.name | _Athletics - Baseball - MS_ 
+|start_date| GEN.ID | '' | N1
+|end_date| GEN.ID | '' | N1
+|is_active| GEN.ID | _0_ | N1
+|department_code| GEN.ID | '' | N1
+|template_code| GEN.ID | '' | N1
+|semester_code| GEN.ID | _term\_ATH_ | N1 
+|offering_code| GEN.ID | '' | N1
+|custom_code| GEN.ID | '' | N1
+
+**NOTES**
+
+**N1:** Field does not appear in database; use a known field such as `<column column=STUDENT.ID>header<\column>` to prevent an "unknown column error"
+
+**Tables Used**
+
+| Table |
+|-|
+|STUDENTS|
+|GEN|
+
+**SQL Query**
+
+```SQL
+SELECT distinct
+    'course offering' as "type",
+    'UPDATE' as "action",
+    'co_ath_'||Gen.Name AS "code",
+    Gen.Name as "name",
+    '' as "start_date",
+    '' as "end_date",
+    1 as "is_active",
+    '' as "department_code",
+    'Templ_ath' as "template_code",
+    /*
+    Athletics classes will not be tied to a term -- all classes
+    will run indefinitely
+    */
+    'term_ATH' as "semester_code",
+    '' as "offering_code",
+    '' as "custom_code"
+
+  FROM
+      Students
+      JOIN Gen ON Gen.cat='activity'
+  WHERE
+      Students.Enroll_Status = 0
+      and STUDENTS.GRADE_LEVEL >=5
+      AND PS_CustomFields.GetStudentsCF(Students.ID,Gen.Value) IS NOT NULL
+      AND PS_CustomFields.GetStudentsCF(Students.ID,Gen.Value) >=1
+      AND Gen.Name LIKE '%Athletics - %'
+  ORDER BY
+      Gen.Name
+```
+
 
 ## 6 Sections
 
