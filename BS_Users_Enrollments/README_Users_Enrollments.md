@@ -49,9 +49,13 @@ PowerQuery Plugin for exporting the following information from PowerSchool &rarr
   - [Fields Provided & Used](#fields-provided--used-10)
   - [Data Export Manager Setup](#data-export-manager-setup-10)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-10)
+- [8 Enrollments Students Athletics](#8-enrollments-students-athletics)
   - [Fields Provided & Used](#fields-provided--used-11)
   - [Data Export Manager Setup](#data-export-manager-setup-11)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-11)
+  - [Fields Provided & Used](#fields-provided--used-12)
+  - [Data Export Manager Setup](#data-export-manager-setup-12)
+  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-12)
 
 ## Important Implementation Notes
 
@@ -1390,7 +1394,7 @@ select distinct
 ### Data Export Manager Setup
 
 - **Category:** Show All
-- **Export From:**  `NQ com.txoof.brightspace.enroll.08_students`
+- **Export From:**  `NQ com.txoof.brightspace.enroll.08_800_students`
 
 **Labels Used on Export**
 
@@ -1478,6 +1482,102 @@ select
       THEN (EXTRACT(year from sysdate)-2000+10)*100
       end
  order by STUDENTS.GRADE_LEVEL ASC, STUDENTS.LASTFIRST ASC, SECTIONS.SECTION_NUMBER ASC
+```
+
+
+
+<!-- omit in toc -->
+
+## 8 Enrollments Students Athletics
+
+### Fields Provided & Used
+
+**PROVIDES FIELDS:**
+
+- `child_code` used in ?? as `??` 
+
+|Field |Format |example |
+|:-|:-|:-|
+|`child_code`| `'cs_'\|\|cc.schoolid\|\|'_'\|\|cc.course_number\|\|'_'\|\|cc.TermID` | cs_2_C5A_3100
+
+**USES FIELDS:**
+
+- `org_defined_id` from [07-Users - Students](../BS_07_Users_Students/README.md) as `child_code`
+- `code` from [06-Sections](../BS_06_Offerings/README.md) as `parent_code`
+- ALTERNATIVE: `code` from [05-Offerings](../BS_05_Offerings/README.md) as `parent_code`
+
+### Data Export Manager Setup
+
+- **Category:** Show All
+- **Export From:**  `NQ com.txoof.brightspace.enroll.08_students`
+
+**Labels Used on Export**
+
+| Label |
+|-|
+|type|
+|action|
+|child_code|
+|role_name|
+|parent_code|
+
+**Export Summary and Output Options**
+
+- *Export File Name:* `8-Enrollments_801_students_athletics-%d.csv`
+- *Line Delimiter:* `CR-LF`
+- *Field Delimiter:* `,`
+- *Character Set:* `UTF-8`
+- *Include Column Headers:* `True`
+- *Surround "field values" in Quotes:* TBD
+
+### Query Setup for `named_queries.xml`
+
+- Files: `08_e_s.named_queries.xml`
+
+| header | table.field | value | NOTE |
+|-|-|-|-|
+|-|-|-|-|
+|type| STUDENTS.ID | _enrollment_ | N1
+|action| STUDENTS.ID | _UPDATE_ | N1
+|child_code| `S_`_`STUDENTS.STUDENT_NUMBER`_ | _S\_506113_
+|role_name| STUDENTS.ID | _Learner_ | N1
+|parent_code| _`co_athl`\_`GEN.NAME`_ | _co\_ath\_Athletics - Baseball - MS_
+
+**NOTES**
+
+**N1:** Field does not appear in database; use a known field such as `<column column=STUDENT.ID>header<\column>` to prevent an "unknown column error"
+
+**Tables Used**
+
+| Table |
+|-|
+|STUDENTS|
+|COURSES|
+|CC|
+|SECTIONS|
+
+**SQL Query**
+
+```SQL
+SELECT distinct
+    'enrollment' as "type",
+    'UPDATE' as "action",
+    'S_'||STUDENTS.STUDENT_NUMBER as "child_code",
+    'Learner' as "role_name",
+    'co_ath_'||Gen.Name AS "parent_code"
+
+  FROM
+      Students
+      JOIN Gen ON Gen.cat='activity'
+  WHERE
+      Students.Enroll_Status = 0
+      and STUDENTS.GRADE_LEVEL >=5
+      AND PS_CustomFields.GetStudentsCF(Students.ID,Gen.Value) IS NOT NULL
+      AND PS_CustomFields.GetStudentsCF(Students.ID,Gen.Value) >=1
+      AND Gen.Name LIKE '%Athletics - %'
+  ORDER BY
+      Students.LastFirst,
+      Gen.Name
 ```
 
 
