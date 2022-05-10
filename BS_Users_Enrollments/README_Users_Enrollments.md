@@ -838,6 +838,8 @@ select
     and trunc(sysdate) - STUDENTS.EXITDATE > 0
     /* Only students grade 5 and up */
     and STUDENTS.GRADE_LEVEL >= 5
+    /* exclude anyone that doesn't have an email address */
+    AND U_StudentsUserFields.EmailStudent IS NOT NULL
  order by STUDENTS.EXITDATE asc
 ```
 
