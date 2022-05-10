@@ -1,63 +1,65 @@
 <queries>
-	<!--set name here (also applies to permissions_root-->
+    <!--set name here (also applies to permissions_root-->
     <query name="com.txoof.brightspace.users.07s_inactive" coreTable="students" flattened="false">
-		<!--add description here-->
+        <!--add description here-->
         <description>inactive students</description>
-		<!--number of columns here must match number sql returns-->
+        <!--number of columns here must match number sql returns-->
         <columns>
-			<column column="STUDENTS.ID">type</column> <!-- for columns not in database use a core filed-->
-			<column column="STUDENTS.EXITDATE">action</column> 
-			<column column="U_STUDENTSUSERFIELDS.EMAILSTUDENT">username</column> 
-			<column column="STUDENTS.ID">org_defined_id</column>
-			<column column="STUDENTS.FIRST_NAME">first_name</column>
-			<column column="STUDENTS.LAST_NAME">last_name</column>
-			<column column="STUDENTS.ID">password</column>
-			<column column="STUDENTS.ENROLL_STATUS">is_active</column>
-			<column column="STUDENTS.ID">role_name</column>
-			<column column="U_STUDENTSUSERFIELDS.EMAILSTUDENT">email</column>
-			<column column="STUDENTS.ID">relationships</column>
-			<column column="STUDENTS.ID">pref_first_name</column>
-			<column column="STUDENTS.ID">pref_last_name</column>
- 		</columns>
-		<!--SQL query in format <![CDATA[QUERY]]>-->
+            <column column="STUDENTS.ID">type</column> <!-- for columns not in database use a core filed-->
+            <column column="STUDENTS.EXITDATE">action</column> 
+            <column column="U_STUDENTSUSERFIELDS.EMAILSTUDENT">username</column> 
+            <column column="STUDENTS.ID">org_defined_id</column>
+            <column column="STUDENTS.FIRST_NAME">first_name</column>
+            <column column="STUDENTS.LAST_NAME">last_name</column>
+            <column column="STUDENTS.ID">password</column>
+            <column column="STUDENTS.ENROLL_STATUS">is_active</column>
+            <column column="STUDENTS.ID">role_name</column>
+            <column column="U_STUDENTSUSERFIELDS.EMAILSTUDENT">email</column>
+            <column column="STUDENTS.ID">relationships</column>
+            <column column="STUDENTS.ID">pref_first_name</column>
+            <column column="STUDENTS.ID">pref_last_name</column>
+         </columns>
+        <!--SQL query in format <![CDATA[QUERY]]>-->
         <sql>
-			<![CDATA[
-				select 
-					'user' as "type",
-					/* mark students that have left in the past N days for deletion */
-					case 
-					WHEN (trunc(sysdate) - STUDENTS.EXITDATE) >=90
-						THEN 'DELETE'
-					ELSE 
-						'UPDATE'
-					END "action",
-					REGEXP_REPLACE(U_STUDENTSUSERFIELDS.EMAILSTUDENT, '(^.*)(@.*)', '\1') as "username",
-					/* use student number as unique id - we recycle email addresses and this causes issues */
-					/* prepend a 'S" to the number to distinguish between students & teachers */
-					'S_'||STUDENTS.STUDENT_NUMBER as "org_defined_id",
-					STUDENTS.FIRST_NAME as "first_name",
-					STUDENTS.LAST_NAME as "last_name",
-					'' as "password",
-					/* Mark students that are not "active" in powerschool (PS !=0) as inactive (BS=0) */
-					(CASE STUDENTS.ENROLL_STATUS
-						WHEN 0 THEN 1
-						ELSE 0 END) as "is_active",
-					'Learner' as "role_name",
-					U_STUDENTSUSERFIELDS.EMAILSTUDENT as "email",
-					'' as "relationships",
-					'' as "pref_first_name",
-					'' as "pref_last_name"
-				from STUDENTS STUDENTS,
-					U_STUDENTSUSERFIELDS U_STUDENTSUSERFIELDS
-				where 
-					STUDENTS.DCID=U_STUDENTSUSERFIELDS.STUDENTSDCID
-					and STUDENTS.ENROLL_STATUS >=2
-					and trunc(sysdate) - STUDENTS.EXITDATE < 180 
-					and trunc(sysdate) - STUDENTS.EXITDATE > 0
-					/* Only students grade 5 and up */
-					and STUDENTS.GRADE_LEVEL >= 5
-				order by STUDENTS.EXITDATE asc
-			]]>
+            <![CDATA[
+            select 
+                'user' as "type",
+                /* mark students that have left in the past N days for deletion */
+                case 
+                WHEN (trunc(sysdate) - STUDENTS.EXITDATE) >=90
+                    THEN 'DELETE'
+                ELSE 
+                    'UPDATE'
+                END "action",
+                REGEXP_REPLACE(U_STUDENTSUSERFIELDS.EMAILSTUDENT, '(^.*)(@.*)', '\1') as "username",
+                /* use student number as unique id - we recycle email addresses and this causes issues */
+                /* prepend a 'S" to the number to distinguish between students & teachers */
+                'S_'||STUDENTS.STUDENT_NUMBER as "org_defined_id",
+                STUDENTS.FIRST_NAME as "first_name",
+                STUDENTS.LAST_NAME as "last_name",
+                '' as "password",
+                /* Mark students that are not "active" in powerschool (PS !=0) as inactive (BS=0) */
+                (CASE STUDENTS.ENROLL_STATUS
+                    WHEN 0 THEN 1
+                    ELSE 0 END) as "is_active",
+                'Learner' as "role_name",
+                U_STUDENTSUSERFIELDS.EMAILSTUDENT as "email",
+                '' as "relationships",
+                '' as "pref_first_name",
+                '' as "pref_last_name"
+            from STUDENTS STUDENTS,
+                U_STUDENTSUSERFIELDS U_STUDENTSUSERFIELDS
+            where 
+                STUDENTS.DCID=U_STUDENTSUSERFIELDS.STUDENTSDCID
+                and STUDENTS.ENROLL_STATUS >=2
+                and trunc(sysdate) - STUDENTS.EXITDATE < 180 
+                and trunc(sysdate) - STUDENTS.EXITDATE > 0
+                /* Only students grade 5 and up */
+                and STUDENTS.GRADE_LEVEL >= 5
+                /* exclude anyone that doesn't have an email address */
+                AND U_StudentsUserFields.EmailStudent IS NOT NULL
+            order by STUDENTS.EXITDATE asc
+            ]]>
         </sql>
     </query>
 
