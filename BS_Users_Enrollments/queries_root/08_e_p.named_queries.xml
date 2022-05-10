@@ -1,0 +1,53 @@
+<queries>
+    <!--set name here (also applies to permissions_root-->
+    <query name="com.txoof.brightspace.enroll.08_parents" coreTable="cc" flattened="false">
+        <!--add description here-->
+        <description>enroll active students</description>
+        <!--number of columns here must match number sql returns-->
+        <columns>
+            <column column="CC.ID">type</column>
+            <column column="CC.ID">action</column>
+            <column column="GUARDIAN.GUARDIANID">child_code</column>
+            <column column="CC.ID">role_name</column>
+            <column column="CC.schoolid">parent_code</column>
+         </columns>
+        <!--SQL query in format <![CDATA[QUERY]]>-->
+        <sql>
+            <![CDATA[
+            select 
+                'enrollment' as "type",
+                'UPDATE' as "action",
+                'P_'||GUARDIAN.GUARDIANID as "child_code",
+                'Parent' as "role_name",
+                /* using 6-Sections:code as parent_code */
+                'cs_'||cc.schoolid||'_'||cc.course_number||'_'||cc.TermID||'_'||DECODE(substr(cc.expression, 1, 1), 
+                1, 'A', 
+                2, 'B', 
+                3, 'C', 
+                4, 'D', 
+                5, 'E', 
+                6, 'F', 
+                7, 'G', 
+                8, 'H', 
+                9, 'ADV', 
+                'UNKNOWN') as "parent_code"
+            from GUARDIAN GUARDIAN,
+                COURSES COURSES,
+                SECTIONS SECTIONS,
+                STUDENTS STUDENTS,
+                CC CC,
+                GUARDIANSTUDENT GUARDIANSTUDENT 
+            where GUARDIANSTUDENT.STUDENTSDCID=STUDENTS.DCID
+                and STUDENTS.ID=CC.STUDENTID
+                and CC.SECTIONID=SECTIONS.ID
+                and SECTIONS.COURSE_NUMBER=COURSES.COURSE_NUMBER
+                and GUARDIANSTUDENT.GUARDIANID=GUARDIAN.GUARDIANID
+                and STUDENTS.ENROLL_STATUS =0
+                and STUDENTS.GRADE_LEVEL >=5
+                and CC.TERMID >=3100
+            order by GUARDIANSTUDENT.GUARDIANID ASC	
+            ]]>
+        </sql>
+    </query>
+
+</queries>
