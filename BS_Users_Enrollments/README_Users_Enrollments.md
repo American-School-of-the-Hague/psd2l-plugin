@@ -49,13 +49,17 @@ PowerQuery Plugin for exporting the following information from PowerSchool &rarr
   - [Fields Provided & Used](#fields-provided--used-10)
   - [Data Export Manager Setup](#data-export-manager-setup-10)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-10)
-- [8 Enrollments Students Athletics](#8-enrollments-students-athletics)
+- [8 Enrollments Parents in Student Classes](#8-enrollments-parents-in-student-classes)
   - [Fields Provided & Used](#fields-provided--used-11)
   - [Data Export Manager Setup](#data-export-manager-setup-11)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-11)
+- [8 Enrollments Students Athletics](#8-enrollments-students-athletics)
   - [Fields Provided & Used](#fields-provided--used-12)
   - [Data Export Manager Setup](#data-export-manager-setup-12)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-12)
+  - [Fields Provided & Used](#fields-provided--used-13)
+  - [Data Export Manager Setup](#data-export-manager-setup-13)
+  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-13)
 
 ## Important Implementation Notes
 
@@ -1396,7 +1400,7 @@ select distinct
 ### Data Export Manager Setup
 
 - **Category:** Show All
-- **Export From:**  `NQ com.txoof.brightspace.enroll.08_800_students`
+- **Export From:**  `NQ com.txoof.brightspace.enroll.08_students`
 
 **Labels Used on Export**
 
@@ -1488,7 +1492,122 @@ select
 
 
 
-<!-- omit in toc -->
+
+## 8 Enrollments Parents in Student Classes
+
+Enrol parents in classes as view-only members of their children's classes.
+
+### Fields Provided & Used
+
+**PROVIDES FIELDS:**
+
+- `child_code` used in ?? as `??` 
+
+|Field |Format |example |
+|:-|:-|:-|
+|`child_code`| `'cs_'\|\|cc.schoolid\|\|'_'\|\|cc.course_number\|\|'_'\|\|cc.TermID` | cs_2_C5A_3100
+
+**USES FIELDS:**
+
+- `org_defined_id` from [07-Users - Students](../BS_07_Users_Students/README.md) as `child_code`
+- `code` from [06-Sections](../BS_06_Offerings/README.md) as `parent_code`
+- ALTERNATIVE: `code` from [05-Offerings](../BS_05_Offerings/README.md) as `parent_code`
+
+### Data Export Manager Setup
+
+- **Category:** Show All
+- **Export From:**  `NQ com.txoof.brightspace.enroll.08_parents`
+
+**Labels Used on Export**
+
+| Label |
+|-|
+|type|
+|action|
+|child_code|
+|role_name|
+|parent_code|
+
+**Export Summary and Output Options**
+
+- *Export File Name:* `8-Enrollments_parent_audiors-%d.csv`
+- *Line Delimiter:* `CR-LF`
+- *Field Delimiter:* `,`
+- *Character Set:* `UTF-8`
+- *Include Column Headers:* `True`
+- *Surround "field values" in Quotes:* TBD
+
+### Query Setup for `named_queries.xml`
+
+- Files: `08_e_p.named_queries.xml`
+
+| header | table.field | value | NOTE |
+|-|-|-|-|
+|-|-|-|-|
+|type| CC.ID | _enrollment_ | N1
+|action| CC.ID | _UPDATE_ | N1
+|child_code| `S_`_`GUARDIAN.GUARDIANID`_ | _S\_506113_
+|role_name| CC.ID | _Parent-Auditor_ | N1
+|parent_code| `cs_`_`cc.schoolid`_`_`_`cc.course_number`_`_`_`cc.termid`_ | _cs_2_E0DNS_3100_ 
+
+**NOTES**
+
+**N1:** Field does not appear in database; use a known field such as `<column column=STUDENT.ID>header<\column>` to prevent an "unknown column error"
+
+**Tables Used**
+
+| Table |
+|-|
+|STUDENTS|
+|GUARDIAN|
+|COURSES|
+|CC|
+|SECTIONS|
+
+**SQL Query**
+
+```SQL
+select 
+    'enrollment' as "type",
+    'UPDATE' as "action",
+    'P_'||GUARDIAN.GUARDIANID as "child_code",
+    'Parent' as "role_name",
+    /* using 6-Sections:code as parent_code */
+    'cs_'||cc.schoolid||'_'||cc.course_number||'_'||cc.TermID||'_'||DECODE(substr(cc.expression, 1, 1), 
+     1, 'A', 
+     2, 'B', 
+     3, 'C', 
+     4, 'D', 
+     5, 'E', 
+     6, 'F', 
+     7, 'G', 
+     8, 'H', 
+     9, 'ADV', 
+     'UNKNOWN') as "parent_code"   
+    /*
+    GUARDIANSTUDENT.GUARDIANID as GUARDIANID,
+    COURSES.COURSE_NAME as COURSE_NAME,
+    STUDENTS.LASTFIRST as LASTFIRST,
+    STUDENTS.STUDENT_NUMBER as STUDENT_NUMBER,
+    GUARDIAN.LASTNAME as LASTNAME,
+    GUARDIAN.FIRSTNAME as FIRSTNAME 
+    */
+ from GUARDIAN GUARDIAN,
+    COURSES COURSES,
+    SECTIONS SECTIONS,
+    STUDENTS STUDENTS,
+    CC CC,
+    GUARDIANSTUDENT GUARDIANSTUDENT 
+ where GUARDIANSTUDENT.STUDENTSDCID=STUDENTS.DCID
+    and STUDENTS.ID=CC.STUDENTID
+    and CC.SECTIONID=SECTIONS.ID
+    and SECTIONS.COURSE_NUMBER=COURSES.COURSE_NUMBER
+    and GUARDIANSTUDENT.GUARDIANID=GUARDIAN.GUARDIANID
+    and STUDENTS.ENROLL_STATUS =0
+    and STUDENTS.GRADE_LEVEL >=5
+    and CC.TERMID >=3100
+ order by GUARDIANSTUDENT.GUARDIANID ASC
+```
 
 ## 8 Enrollments Students Athletics
 
