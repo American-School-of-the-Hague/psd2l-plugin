@@ -566,40 +566,6 @@ where SCHOOLSTAFF.USERS_DCID=USERS.DCID
 ORDER BY users.last_name asc
 ```
 
-**Depricated** does not include Role assignment
-
-```SQL
-select DISTINCT
-    'user' as "type",
-    'UPDATE' as "action",
-    /* 
-    use username portion of teacher/staff email addresses for D2L username.
-    This is necessary because some staff use their @ash.nl email address as
-    their guardian contact information. The parent accounts are created first
-    resulting in a colision between the parent account username and teacher 
-    account username.
-    */
-    regexp_replace(TEACHERS.EMAIL_ADDR, '(@.*)', '') as "username",
-    /* prepend a 'T' to make sure there are no studentid/teacherid colissions */
-    'T_'||TEACHERS.TEACHERNUMBER as "org_defined_id",
-    TEACHERS.FIRST_NAME as "first_name",
-    TEACHERS.LAST_NAME as "last_name",
-    '' as "password",
-    TEACHERS.STATUS as "is_active",
-    'Instructor' as "role_name",
-    TEACHERS.EMAIL_ADDR as "email",
-    '' as "relationships",
-    '' as "pref_first_name",
-    '' as "pref_last_name"
-
-from TEACHERS TEACHERS
-where TEACHERS.HOMESCHOOLID = TEACHERS.SCHOOLID 
-    AND TEACHERS.STATUS = 1 
-    /* Ignore all users with no email address */
-    AND LENGTH(TEACHERS.EMAIL_ADDR) > 0
-    ORDER BY TEACHERS.LAST_NAME ASC
-```
-
 ## **DEPRICATED** 7 Users Teacher-Auditors Active
 
 The relationship built in the Active-Students query builds the relationships. This is not needed.
@@ -1142,6 +1108,8 @@ ORDER BY
 
 ## 8 Enrollments Teachers
 
+Add all teachers to scheduled classes. Class enrolment needs to happen last after all other role-based enrollments.
+
 ### Fields Provided & Used
 
 **PROVIDES FIELDS:**
@@ -1175,7 +1143,7 @@ ORDER BY
 
 **Export Summary and Output Options**
 
-- *Export File Name:* `8-Enrollments_teachers-%d.csv`
+- *Export File Name:* `8-Enrollments_109_teachers-%d.csv`
 - *Line Delimiter:* `CR-LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
@@ -1247,53 +1215,12 @@ select distinct
  order by teachers.teachernumber asc
 ```
 
-**DEPRECATED** only enrolls primary teacher does not add co-teachers
-
-```SQL
-/*
-Depricated -- enrol primary teacher into course (no co-teachers)
-*/
-select distinct
-    'enrollment' as "type",
-    'UPDATE' as "action",
-    'T_'||TEACHERS.TEACHERNUMBER as "child_code",
-    'Instructor' as "role_name",
-    'cs_'||CC.SCHOOLID||'_'||cc.COURSE_NUMBER||'_'||CC.TERMID||'_'||DECODE(substr(cc.expression, 1, 1), 
-     1, 'A', 
-     2, 'B', 
-     3, 'C', 
-     4, 'D', 
-     5, 'E', 
-     6, 'F', 
-     7, 'G', 
-     8, 'H', 
-     9, 'ADV', 
-     'UNKNOWN') as "parent_code"
- from CC CC,
-    STUDENTS STUDENTS,
-    TEACHERS TEACHERS 
- where CC.STUDENTID=STUDENTS.ID
-    and CC.TEACHERID=TEACHERS.ID
-    and STUDENTS.ENROLL_STATUS =0
-    and TEACHERS.STATUS =1
-    and cc.termid >= case 
-      when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
-      THEN (EXTRACT(year from sysdate)-2000+9)*100
-      when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
-      THEN (EXTRACT(year from sysdate)-2000+10)*100
-      end
-  /* 
-   exclude any teachers that do not have email addresses
-   this should exclude "bookeeping" teachers that are created
-   to host study blocks 
-  */
-  and length( teachers.email_addr) > 0
-order by "child_code" asc, "parent_code" asc
-```
 
 ## 8 Enrollments Teachers - School Level
 
 Enrols staff at the school level matching their powerschool schoolid value. All staff are added to at least one school as an instructor. This allows creating [Intelligent Agents](https://documentation.brightspace.com/EN/le/intelligent_agents/instructor/create_agent.htm?Highlight=intelligent%20agents) that can be used for auto-enroling teachers into courses such as HS and MS Library.
+
+This needs to be run prior to the individual course enrollments
 
 ### Fields Provided & Used
 
@@ -1328,7 +1255,7 @@ Enrols staff at the school level matching their powerschool schoolid value. All 
 
 **Export Summary and Output Options**
 
-- *Export File Name:* `8-Enrollments_teachers_school-%d.csv`
+- *Export File Name:* `8-Enrollments_100_teachers_school-%d.csv`
 - *Line Delimiter:* `CR-LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
