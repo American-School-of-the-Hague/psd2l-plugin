@@ -309,7 +309,16 @@ select distinct
   'semester' as "type",
   'UPDATE' as "action",
   'term_'||TERMS.ID as "code",
-  TERMS.NAME as "name",
+  /*
+  post-pend the school year to the abbreviated term name using the current year and month
+  */
+  CASE 
+    WHEN (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
+     THEN TERMS.Abbreviation||' '||to_char(EXTRACT(year from sysdate)-1)||'-'||to_char(EXTRACT(year from sysdate))
+   WHEN (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
+     THEN to_char(EXTRACT(year from sysdate))||'-'||to_char(EXTRACT(year from sysdate))
+  END
+     as "name",
   '' as "start_date",
   '' as "end_date",
   '' as "is_active",
