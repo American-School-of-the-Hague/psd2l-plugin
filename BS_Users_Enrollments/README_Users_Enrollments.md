@@ -516,6 +516,7 @@ All active staff staff added to ORG (6066) as "Instructor"
 All active staff with Brightspace Roles assigned
 
 ```SQL
+-- 07_u_t_active.named_queries.xml
 select DISTINCT
     'user' as "type",
     'UPDATE' as "action",
@@ -541,7 +542,7 @@ select DISTINCT
 from 
     users users,
     schoolstaff schoolstaff,
-
+    U_SCHOOLSTAFFUSERFIELDS U_SCHOOLSTAFFUSERFIELDS
 where SCHOOLSTAFF.USERS_DCID=USERS.DCID
     /* only the homeschool information for each user; 
     this prevents multiple entries
@@ -1039,6 +1040,7 @@ Add all teachers and co-teachers
 
 ```SQL
 /*
+08_e_t.named_queries.xml
 enroll all section teachers (including primary and co-teachers) into sections/courses
 */
 select distinct
@@ -1152,6 +1154,7 @@ Add all teachers and co-teachers
 
 ```SQL
 /*
+08_e_t_school.named_queries.xml
 add staff w/ specific roles set in SIS
 Start Page > Staff > Select A Staff Member > Integration Information
 Always change roles at the HOME SCHOOL level in SIS
@@ -1210,7 +1213,7 @@ order by teachers.homeschoolid
 
 **Export Summary and Output Options**
 
-- *Export File Name:* `8-Enrollments_students-%d.csv`
+- *Export File Name:* `8-Enrollments_800_students-%d.csv`
 - *Line Delimiter:* `CR-LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
@@ -1326,7 +1329,7 @@ Enrol parents in classes as view-only members of their children's classes.
 
 **Export Summary and Output Options**
 
-- *Export File Name:* `8-Enrollments_parent_audiors-%d.csv`
+- *Export File Name:* `8-Enrollments_802_parent_audiors-%d.csv`
 - *Line Delimiter:* `CR-LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
