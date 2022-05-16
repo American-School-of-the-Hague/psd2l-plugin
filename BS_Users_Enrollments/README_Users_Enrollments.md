@@ -21,45 +21,41 @@ PowerQuery Plugin for exporting the following information from PowerSchool &rarr
   - [Fields Provided & Used](#fields-provided--used-3)
   - [Data Export Manager Setup](#data-export-manager-setup-3)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-3)
-- [**DEPRICATED** 7 Users Teacher-Auditors Active](#depricated-7-users-teacher-auditors-active)
+- [7 Users Students Inactive](#7-users-students-inactive)
   - [Fields Provided & Used](#fields-provided--used-4)
   - [Data Export Manager Setup](#data-export-manager-setup-4)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-4)
-- [7 Users Students Inactive](#7-users-students-inactive)
+- [**DEPRICATED** 7 Users Students Active](#depricated-7-users-students-active)
   - [Fields Provided & Used](#fields-provided--used-5)
   - [Data Export Manager Setup](#data-export-manager-setup-5)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-5)
-- [**DEPRICATED** 7 Users Students Active](#depricated-7-users-students-active)
+- [7 Users Students Active](#7-users-students-active)
   - [Fields Provided & Used](#fields-provided--used-6)
   - [Data Export Manager Setup](#data-export-manager-setup-6)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-6)
-- [7 Users Students Active](#7-users-students-active)
+- [8 Enrollments Teachers](#8-enrollments-teachers)
   - [Fields Provided & Used](#fields-provided--used-7)
   - [Data Export Manager Setup](#data-export-manager-setup-7)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-7)
-- [8 Enrollments Teachers](#8-enrollments-teachers)
+- [8 Enrollments Teachers - School Level](#8-enrollments-teachers---school-level)
   - [Fields Provided & Used](#fields-provided--used-8)
   - [Data Export Manager Setup](#data-export-manager-setup-8)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-8)
-- [8 Enrollments Teachers - School Level](#8-enrollments-teachers---school-level)
+- [8 Enrollments Students](#8-enrollments-students)
   - [Fields Provided & Used](#fields-provided--used-9)
   - [Data Export Manager Setup](#data-export-manager-setup-9)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-9)
-- [8 Enrollments Students](#8-enrollments-students)
+- [8 Enrollments Parents in Student Classes](#8-enrollments-parents-in-student-classes)
   - [Fields Provided & Used](#fields-provided--used-10)
   - [Data Export Manager Setup](#data-export-manager-setup-10)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-10)
-- [8 Enrollments Parents in Student Classes](#8-enrollments-parents-in-student-classes)
+- [8 Enrollments Students Athletics](#8-enrollments-students-athletics)
   - [Fields Provided & Used](#fields-provided--used-11)
   - [Data Export Manager Setup](#data-export-manager-setup-11)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-11)
-- [8 Enrollments Students Athletics](#8-enrollments-students-athletics)
   - [Fields Provided & Used](#fields-provided--used-12)
   - [Data Export Manager Setup](#data-export-manager-setup-12)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-12)
-  - [Fields Provided & Used](#fields-provided--used-13)
-  - [Data Export Manager Setup](#data-export-manager-setup-13)
-  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-13)
 
 ## Important Implementation Notes
 
@@ -449,7 +445,7 @@ select distinct
 
 ## 7 Users Teachers Active
 
-All active staff updated as role "Instructors".
+All active staff staff added to ORG (6066) as "Instructor"
 
 ### Fields Provided & Used
 
@@ -513,8 +509,7 @@ All active staff updated as role "Instructors".
 | Table |
 |-|
 |USERS|
-|TEACHERS|
-|U_SCHOOLSTAFFUSERFIELDS|
+|schoolstaff|
 
 **SQL Query**
 
@@ -538,12 +533,7 @@ select DISTINCT
     users.LAST_NAME as "last_name",
     '' as "password",
     schoolstaff.STATUS as "is_active",
-    -- 'Instructor' as "role_name",
-    case 
-        when U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE is Null or lower(trim(U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE)) = lower('NONE')
-        Then 'Instructor'
-        ELSE trim(U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE)
-    end as"role_name",
+    'Instructor' as "role_name",
     users.EMAIL_ADDR as "email",
     '' as "relationships",
     '' as "pref_first_name",
@@ -551,7 +541,6 @@ select DISTINCT
 from 
     users users,
     schoolstaff schoolstaff,
-    U_SCHOOLSTAFFUSERFIELDS U_SCHOOLSTAFFUSERFIELDS 
 
 where SCHOOLSTAFF.USERS_DCID=USERS.DCID
     /* only the homeschool information for each user; 
@@ -564,138 +553,6 @@ where SCHOOLSTAFF.USERS_DCID=USERS.DCID
     /* only active staff */
     and schoolstaff.status=1
 ORDER BY users.last_name asc
-```
-
-## **DEPRICATED** 7 Users Teacher-Auditors Active
-
-The relationship built in the Active-Students query builds the relationships. This is not needed.
-
-All teachers that are memberts of the "Learner Support" auditors role. Teachers of EAL and Learning Support classes. These users are linked via the relationship field for students. These roles overwrite the "Instructor" roles.
-
-### Fields Provided & Used
-
-- `org_defined_id` used in [08-Enrollments Students](#8-enrollmentsstudents) as `child_code`
-- `org_defined_id` used in [08-Enrollments Teachers](#8-enrollmentsteachers) as `child_code`
-
-### Data Export Manager Setup
-
-- **Category:** Show All
-- **Export Form:**  `NQ com.txoof.brightspace.users.07t_active_auditors`
-
-**Labels Used on Export**
-
-| Label |
-|-|
-|type|
-|action|
-|username|
-|org_define_id|
-|first_name|
-|last_name|
-|password|
-|role_name|
-|relationships|
-|pref_first_name |
-|pref_last_name |
-
-**Export Summary and Output Options**
-
-- *Export File Name:* `7-Users_102_teachers_active_auditors-%d.csv`
-- *Line Delimiter:* `CR-LF`
-- *Field Delimiter:* `,`
-- *Character Set:* `UTF-8`
-- *Include Column Headers:* `True`
-- *Surround "field values" in Quotes:* TBD
-
-### Query Setup for `named_queries.xml`
-
-- File: `07_u_t_active_auditors.named_queries.xml`
-
-| header | table.field | value | NOTE |
-|-|-|-|-|
-|type| TEACHERS.ID | user | N1 |
-|action| TEACHERS.ID | UPDATE | N1 |
-|username| TEACHERS.EMAIL_ADDR |_foo@ash.nl_ |
-|org_define_id| TEACHERS.ID | _T\_234_ |
-|first_name| TEACHERS.FIRST_NAME | _John_ |
-|last_name| TEACHERS.LAST_NAME |_Doe_ | 
-|password| TEACHERS.ID | '' | N1 |
-|role_name| TEACHERS.ID | _Learner Support_ | N1 |
-|relationships| TEACHERS.ID | TBD | N1 |
-|pref_frist_name| TEACHERS.ID |TBD | N1 |
-|pref_last_name| TEACHERS.ID |TBD | N1 |
-
-**NOTES**
-
-**N1:** Field does not appear in database; use a known field such as `<column column=STUDENT.ID>header<\column>` to prevent an "unknown column error"
-
-**Tables Used**
-
-| Table |
-|-|
-|TEACHERS|
-|CC|
-|STUDENTS|
-|TEACHERS|
-|COURSES|
-
-**SQL Query**
-
-```SQL
-select distinct
-    'user' as "type",
-    'UPDATE' as "action",
-    /* 
-    use username portion of teacher/staff email addresses for D2L username.
-    This is necessary because some staff use their @ash.nl email address as
-    their guardian contact information. The parent accounts are created first
-    resulting in a colision between the parent account username and teacher 
-    account username.
-    */
-    regexp_replace(TEACHERS.EMAIL_ADDR, '(@.*)', '') as "username",
-    /* prepend a 'T' to make sure there are no studentid/teacherid colisions */
-    'T_'||TEACHERS.TEACHERNUMBER as "org_defined_id",
-    TEACHERS.FIRST_NAME as "first_name",
-    TEACHERS.LAST_NAME as "last_name",
-    '' as "password",
-    0 as "is_active",
-    'Learner Support' as "role_name",
-    TEACHERS.EMAIL_ADDR as "email",
-    '' as "relationships",
-    '' as "pref_first_name",
-    '' as "pref_last_name"
- from COURSES COURSES,
-    CC CC,
-    STUDENTS STUDENTS,
-    TEACHERS TEACHERS 
- where CC.STUDENTID=STUDENTS.ID
-    and CC.TEACHERID=TEACHERS.ID
-    and COURSES.COURSE_NUMBER=CC.COURSE_NUMBER
-    and TEACHERS.SCHOOLID >=2
-    and CC.TERMID >=3100
-    and STUDENTS.ENROLL_STATUS =0
-    and TEACHERS.STATUS =1
-    /*
-    only include teachers of Learning Support (OLEA, MSLSC), EAL, Special Ed (SSE)
-    and English Foundations 
-    */
-    and (cc.course_number like 'OLEA' 
-        or courses.sched_department like 'MSLSC' 
-        or courses.sched_department like 'MSEAL'
-        /* ms, hs special education */
-        or courses.sched_department like '%SSE%'
-        or courses.course_name like '%ENG English Foundations%'
-        or courses.course_name like '%English as an Addl Language%')
-    and CC.COURSE_NUMBER=COURSES.COURSE_NUMBER
-    and STUDENTS.ENROLL_STATUS =0
-    and STUDENTS.GRADE_LEVEL >=5
-    and CC.TERMID >= case 
-      when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
-      THEN (EXTRACT(year from sysdate)-2000+9)*100
-      when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
-      THEN (EXTRACT(year from sysdate)-2000+10)*100
-      end
-order by "last_name" asc
 ```
 
 ## 7 Users Students Inactive
@@ -1210,7 +1067,12 @@ select distinct
     and CC.SECTIONID=SECTIONTEACHER.SECTIONID
     and SECTIONTEACHER.TEACHERID=TEACHERS.ID
     and STUDENTS.ENROLL_STATUS =0
-    and CC.TERMID =3100
+    and CC.TERMID >= case 
+      when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
+      THEN (EXTRACT(year from sysdate)-2000+9)*100
+      when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
+      THEN (EXTRACT(year from sysdate)-2000+10)*100
+      end
     and STUDENTS.GRADE_LEVEL >=5
  order by teachers.teachernumber asc
 ```
@@ -1290,20 +1152,27 @@ Add all teachers and co-teachers
 
 ```SQL
 /*
-Enrol all teachers and other staff into school level orgunits based
-on their home school id
-    - ECC, ES, MS, HS and District Office
+add staff w/ specific roles set in SIS
+Start Page > Staff > Select A Staff Member > Integration Information
+Always change roles at the HOME SCHOOL level in SIS
 */
 select distinct
     'enrollment' as "type",
     'UPDATE' as "action",
     'T_'||teachers.teachernumber as "child_code",
-    'Instructor' as "role_name",
+    case 
+        when U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE is Null or lower(trim(U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE)) = lower('NONE')
+        Then 'Instructor'
+        ELSE trim(U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE)
+    end  as "role_name",
     teachers.homeschoolid as "parent_code"
- from TEACHERS TEACHERS
+ from TEACHERS TEACHERS,
+ U_SCHOOLSTAFFUSERFIELDS U_SCHOOLSTAFFUSERFIELDS
  where teachers.status =1
     and length(teachers.email_addr) >0
- order by teachers.homeschoolid asc
+    and teachers.schoolid = teachers.homeschoolid
+    and u_schoolstaffuserfields.schoolstaffdcid = teachers.dcid
+order by teachers.homeschoolid
 ```
 
 ## 8 Enrollments Students
