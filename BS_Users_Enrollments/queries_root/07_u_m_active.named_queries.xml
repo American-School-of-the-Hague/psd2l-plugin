@@ -49,7 +49,7 @@
                 so the sanity and sustainability of this is questionable 
                 */
                 and trim(guardian.firstname)=trim(u_studentsuserfields.mother_firstname)
-                and trim(guardian.lastname)=trim(u_studentsuserfields.mother_lastname)
+                -- and trim(guardian.lastname)=trim(u_studentsuserfields.mother_lastname)
                 and LENGTH(U_STUDENTSUSERFIELDS.EMAILMOTHER) >0
                 and STUDENTS.ENROLL_STATUS =0
                 and students.grade_level >=5

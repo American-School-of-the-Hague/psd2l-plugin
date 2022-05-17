@@ -25,7 +25,7 @@
 			<![CDATA[
 			select distinct
                 'user' as "type",
-                /* mark students that have left in the past N days for deletion */
+                /* mark parents of students that have left in the past N days for deletion */
                 case 
                 WHEN (trunc(sysdate) - STUDENTS.EXITDATE) >=90
                     THEN 'DELETE'
@@ -57,7 +57,7 @@
                 so the sanity and sustainability of this is questionable 
                 */
                 and trim(guardian.firstname)=trim(u_studentsuserfields.father_firstname)
-                and trim(guardian.lastname)=trim(u_studentsuserfields.father_lastname)
+                -- and trim(guardian.lastname)=trim(u_studentsuserfields.father_lastname)
                 and trunc(sysdate) - STUDENTS.EXITDATE < 180 
                 and trunc(sysdate) - STUDENTS.EXITDATE > 0    
                 and STUDENTS.ENROLL_STATUS !=0

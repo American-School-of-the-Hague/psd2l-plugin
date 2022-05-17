@@ -3,6 +3,8 @@
 
 Feb-June 2022 : Aaron Ciuffo : aciuffo@ash.nl : aaron.ciuffo@gmail.com
 - [Implementation Notes](#implementation-notes)
+  - [Important Implementation Choices](#important-implementation-choices)
+    - [Parents](#parents)
 - [PowerSchool Setup and Installation](#powerschool-setup-and-installation)
   - [SIS Installation](#sis-installation)
   - [Data Export Manager Configuration](#data-export-manager-configuration)
@@ -24,6 +26,18 @@ Feb-June 2022 : Aaron Ciuffo : aciuffo@ash.nl : aaron.ciuffo@gmail.com
 Automated exports are managed through PowerSchool PowerQuery Plugins. Plugins follow the structure outlined below.
 
 Each CSV Export for Brightspace is managed through an individual plugin. Each plugin contains an SQL query that matches the required fields for the CSV. See the [Automated Exports from PSL to Brightspace](#automated-exports-from-psl-to-brightspace) section for more information.
+
+### Important Implementation Choices
+
+#### Parents
+
+Parent/Auditor Association in Brightspace cannot be used as of May 2022. 
+
+There is no consistent way to link parents to students using the custom powerschool tables. The only way to provide a match between `motheremail`, `fatheremail` and `guiardianid` is by matching the first and last names stored in the `U_STUDENTSUSERFIELDS` and `GUARDIAN` tables. The first/last names stored in these tables is inconsistent. The result is that parent accounts cannot be created reliably in the IPSIS 7-Users uploads. This leads to an account creation failure when attempting to create students with Auditor associations.
+
+The work around is to break the parent/auditor association and rely only on parent user accounts that are eventually enrolled using a read-only role in all student accounts. This means that the Brightspace Pulse application is not an option for parents.
+
+
 
 ## PowerSchool Setup and Installation
 

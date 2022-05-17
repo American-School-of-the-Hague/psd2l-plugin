@@ -33,7 +33,7 @@
                 '' as "password",
                 1 as "is_active",
                 'Parent' as "role_name",
-                trim(U_STUDENTSUSERFIELDS.EMAILFATHER) as "email",
+                trim(U_STUDENTSUSERFIELDS.EMAILMOTHER) as "email",
                 '' as "relationships",
                 '' as "pref_first_name",
                 '' as "pref_last_name"
@@ -49,7 +49,7 @@
                 so the sanity and sustainability of this is questionable 
                 */
                 and trim(guardian.firstname)=trim(u_studentsuserfields.father_firstname)
-                and trim(guardian.lastname)=trim(u_studentsuserfields.father_lastname)
+                -- and trim(guardian.lastname)=trim(u_studentsuserfields.father_lastname)
                 and LENGTH(U_STUDENTSUSERFIELDS.EMAILFATHER) >0
                 and STUDENTS.ENROLL_STATUS =0
                 and students.grade_level >=5
