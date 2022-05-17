@@ -1100,7 +1100,6 @@ select distinct
       THEN (EXTRACT(year from sysdate)-2000+10)*100
       end
     and STUDENTS.GRADE_LEVEL >=5
- order by teachers.teachernumber asc
 ```
 
 
