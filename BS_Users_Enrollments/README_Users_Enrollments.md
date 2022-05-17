@@ -25,37 +25,33 @@ PowerQuery Plugin for exporting the following information from PowerSchool &rarr
   - [Fields Provided & Used](#fields-provided--used-4)
   - [Data Export Manager Setup](#data-export-manager-setup-4)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-4)
-- [**DEPRICATED** 7 Users Students Active](#depricated-7-users-students-active)
+- [7 Users Students Active](#7-users-students-active)
   - [Fields Provided & Used](#fields-provided--used-5)
   - [Data Export Manager Setup](#data-export-manager-setup-5)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-5)
-- [7 Users Students Active](#7-users-students-active)
+- [8 Enrollments Teachers](#8-enrollments-teachers)
   - [Fields Provided & Used](#fields-provided--used-6)
   - [Data Export Manager Setup](#data-export-manager-setup-6)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-6)
-- [8 Enrollments Teachers](#8-enrollments-teachers)
+- [8 Enrollments Teachers - School Level](#8-enrollments-teachers---school-level)
   - [Fields Provided & Used](#fields-provided--used-7)
   - [Data Export Manager Setup](#data-export-manager-setup-7)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-7)
-- [8 Enrollments Teachers - School Level](#8-enrollments-teachers---school-level)
+- [8 Enrollments Students](#8-enrollments-students)
   - [Fields Provided & Used](#fields-provided--used-8)
   - [Data Export Manager Setup](#data-export-manager-setup-8)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-8)
-- [8 Enrollments Students](#8-enrollments-students)
+- [8 Enrollments Parents in Student Classes](#8-enrollments-parents-in-student-classes)
   - [Fields Provided & Used](#fields-provided--used-9)
   - [Data Export Manager Setup](#data-export-manager-setup-9)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-9)
-- [8 Enrollments Parents in Student Classes](#8-enrollments-parents-in-student-classes)
+- [8 Enrollments Students Athletics](#8-enrollments-students-athletics)
   - [Fields Provided & Used](#fields-provided--used-10)
   - [Data Export Manager Setup](#data-export-manager-setup-10)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-10)
-- [8 Enrollments Students Athletics](#8-enrollments-students-athletics)
   - [Fields Provided & Used](#fields-provided--used-11)
   - [Data Export Manager Setup](#data-export-manager-setup-11)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-11)
-  - [Fields Provided & Used](#fields-provided--used-12)
-  - [Data Export Manager Setup](#data-export-manager-setup-12)
-  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-12)
 
 ## Important Implementation Notes
 
@@ -64,7 +60,7 @@ Usernames for parents and staff are set to their email addresses. Students are s
 
 Usernames for teachers are set to the username portion of their @ash.nl email address. This is to prevent username collisions with parent accounts.
 
-User creation must occur in the following order: Parents, Teachers, Students. Student accounts are related to parent accounts through the `relations` field; this field requires the `org_defined_id` from the parents to exist.
+User creation must occur in the following order: Parents, Teachers, Students. Student accounts are related to parent accounts through the `relations` field; this field requires the `org_defined_id` from the parents to exist. As of May 2022, this feature is not used. See the implementation choices documentation in the [README.md](../README.md/#important-implementation-choices).
 
 D2L IPSIS processes CSV files in alphabetical order. To enforce the proper order, it is critical that the PowerSchool Data Export Manager templates are set with filenames that will sort such that parents come first, teachers second and students last. 
 
@@ -158,6 +154,51 @@ There are two separate Named Queries (NQ) for parents, one for mother and one fo
 
 Both mother and father query depend on u_studentuserfields.mother|father_firstname be exactly equal to guardian.firstname. u_studentuserfields is populated via an e-collect form by parents. It is unclear how the guardian fields are populated, so this may break in the future. `¯\_(ツ)_/¯`
 
+**FATHER***
+```SQL
+select distinct
+    'user' as "type",
+    /* mark parents of students that have left in the past N days for deletion */
+    case 
+       WHEN (trunc(sysdate) - STUDENTS.EXITDATE) >=90
+           THEN 'DELETE'
+       ELSE 
+           'UPDATE'
+       END "action",    
+    trim(U_STUDENTSUSERFIELDS.EMAILFATHER) as "username",
+    'P_'||GUARDIAN.GUARDIANID as "org_defined_id",
+    GUARDIAN.FIRSTNAME as "first_name",
+    GUARDIAN.LASTNAME as "last_name",
+    '' as "password",
+    /* Mark students that are not "active" in powerschool (PS !=0) as inactive (BS=0) */
+    (CASE STUDENTS.ENROLL_STATUS
+        WHEN 0 THEN 1
+        ELSE 0 END) as "is_active",    'Parent' as "role_name",
+    trim(U_STUDENTSUSERFIELDS.EMAILFATHER) as "email",
+    '' as "relationships",
+    '' as "pref_first_name",
+    '' as "pref_last_name"
+from GUARDIANSTUDENT GUARDIANSTUDENT,
+    GUARDIAN GUARDIAN,
+    U_STUDENTSUSERFIELDS U_STUDENTSUSERFIELDS,
+    STUDENTS STUDENTS 
+where U_STUDENTSUSERFIELDS.STUDENTSDCID=STUDENTS.DCID
+    and GUARDIAN.GUARDIANID=GUARDIANSTUDENT.GUARDIANID
+    and STUDENTS.DCID=GUARDIANSTUDENT.STUDENTSDCID
+    /* this requires that the names in guardian and u_studentuserfields 
+    match exactly. We're not entirely sure how the guardian fields come to be populated
+    so the sanity and sustainability of this is questionable 
+    */
+    and trim(guardian.firstname)=trim(u_studentsuserfields.father_firstname)
+    -- and trim(guardian.lastname)=trim(u_studentsuserfields.father_lastname)
+    and trunc(sysdate) - STUDENTS.EXITDATE < 180 
+    and trunc(sysdate) - STUDENTS.EXITDATE > 0    
+    and STUDENTS.ENROLL_STATUS !=0
+    and students.grade_level >=5
+order by "org_defined_id" asc
+```
+
+**MOTHER***
 ```SQL
 select distinct
     'user' as "type",
@@ -193,7 +234,7 @@ where U_STUDENTSUSERFIELDS.STUDENTSDCID=STUDENTS.DCID
     so the sanity and sustainability of this is questionable 
     */
     and trim(guardian.firstname)=trim(u_studentsuserfields.mother_firstname)
-    and trim(guardian.lastname)=trim(u_studentsuserfields.mother_lastname)
+    -- and trim(guardian.lastname)=trim(u_studentsuserfields.mother_lastname)
     and trunc(sysdate) - STUDENTS.EXITDATE < 180 
     and trunc(sysdate) - STUDENTS.EXITDATE > 0    
     and STUDENTS.ENROLL_STATUS !=0
@@ -292,7 +333,43 @@ Both mother and father query depend on u_studentuserfields.mother_firstanme|fath
 
 Remember to update the mother and father Named Query files if any changes are made.
 
-```SQL:
+**FATHER**
+```SQL
+select distinct
+    'user' as "type",
+    'UPDATE' as "action",
+    trim(U_STUDENTSUSERFIELDS.EMAILFATHER) as "username",
+    'P_'||GUARDIAN.GUARDIANID as "org_defined_id",
+    GUARDIAN.FIRSTNAME as "first_name",
+    GUARDIAN.LASTNAME as "last_name",
+    '' as "password",
+    1 as "is_active",
+    'Parent' as "role_name",
+    trim(U_STUDENTSUSERFIELDS.EMAILMOTHER) as "email",
+    '' as "relationships",
+    '' as "pref_first_name",
+    '' as "pref_last_name"
+from GUARDIANSTUDENT GUARDIANSTUDENT,
+    GUARDIAN GUARDIAN,
+    U_STUDENTSUSERFIELDS U_STUDENTSUSERFIELDS,
+    STUDENTS STUDENTS 
+where U_STUDENTSUSERFIELDS.STUDENTSDCID=STUDENTS.DCID
+    and GUARDIAN.GUARDIANID=GUARDIANSTUDENT.GUARDIANID
+    and STUDENTS.DCID=GUARDIANSTUDENT.STUDENTSDCID
+    /* this requires that the names in guardian and u_studentuserfields 
+    match exactly. We're not entirely sure how the guardian fields come to be populated
+    so the sanity and sustainability of this is questionable 
+    */
+    and trim(guardian.firstname)=trim(u_studentsuserfields.father_firstname)
+    -- and trim(guardian.lastname)=trim(u_studentsuserfields.father_lastname)
+    and LENGTH(U_STUDENTSUSERFIELDS.EMAILFATHER) >0
+    and STUDENTS.ENROLL_STATUS =0
+    and students.grade_level >=5
+order by "org_defined_id" asc
+```
+
+**MOTHER**
+```SQL
 select distinct
     'user' as "type",
     'UPDATE' as "action",
@@ -319,7 +396,7 @@ where U_STUDENTSUSERFIELDS.STUDENTSDCID=STUDENTS.DCID
     so the sanity and sustainability of this is questionable 
     */
     and trim(guardian.firstname)=trim(u_studentsuserfields.mother_firstname)
-    and trim(guardian.lastname)=trim(u_studentsuserfields.mother_lastname)
+    -- and trim(guardian.lastname)=trim(u_studentsuserfields.mother_lastname)
     and LENGTH(U_STUDENTSUSERFIELDS.EMAILMOTHER) >0
     and STUDENTS.ENROLL_STATUS =0
     and students.grade_level >=5
@@ -671,134 +748,6 @@ select
  order by STUDENTS.EXITDATE asc
 ```
 
-## **DEPRICATED** 7 Users Students Active
-
-Replaced with more complex query that adds auditors and parent relations. **DO NOT USE**
-
-This query pulls all active students grade 5 and higher and adds a relationship between students and parents.
-
-### Fields Provided & Used
-
-**PROVIDES FIELDS:**
-
-- `org_defined_id` used in [08-Enrollments_Students](#8-enrollments_students) as `child_code` 
-
-|Field |Format |example |
-|:-|:-|:-|
-|`org_defined_id`| `S_`_`STUDENTS.STUDENT_NUMBER`_ | S_123456
-
-**USES FIELDS:**
-
-- `org_definied_id` as `Id` in `relationships` field from [07-Users_Parents_Active](#7-usersparentsactive)
-
-|Field |Format |example |
-|:-|:-|:-|
-|`relationships`| `[{"type": "parent", "Id": "P_GUARDIAN.GUARDIANID"}]` | [{"type": "parent", "Id": "P_123456"}]
-
-### Data Export Manager Setup
-
-- **Category:** Show All
-- **Export From:**  `NQ com.txoof.brightspace.users.07s_active`
-
-**Labels Used on Export**
-
-| Label |
-|-|
-|type|
-|action|
-|username|
-|org_define_id|
-|first_name|
-|last_name|
-|password|
-|role_name|
-|relationships|
-|pref_first_name |
-|pref_last_name |
-
-**Export Summary and Output Options**
-
-- *Export File Name:* `7-Users_201_Students_Active.csv`
-- *Line Delimiter:* `CR-LF`
-- *Field Delimiter:* `,`
-- *Character Set:* `UTF-8`
-- *Include Column Headers:* `True`
-- *Surround "field values" in Quotes:* TBD
-
-### Query Setup for `named_queries.xml`
-
-- File: `07_u_s_active.named_queries.xml`
-
-| header | table.field | value | NOTE |
-|-|-|-|-|
-|type| STUDENTS.ID | user | N1 |
-|action| STUDENTS.ID | UPDATE | N1 |
-|username| U_STUDENTSUSERFIELDS.EMAILSTUDENT | _bar@ash.nl_ |
-|org_define_id| STUDENTS.STUDENT_NUMBER | _S\_123456_ |
-|first_name| STUDENTS.FIRST_NAME | _Jane_ |
-|last_name| STUDENTS.LAST_NAME |_Doe_ | 
-|password| STUDENTS.ID | '' | N1 |
-|role_name| STUDENTS.ID | _Learner_ | N1 |
-|relationships| STUDENTS.ID | TBD | N1 |
-|pref_frist_name| STUDENTS.ID |TBD | N1 |
-|pref_last_name| STUDENTS.ID |TBD | N1 |
-
-**NOTES**
-
-**N1:** Field does not appear in database; use a known field such as `<column column=STUDENT.ID>header<\column>` to prevent an "unknown column error"
-
-**Tables Used**
-
-| Table |
-|-|
-|STUDENTS|
-|U_STUDENTSUSERFIELDS|
-|GuardianStudent|
-|Guardian|
-
-**SQL Query**
-
-```SQL
-SELECT
-    'user' as "type",
-    'UPDATE' as "action",
-    u_studentsuserfields.emailstudent as "username",
-    'S_'||students.student_number as "org_defined_id",
-    students.first_name as "first_name",
-    students.last_name as "last_name",
-    '' as "password",
-    1 as "is_active",
-    'Learner' as "role_name",
-    u_studentsuserfields.emailstudent as "email",
-    listagg('Parent'||chr(58)||'P_'||guardian.guardianid, chr(124)) WITHIN GROUP ( ORDER BY Guardian.LastName desc ) as "relationship",
-    '' as "pref_last_name",
-    '' as "pref_first_name"
-FROM 
-Guardian Guardian
-
-INNER JOIN 
-GuardianStudent GuardianStudent 
-ON 
-Guardian.GuardianID = GuardianStudent.GuardianID
-
-INNER JOIN 
-Students Students 
-ON 
-GuardianStudent.studentsdcid = Students.dcid
-
-INNER JOIN
-U_STUDENTSUSERFIELDS U_STUDENTSUSERFIELDS
-ON
-U_STUDENTSUSERFIELDS.STUDENTSDCID = students.dcid
-
-WHERE 
-  Students.enroll_status = 0
-  and students.grade_level >=5
-
-GROUP BY students.student_number, students.first_name, students.last_name, u_studentsuserfields.emailstudent
-ORDER BY "org_defined_id"
-```
-
 ## 7 Users Students Active
 
 This query includes all active students with Parent and Auditor relationships.
@@ -886,6 +835,81 @@ This query includes all active students with Parent and Auditor relationships.
 
 **SQL Query**
 
+**ONLY AUDITORS RELATIONSHIP**
+
+```SQL
+SELECT
+    'user' as "type",
+    'UPDATE' as "action",
+    U_StudentsUserFields.EmailStudent AS "username",
+    'S_'||students.student_number as "org_defined_id",
+    students.first_name as "first_name",
+    students.last_name as "last_name",
+    '' as "password",
+    1 as "is_active",
+    'Learner' as "role_name",
+    u_studentsuserfields.emailstudent as "email",
+    CASE
+        WHEN Auditors.Auditors IS NOT NULL AND Parents.Parents IS NOT NULL
+        THEN Auditors.Auditors || ''
+        ELSE Auditors.Auditors
+    END AS "relationship",
+    '' as "pref_first_name",
+    '' as "pref_last_name"
+FROM
+    Students
+    JOIN U_StudentsUserFields ON Students.DCID = U_StudentsUserFields.StudentsDCID
+    LEFT JOIN (
+        SELECT
+            Helper.StudentID,
+            LISTAGG('Auditor'||CHR(58)||'T_'||Helper.TeacherNumber,'|')
+                WITHIN GROUP (ORDER BY Helper.TeacherNumber DESC) AS Auditors
+        FROM ( /* Oracle 12c method to deduplicate the LISTAGG */
+            SELECT DISTINCT
+                CC.StudentID,
+                Teachers.TeacherNumber
+            FROM
+                CC
+                JOIN Courses ON CC.Course_Number = Courses.Course_Number
+                JOIN Teachers ON CC.TeacherID = Teachers.ID
+            WHERE
+                (
+                    Courses.Course_Name LIKE 'ENG English Foundations%'
+                    OR Courses.Course_name LIKE 'Grade%English Essentials%'
+                    OR CC.Course_Number = 'OLEA'
+                    OR Courses.Sched_Department IN ('MSEAL','MSLSC')
+                )
+                     and CC.TERMID >= case 
+                        when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
+                        THEN (EXTRACT(year from sysdate)-2000+9)*100
+                        when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
+                        THEN (EXTRACT(year from sysdate)-2000+10)*100
+                     end
+        ) Helper
+        GROUP BY
+            Helper.StudentID
+    ) Auditors ON Students.ID = Auditors.StudentID
+    LEFT JOIN ( /* I didn't deduplicate here because there shouldn't be duplicate
+        parent accounts, but you could use that same approach here if needed. */
+        SELECT
+            GuardianStudent.StudentsDCID,
+            LISTAGG('Parent' || CHR(58) || 'P_' || GuardianID,'|')
+                WITHIN GROUP (ORDER BY Guardian.LastName DESC) AS Parents
+        FROM
+            Guardian
+            JOIN GuardianStudent USING(GuardianID)
+        GROUP BY
+            GuardianStudent.StudentsDCID
+    ) Parents ON Students.DCID = Parents.StudentsDCID
+WHERE
+    Students.Enroll_Status = 0
+    AND Students.Grade_Level >= 5
+    AND U_StudentsUserFields.EmailStudent IS NOT NULL
+ORDER BY
+    U_StudentsUserFields.EmailStudent
+```
+
+**WITH PARENTS & AUDIORS RELATIONSHIP**
 ```SQL
 /*
 based entirely on solution provided by Vance M. Allen
