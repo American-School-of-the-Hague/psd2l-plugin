@@ -2,7 +2,7 @@
     <!--set name here (also applies to permissions_root-->
     <query name="com.txoof.brightspace.enroll.08_s_athl" coreTable="STUDENTS" flattened="false">
         <!--add description here-->
-        <description>enroll active students</description>
+        <description>enroll active students in athletics</description>
         <!--number of columns here must match number sql returns-->
         <columns>
             <column column="STUDENTS.ID">type</column>

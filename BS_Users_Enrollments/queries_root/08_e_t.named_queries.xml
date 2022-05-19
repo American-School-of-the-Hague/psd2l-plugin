@@ -2,7 +2,7 @@
     <!--set name here (also applies to permissions_root-->
     <query name="com.txoof.brightspace.enroll.08_teacher" coreTable="TEACHERS" flattened="false">
         <!--add description here-->
-        <description>enroll teachers</description>
+        <description>enroll teacher in classes</description>
         <!--number of columns here must match number sql returns-->
         <columns>
             <column column="TEACHERS.ID">type</column>
@@ -51,6 +51,12 @@
                 THEN (EXTRACT(year from sysdate)-2000+10)*100
                 end
                 and STUDENTS.GRADE_LEVEL >=5
+                /*
+                exclude all teachernumber that are not purely digits
+                This avoids processing `UNASSIGNED` or `NN2`  or similar garbage
+                */
+                and REGEXP_LIKE(teachers.teachernumber, '^\d+$')
+            order by "child_code" desc
             ]]>
         </sql>
     </query>
