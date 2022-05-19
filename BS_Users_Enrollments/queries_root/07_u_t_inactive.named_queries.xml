@@ -2,7 +2,7 @@
 	<!--set name here (also applies to permissions_root-->
     <query name="com.txoof.brightspace.users.07t_inactive" coreTable="teachers" flattened="false">
 		<!--add description here-->
-        <description>export all active teachers for use with a BrightSpace 7-User import</description>
+        <description>export all inactive teachers for use with a BrightSpace 7-User import</description>
 		<!--number of columns here must match number sql returns-->
         <columns>
 			<column column="TEACHERS.TEACHERNUMBER">type</column> <!-- for columns not in database use a core filed-->

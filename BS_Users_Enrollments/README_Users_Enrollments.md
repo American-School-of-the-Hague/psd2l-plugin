@@ -41,29 +41,33 @@ PowerQuery Plugin for exporting the following information from PowerSchool &rarr
   - [Fields Provided & Used](#fields-provided--used-8)
   - [Data Export Manager Setup](#data-export-manager-setup-8)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-8)
-- [8 Enrollments Parents in Student Classes](#8-enrollments-parents-in-student-classes)
+- [8 Enrollments Students Active Dropped Classes](#8-enrollments-students-active-dropped-classes)
   - [Fields Provided & Used](#fields-provided--used-9)
   - [Data Export Manager Setup](#data-export-manager-setup-9)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-9)
-- [8 Enrollments Students Athletics](#8-enrollments-students-athletics)
+- [8 Enrollments Parents in Student Classes](#8-enrollments-parents-in-student-classes)
   - [Fields Provided & Used](#fields-provided--used-10)
   - [Data Export Manager Setup](#data-export-manager-setup-10)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-10)
-- [8 Enrollments Students](#8-enrollments-students-1)
+- [8 Enrollments Students Athletics](#8-enrollments-students-athletics)
   - [Fields Provided & Used](#fields-provided--used-11)
   - [Data Export Manager Setup](#data-export-manager-setup-11)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-11)
-- [8 Enrollments Parents in Student Classes](#8-enrollments-parents-in-student-classes-1)
+- [8 Enrollments Students](#8-enrollments-students-1)
   - [Fields Provided & Used](#fields-provided--used-12)
   - [Data Export Manager Setup](#data-export-manager-setup-12)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-12)
-- [8 Enrollments Parents Athletics](#8-enrollments-parents-athletics)
+- [8 Enrollments Parents in Student Classes](#8-enrollments-parents-in-student-classes-1)
   - [Fields Provided & Used](#fields-provided--used-13)
   - [Data Export Manager Setup](#data-export-manager-setup-13)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-13)
+- [8 Enrollments Parents Athletics](#8-enrollments-parents-athletics)
   - [Fields Provided & Used](#fields-provided--used-14)
   - [Data Export Manager Setup](#data-export-manager-setup-14)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-14)
+  - [Fields Provided & Used](#fields-provided--used-15)
+  - [Data Export Manager Setup](#data-export-manager-setup-15)
+  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-15)
 
 ## Important Implementation Notes
 
@@ -1112,6 +1116,12 @@ select distinct
       THEN (EXTRACT(year from sysdate)-2000+10)*100
       end
     and STUDENTS.GRADE_LEVEL >=5
+    /*
+    exclude all teachernumber that are not purely digits
+    This avoids processing `UNASSIGNED` or `NN2`  or similar garbage
+    */
+    and REGEXP_LIKE(teachers.teachernumber, '^\d+$')
+order by "child_code" desc
 ```
 
 
@@ -1324,8 +1334,119 @@ select
  order by STUDENTS.GRADE_LEVEL ASC, STUDENTS.LASTFIRST ASC, SECTIONS.SECTION_NUMBER ASC
 ```
 
+## 8 Enrollments Students Active Dropped Classes
 
+Remove students from classes that are dropped in the SIS. Run this job only 
+once per week as it will generate errors for every *previously* dropped class
+that has already been processed.
 
+### Fields Provided & Used
+
+**PROVIDES FIELDS:**
+
+- `child_code` used in ?? as `??` 
+
+|Field |Format |example |
+|:-|:-|:-|
+|`child_code`| `'cs_'\|\|cc.schoolid\|\|'_'\|\|cc.course_number\|\|'_'\|\|cc.TermID` | cs_2_C5A_3100
+
+**USES FIELDS:**
+
+- `org_defined_id` from [07-Users - Students](../BS_07_Users_Students/README.md) as `child_code`
+- `code` from [06-Sections](../BS_06_Offerings/README.md) as `parent_code`
+- ALTERNATIVE: `code` from [05-Offerings](../BS_05_Offerings/README.md) as `parent_code`
+
+### Data Export Manager Setup
+
+- **Category:** Show All
+- **Export From:**  `NQ com.txoof.brightspace.enroll.08_stud_drop`
+
+**Labels Used on Export**
+
+| Label |
+|-|
+|type|
+|action|
+|child_code|
+|role_name|
+|parent_code|
+
+**Export Summary and Output Options**
+
+- *Export File Name:* `8-Enrollments_810_students_dropped-%d.csv`
+- *Line Delimiter:* `CR-LF`
+- *Field Delimiter:* `,`
+- *Character Set:* `UTF-8`
+- *Include Column Headers:* `True`
+- *Surround "field values" in Quotes:* TBD
+
+### Query Setup for `named_queries.xml`
+
+- Files: `08_e_s.named_queries.xml`
+
+| header | table.field | value | NOTE |
+|-|-|-|-|
+|-|-|-|-|
+|type| CC.ID | _enrollment_ | N1
+|action| CC.ID | _UPDATE_ | N1
+|child_code| `S_`_`STUDENTS.STUDENT_NUMBER`_ | _S\_506113_
+|role_name| CC.ID | _Learner_ | N1
+|parent_code| `cs_`_`cc.schoolid`_`_`_`cc.course_number`_`_`_`cc.termid`_ | _cs_2_E0DNS_3100_ 
+
+**NOTES**
+
+**N1:** Field does not appear in database; use a known field such as `<column column=STUDENT.ID>header<\column>` to prevent an "unknown column error"
+
+**Tables Used**
+
+| Table |
+|-|
+|STUDENTS|
+|COURSES|
+|CC|
+|SECTIONS|
+
+**SQL Query**
+
+```SQL
+/*
+08_e_s_dropped.named_query.xml
+Delete students from classes they are no longer enrolled in
+NOTE: This will generate an error for every class that has been
+previously dropped by Brightspace; run this at most once per week to
+prevent logs from filling with garbage.
+*/
+select
+    'enrollment' as "type",
+    'DELETE' as "action",
+    'S_'||STUDENTS.STUDENT_NUMBER as "child_code",
+    'Learner' as "role_name",
+    'cs_'||cc.schoolid||'_'||cc.course_number||'_'||REGEXP_REPLACE(cc.termid, '\D+', '')||'_'||DECODE(substr(cc.expression, 1, 1), 
+    
+     1, 'A', 
+     2, 'B', 
+     3, 'C', 
+     4, 'D', 
+     5, 'E', 
+     6, 'F', 
+     7, 'G', 
+     8, 'H', 
+     9, 'ADV', 
+     'UNKNOWN') as "parent_code"
+ from
+    cc
+    join students on cc.studentid = students.id
+    join sections on CC.OrigSectionID = Sections.ID
+    join courses on sections.course_number = courses.course_number
+    join teachers on sections.teacher = teachers.id
+ 
+ where
+    floor(sections.termid/100) = ~(curyearid)
+    and students.enroll_status IN (0)
+    and students.grade_level >= 5
+order by
+    "child_code" desc
+```
 
 ## 8 Enrollments Parents in Student Classes
 
