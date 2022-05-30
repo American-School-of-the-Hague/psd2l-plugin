@@ -37,11 +37,11 @@ PowerQuery Plugin for exporting the following information from PowerSchool &rarr
   - [Fields Provided & Used](#fields-provided--used-7)
   - [Data Export Manager Setup](#data-export-manager-setup-7)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-7)
-- [8 Enrollments Students](#8-enrollments-students)
+- [8 Enrollments Students Active](#8-enrollments-students-active)
   - [Fields Provided & Used](#fields-provided--used-8)
   - [Data Export Manager Setup](#data-export-manager-setup-8)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-8)
-- [8 Enrollments Students Active Dropped Classes](#8-enrollments-students-active-dropped-classes)
+- [8 Enrollments Students Active - Dropped Classes](#8-enrollments-students-active---dropped-classes)
   - [Fields Provided & Used](#fields-provided--used-9)
   - [Data Export Manager Setup](#data-export-manager-setup-9)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-9)
@@ -53,21 +53,17 @@ PowerQuery Plugin for exporting the following information from PowerSchool &rarr
   - [Fields Provided & Used](#fields-provided--used-11)
   - [Data Export Manager Setup](#data-export-manager-setup-11)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-11)
-- [8 Enrollments Students](#8-enrollments-students-1)
+- [8 Enrollments Parents in Student Classes](#8-enrollments-parents-in-student-classes-1)
   - [Fields Provided & Used](#fields-provided--used-12)
   - [Data Export Manager Setup](#data-export-manager-setup-12)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-12)
-- [8 Enrollments Parents in Student Classes](#8-enrollments-parents-in-student-classes-1)
+- [8 Enrollments Parents Athletics](#8-enrollments-parents-athletics)
   - [Fields Provided & Used](#fields-provided--used-13)
   - [Data Export Manager Setup](#data-export-manager-setup-13)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-13)
-- [8 Enrollments Parents Athletics](#8-enrollments-parents-athletics)
   - [Fields Provided & Used](#fields-provided--used-14)
   - [Data Export Manager Setup](#data-export-manager-setup-14)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-14)
-  - [Fields Provided & Used](#fields-provided--used-15)
-  - [Data Export Manager Setup](#data-export-manager-setup-15)
-  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-15)
 
 ## Important Implementation Notes
 
@@ -125,7 +121,9 @@ There are two separate Named Queries (NQ) for parents, one for mother and one fo
 
 **NOTE:** Parents file must be processed before student files so relationships can be properly built. Prepend 000 (mother) and 001 (father) to parents CSV filename to ensure this. Students have 100 prepended.
 
-- *Export File Name:* `7-Users_000_mother_inactive-%d.csv` & `7-Users_001_father_inactive-%d.csv`
+- *Export File Name:* 
+  - `7-Users_000_mother_inactive-%d.csv`
+  - `7-Users_001_father_inactive-%d.csv`
 - *Line Delimiter:* `CR-LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
@@ -170,7 +168,7 @@ There are two separate Named Queries (NQ) for parents, one for mother and one fo
 
 Both mother and father query depend on u_studentuserfields.mother|father_firstname be exactly equal to guardian.firstname. u_studentuserfields is populated via an e-collect form by parents. It is unclear how the guardian fields are populated, so this may break in the future. `¯\_(ツ)_/¯`
 
-**FATHER***
+**FATHER**
 ```SQL
 select distinct
     'user' as "type",
@@ -214,7 +212,7 @@ where U_STUDENTSUSERFIELDS.STUDENTSDCID=STUDENTS.DCID
 order by "org_defined_id" asc
 ```
 
-**MOTHER***
+**MOTHER**
 ```SQL
 select distinct
     'user' as "type",
@@ -260,7 +258,7 @@ order by "org_defined_id" asc
 
 ## 7 Users Parents Active
 
-There are two separate Named Queries (NQ) for parents, one for mother and one for father. These are listed as m_inactive and f_inactive respectively. These could potentially be combined in the future.
+There are two separate Named Queries (NQ) for parents, one for mother and one for father. These are listed as m_active and f_active respectively. These could potentially be combined in the future.
 
 ### Fields Provided & Used
 
@@ -301,12 +299,13 @@ There are two separate Named Queries (NQ) for parents, one for mother and one fo
 
 **NOTE:** Parents file must be processed before student files so relationships can be properly built. Prepend 002 (mother) and 003 (father) to parents CSV filename to ensure this. Students have 200 prepended.
 
-- *Export File Name:* `7-Users_002_mother_active-%d.csv` & `7-Users_003_fother_active-%d.csv`
+- *Export File Name:* 
+  - `7-Users_002_mother_active-%d.csv`
+  - `7-Users_003_father_active-%d.csv`
 - *Line Delimiter:* `CR-LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
 - *Include Column Headers:* `True`
-- *Surround "field values" in Quotes:* TBD
 
 ### Query Setup for `named_queries.xml`
 
@@ -420,6 +419,8 @@ order by "org_defined_id" asc
 ```
 
 ## 7 Users Teachers Inactive
+
+Disable and delete accounts for teachers that are no longer active.
 
 ### Fields Provided & Used
 
@@ -651,6 +652,8 @@ ORDER BY users.last_name asc
 
 ## 7 Users Students Inactive
 
+Disable and delete accounts for departed students.
+
 ### Fields Provided & Used
 
 - `org_defined_id` used in [08-Enrollments_Students](../BS_08_Enrollments_Students/8-Enrollments_students_README.md) as `child_code` 
@@ -810,7 +813,7 @@ This query includes all active students with Parent and Auditor relationships.
 
 **Export Summary and Output Options**
 
-- *Export File Name:* `7-Users_201_Students_Active_W_Auditor.csv`
+- *Export File Name:* `7-Users_201_students_active.csv`
 - *Line Delimiter:* `CR-LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
@@ -1041,7 +1044,7 @@ Add all teachers to scheduled classes. Class enrolment needs to happen last afte
 
 **Export Summary and Output Options**
 
-- *Export File Name:* `8-Enrollments_109_teachers-%d.csv`
+- *Export File Name:* `8-Enrollments_100_teachers-%d.csv`
 - *Line Delimiter:* `CR-LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
@@ -1164,7 +1167,7 @@ This needs to be run prior to the individual course enrollments
 
 **Export Summary and Output Options**
 
-- *Export File Name:* `8-Enrollments_100_teachers_school-%d.csv`
+- *Export File Name:* `8-Enrollments_101_teachers_school-%d.csv`
 - *Line Delimiter:* `CR-LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
@@ -1223,7 +1226,7 @@ select distinct
 order by teachers.homeschoolid
 ```
 
-## 8 Enrollments Students
+## 8 Enrollments Students Active
 
 ### Fields Provided & Used
 
@@ -1258,7 +1261,7 @@ order by teachers.homeschoolid
 
 **Export Summary and Output Options**
 
-- *Export File Name:* `8-Enrollments_800_students-%d.csv`
+- *Export File Name:* `8-Enrollments_205_students-%d.csv`
 - *Line Delimiter:* `CR-LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
@@ -1334,11 +1337,16 @@ select
  order by STUDENTS.GRADE_LEVEL ASC, STUDENTS.LASTFIRST ASC, SECTIONS.SECTION_NUMBER ASC
 ```
 
-## 8 Enrollments Students Active Dropped Classes
+## 8 Enrollments Students Active - Dropped Classes
 
-Remove students from classes that are dropped in the SIS. Run this job only 
-once per week as it will generate errors for every *previously* dropped class
-that has already been processed.
+Remove students from classes that are dropped in the SIS. This must be run **FIRST**, prior to the other student enrolments. This is to protect against this pattern:
+1. Student is added to ABC_123
+2. Student is dropped from ABC_123
+3. Student is added to XYZ_789
+4. Student is dropped from XYZ_789
+5. Student is added to ABC_123 *← Final Result*
+
+If the drops are run last, the end result will be that the enrolment from step *5* will be clobbered by the drop in step *2*. The student will be missing from ABC_123 though the should be enroled.
 
 ### Fields Provided & Used
 
@@ -1373,7 +1381,7 @@ that has already been processed.
 
 **Export Summary and Output Options**
 
-- *Export File Name:* `8-Enrollments_810_students_dropped-%d.csv`
+- *Export File Name:* `8-Enrollments_200_students_dropped-%d.csv`
 - *Line Delimiter:* `CR-LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
@@ -1485,7 +1493,7 @@ Enrol parents in classes as view-only members of their children's classes.
 
 **Export Summary and Output Options**
 
-- *Export File Name:* `8-Enrollments_802_parent_audiors-%d.csv`
+- *Export File Name:* `8-Enrollments_300_parent_audiors-%d.csv`
 - *Line Delimiter:* `CR-LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
@@ -1599,7 +1607,7 @@ select
 
 **Export Summary and Output Options**
 
-- *Export File Name:* `8-Enrollments_801_students_athletics-%d.csv`
+- *Export File Name:* `8-Enrollments_202_students_athletics-%d.csv`
 - *Line Delimiter:* `CR-LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
@@ -1656,118 +1664,6 @@ SELECT distinct
       Gen.Name
 ```
 
-
-## 8 Enrollments Students
-
-### Fields Provided & Used
-
-**PROVIDES FIELDS:**
-
-- `child_code` used in ?? as `??` 
-
-|Field |Format |example |
-|:-|:-|:-|
-|`child_code`| `'cs_'\|\|cc.schoolid\|\|'_'\|\|cc.course_number\|\|'_'\|\|cc.TermID` | cs_2_C5A_3100
-
-**USES FIELDS:**
-
-- `org_defined_id` from [07-Users - Students](../BS_07_Users_Students/README.md) as `child_code`
-- `code` from [06-Sections](../BS_06_Offerings/README.md) as `parent_code`
-- ALTERNATIVE: `code` from [05-Offerings](../BS_05_Offerings/README.md) as `parent_code`
-
-### Data Export Manager Setup
-
-- **Category:** Show All
-- **Export From:**  `NQ com.txoof.brightspace.enroll.08_students`
-
-**Labels Used on Export**
-
-| Label |
-|-|
-|type|
-|action|
-|child_code|
-|role_name|
-|parent_code|
-
-**Export Summary and Output Options**
-
-- *Export File Name:* `8-Enrollments_800_students-%d.csv`
-- *Line Delimiter:* `CR-LF`
-- *Field Delimiter:* `,`
-- *Character Set:* `UTF-8`
-- *Include Column Headers:* `True`
-- *Surround "field values" in Quotes:* TBD
-
-### Query Setup for `named_queries.xml`
-
-- Files: `08_e_s.named_queries.xml`
-
-| header | table.field | value | NOTE |
-|-|-|-|-|
-|-|-|-|-|
-|type| CC.ID | _enrollment_ | N1
-|action| CC.ID | _UPDATE_ | N1
-|child_code| `S_`_`STUDENTS.STUDENT_NUMBER`_ | _S\_506113_
-|role_name| CC.ID | _Learner_ | N1
-|parent_code| `cs_`_`cc.schoolid`_`_`_`cc.course_number`_`_`_`cc.termid`_ | _cs_2_E0DNS_3100_ 
-
-**NOTES**
-
-**N1:** Field does not appear in database; use a known field such as `<column column=STUDENT.ID>header<\column>` to prevent an "unknown column error"
-
-**Tables Used**
-
-| Table |
-|-|
-|STUDENTS|
-|COURSES|
-|CC|
-|SECTIONS|
-
-**SQL Query**
-
-```SQL
-select 
-    'enrollment' as "type",
-    'UPDATE' as "action",
-    /* using 7-Users:org_defined_id as child_code */
-    'S_'||STUDENTS.STUDENT_NUMBER as "child_code",
-    /* REGEXP_REPLACE(U_STUDENTSUSERFIELDS.EMAILSTUDENT, '(^.*)(@.*)', '\1') as "child_code", */
-    'Learner' as "role_name",
-    /* using 6-Sections:code as parent_code */
-    'cs_'||cc.schoolid||'_'||cc.course_number||'_'||cc.TermID||'_'||DECODE(substr(cc.expression, 1, 1), 
-     1, 'A', 
-     2, 'B', 
-     3, 'C', 
-     4, 'D', 
-     5, 'E', 
-     6, 'F', 
-     7, 'G', 
-     8, 'H', 
-     9, 'ADV', 
-     'UNKNOWN') as "parent_code"
- from 
-    /* U_STUDENTSUSERFIELDS U_STUDENTSUSERFIELDS, */
-    SECTIONS SECTIONS,
-    COURSES COURSES,
-    CC CC,
-    STUDENTS STUDENTS 
- where CC.STUDENTID=STUDENTS.ID
-    and COURSES.COURSE_NUMBER=CC.COURSE_NUMBER
-    and SECTIONS.ID=CC.SECTIONID
-    /* and U_STUDENTSUSERFIELDS.STUDENTSDCID=STUDENTS.DCID */ 
-    and STUDENTS.ENROLL_STATUS =0
-    and STUDENTS.GRADE_LEVEL >=5
-    and CC.TERMID >= case 
-      when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
-      THEN (EXTRACT(year from sysdate)-2000+9)*100
-      when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
-      THEN (EXTRACT(year from sysdate)-2000+10)*100
-      end
- order by STUDENTS.GRADE_LEVEL ASC, STUDENTS.LASTFIRST ASC, SECTIONS.SECTION_NUMBER ASC
-```
-
 ## 8 Enrollments Parents in Student Classes
 
 Enrol parents in classes as view-only members of their children's classes.
@@ -1805,7 +1701,7 @@ Enrol parents in classes as view-only members of their children's classes.
 
 **Export Summary and Output Options**
 
-- *Export File Name:* `8-Enrollments_802_parent_audiors-%d.csv`
+- *Export File Name:* `8-Enrollments_300_parent_audiors-%d.csv`
 - *Line Delimiter:* `CR-LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
@@ -1921,7 +1817,7 @@ Enrol parents in all athletics classes using the read-only parent role
 
 **Export Summary and Output Options**
 
-- *Export File Name:* `8-Enrollments_804_parents_athletics-%d.csv`
+- *Export File Name:* `8-Enrollments_301_parents_athletics-%d.csv`
 - *Line Delimiter:* `CR-LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
