@@ -14,29 +14,26 @@
         <!--SQL query in format <![CDATA[QUERY]]>-->
         <sql>
             <![CDATA[
-            /*
-            08_e_t_school.named_queries.xml
-            add staff w/ specific roles set in SIS
-            Start Page > Staff > Select A Staff Member > Integration Information
-            Always change roles at the HOME SCHOOL level in SIS
-            */
-            select distinct
+            -- 08_e_t_school.named_queries.xml
+            select DISTINCT
                 'enrollment' as "type",
                 'UPDATE' as "action",
-                'T_'||teachers.teachernumber as "child_code",
-                case 
-                    when U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE is Null or lower(trim(U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE)) = lower('NONE')
-                    Then 'Instructor'
-                    ELSE trim(U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE)
-                end  as "role_name",
-                teachers.homeschoolid as "parent_code"
-            from TEACHERS TEACHERS,
-            U_SCHOOLSTAFFUSERFIELDS U_SCHOOLSTAFFUSERFIELDS
-            where teachers.status =1
-                and length(teachers.email_addr) >0
-                and teachers.schoolid = teachers.homeschoolid
-                and u_schoolstaffuserfields.schoolstaffdcid = teachers.dcid
-            order by teachers.homeschoolid
+                'T_'||users.TEACHERNUMBER as "child_code",
+                'Instructor' as "role_name",
+                users.homeschoolid as "parent_code"
+            from 
+                users users,
+                schoolstaff schoolstaff
+            where SCHOOLSTAFF.USERS_DCID=USERS.DCID
+                /* only the homeschool information for each user; 
+                this prevents multiple entries
+                */
+                and users.homeschoolid=schoolstaff.schoolid
+                /* Ignore all users with no email address */
+                AND LENGTH(users.EMAIL_ADDR) > 0
+                /* only active staff */
+                and schoolstaff.status=1
+            ORDER BY "child_code" asc
             ]]>
         </sql>
     </query>

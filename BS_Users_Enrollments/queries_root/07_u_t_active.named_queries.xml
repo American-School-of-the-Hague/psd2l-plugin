@@ -22,7 +22,6 @@
         <!--SQL query in format <![CDATA[QUERY]]>-->
         <sql>
             <![CDATA[
-            -- 07_u_t_active.named_queries.xml
             select DISTINCT
                 'user' as "type",
                 'UPDATE' as "action",
@@ -40,7 +39,11 @@
                 users.LAST_NAME as "last_name",
                 '' as "password",
                 schoolstaff.STATUS as "is_active",
-                'Instructor' as "role_name",
+                case 
+                    when U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE is Null or lower(trim(U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE)) = lower('NONE')
+                    Then 'Instructor'
+                    ELSE trim(U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE)
+                end  as "role_name",
                 users.EMAIL_ADDR as "email",
                 '' as "relationships",
                 '' as "pref_first_name",
