@@ -5,6 +5,7 @@ Feb-June 2022 : Aaron Ciuffo : aciuffo@ash.nl : aaron.ciuffo@gmail.com
 - [Implementation Notes](#implementation-notes)
   - [Important Implementation Choices](#important-implementation-choices)
     - [Parents](#parents)
+    - [ASH Staff/Parents](#ash-staffparents)
 - [PowerSchool Setup and Installation](#powerschool-setup-and-installation)
   - [SIS Installation](#sis-installation)
   - [Data Export Manager Configuration](#data-export-manager-configuration)
@@ -37,7 +38,15 @@ There is no consistent way to link parents to students using the custom powersch
 
 The work around is to break the parent/auditor association and rely only on parent user accounts that are eventually enrolled using a read-only role in all student accounts. This means that the Brightspace Pulse application is not an option for parents.
 
+#### ASH Staff/Parents
 
+ASH staff that are also parents may not be able to sign using the Google SSO if they use their @ash.nl address as their contact email address in PowerSchool.
+
+**SOLUTIONS**
+1. Teachers use username password login by visiting https://lms.ash.nl/d2l/local 
+   - Teachers can choose their own password by clicking on the "Forgot password" link. 
+   - This is not at all obvious and will require a lot of support 
+2. ???
 
 ## PowerSchool Setup and Installation
 
