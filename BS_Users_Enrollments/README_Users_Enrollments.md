@@ -49,14 +49,18 @@ PowerQuery Plugin for exporting the following information from PowerSchool &rarr
   - [Fields Provided & Used](#fields-provided--used-10)
   - [Data Export Manager Setup](#data-export-manager-setup-10)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-10)
-- [8 Enrollments Students Athletics](#8-enrollments-students-athletics)
+- [8 Enrollments Parents in Student Classes - Drop](#8-enrollments-parents-in-student-classes---drop)
   - [Fields Provided & Used](#fields-provided--used-11)
   - [Data Export Manager Setup](#data-export-manager-setup-11)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-11)
-- [8 Enrollments Parents Athletics](#8-enrollments-parents-athletics)
+- [8 Enrollments Students Athletics](#8-enrollments-students-athletics)
   - [Fields Provided & Used](#fields-provided--used-12)
   - [Data Export Manager Setup](#data-export-manager-setup-12)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-12)
+- [8 Enrollments Parents Athletics](#8-enrollments-parents-athletics)
+  - [Fields Provided & Used](#fields-provided--used-13)
+  - [Data Export Manager Setup](#data-export-manager-setup-13)
+  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-13)
 
 ## Important Implementation Notes
 
@@ -1494,7 +1498,7 @@ Enrol parents in classes as view-only members of their children's classes.
 
 **Export Summary and Output Options**
 
-- *Export File Name:* `8-Enrollments_300_parent_audiors-%d.csv`
+- *Export File Name:* `8-Enrollments_301_parent_audiors-%d.csv`
 - *Line Delimiter:* `CR-LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
@@ -1572,6 +1576,134 @@ select
     and CC.TERMID >=3100
  order by GUARDIANSTUDENT.GUARDIANID ASC
 ```
+
+## 8 Enrollments Parents in Student Classes - Drop
+
+Remove parents from student classes that are dropped in the SIS. This must be run **FIRST**, prior to the other student enrolments. This is to protect against this pattern:
+1. Student is added to ABC_123
+2. Student is dropped from ABC_123
+3. Student is added to XYZ_789
+4. Student is dropped from XYZ_789
+5. Student is added to ABC_123 *← Final Result*
+
+If the drops are run last, the end result will be that the enrolment from step *5* will be clobbered by the drop in step *2*. The student will be missing from ABC_123 though the should be enroled.
+
+### Fields Provided & Used
+
+**PROVIDES FIELDS:**
+
+- `child_code` used in ?? as `??` 
+
+|Field |Format |example |
+|:-|:-|:-|
+|`child_code`| `'cs_'\|\|cc.schoolid\|\|'_'\|\|cc.course_number\|\|'_'\|\|cc.TermID` | cs_2_C5A_3100
+
+**USES FIELDS:**
+
+- `org_defined_id` from [07-Users - Students](../BS_07_Users_Students/README.md) as `child_code`
+- `code` from [06-Sections](../BS_06_Offerings/README.md) as `parent_code`
+- ALTERNATIVE: `code` from [05-Offerings](../BS_05_Offerings/README.md) as `parent_code`
+
+### Data Export Manager Setup
+
+- **Category:** Show All
+- **Export From:**  `NQ com.txoof.brightspace.enroll.08_parents_drop`
+
+**Labels Used on Export**
+
+| Label |
+|-|
+|type|
+|action|
+|child_code|
+|role_name|
+|parent_code|
+
+**Export Summary and Output Options**
+
+- *Export File Name:* `8-Enrollments_300_parent_audiors_drops-%d.csv`
+- *Line Delimiter:* `CR-LF`
+- *Field Delimiter:* `,`
+- *Character Set:* `UTF-8`
+- *Include Column Headers:* `True`
+- *Surround "field values" in Quotes:* TBD
+
+### Query Setup for `named_queries.xml`
+
+- Files: `08_e_p_drop.named_queries.xml`
+
+| header | table.field | value | NOTE |
+|-|-|-|-|
+|-|-|-|-|
+|type| CC.ID | _enrollment_ | N1
+|action| CC.ID | _UPDATE_ | N1
+|child_code| `S_`_`GUARDIAN.GUARDIANID`_ | _P\_506113_
+|role_name| CC.ID | _Parent-Auditor_ | N1
+|parent_code| `cs_`_`cc.schoolid`_`_`_`cc.course_number`_`_`_`cc.termid`_ | _cs_2_E0DNS_3100_ 
+
+**NOTES**
+
+**N1:** Field does not appear in database; use a known field such as `<column column=STUDENT.ID>header<\column>` to prevent an "unknown column error"
+
+**Tables Used**
+
+| Table |
+|-|
+|STUDENTS|
+|GUARDIAN|
+|COURSES|
+|CC|
+|SECTIONS|
+|GUARDIANSTUDENT|
+
+**SQL Query**
+
+```SQL
+/*
+08_e_p_drop.named_queries.xml
+Update enrollments for parents: drop parents from classes that students have dropped 
+*/
+select
+    'enrollment' as "type",
+    'DELETE' as "action",
+    'P_'||guardian.guardianid as "child_code",
+    'Learner' as "role_name",
+    'cs_'||cc.schoolid||'_'||cc.course_number||'_'||REGEXP_REPLACE(cc.termid, '\D+', '')||'_'||DECODE(substr(cc.expression, 1, 1), 
+    
+     1, 'A', 
+     2, 'B', 
+     3, 'C', 
+     4, 'D', 
+     5, 'E', 
+     6, 'F', 
+     7, 'G', 
+     8, 'H', 
+     9, 'ADV', 
+     'UNKNOWN') as "parent_code"
+ from
+    cc
+    join students on cc.studentid = students.id
+    join sections on CC.OrigSectionID = Sections.ID
+    join courses on sections.course_number = courses.course_number
+    join teachers on sections.teacher = teachers.id
+    join guardianstudent on students.dcid = guardianstudent.studentsdcid
+    join guardian on guardianstudent.guardianid = guardian.guardianid
+ 
+ where
+    sections.TERMID >= case 
+        when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
+        THEN (EXTRACT(year from sysdate)-2000+9)*100
+        when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
+        THEN (EXTRACT(year from sysdate)-2000+10)*100
+    end
+    -- only select students that are "active"
+    and students.enroll_status IN (0)
+    -- only select students grades 5+
+    and students.grade_level >= 5
+order by
+    "child_code" desc
+```
+
 
 ## 8 Enrollments Students Athletics
 
