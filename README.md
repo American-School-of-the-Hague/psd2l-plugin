@@ -2,6 +2,7 @@
 # D2L BrightSpace IPSIS exports from PowerSchool SIS
 
 Feb-June 2022 : Aaron Ciuffo : aciuffo@ash.nl : aaron.ciuffo@gmail.com
+- [To Do](#to-do)
 - [Implementation Notes](#implementation-notes)
   - [Important Implementation Choices](#important-implementation-choices)
     - [Parents](#parents)
@@ -22,6 +23,12 @@ Feb-June 2022 : Aaron Ciuffo : aciuffo@ash.nl : aaron.ciuffo@gmail.com
   - [Course Offerings](#course-offerings)
   - [Users](#users)
 
+## To Do
+
+* Add parent-student associations
+  * allows parents to see grades, etc.
+  * depends on moving to contacts module and use of guardian tables in powerschool see [Parents](#parents) section below for details.
+
 ## Implementation Notes
 
 Automated exports are managed through PowerSchool PowerQuery Plugins. Plugins follow the structure outlined below.
@@ -38,15 +45,21 @@ There is no consistent way to link parents to students using the custom powersch
 
 The work around is to break the parent/auditor association and rely only on parent user accounts that are eventually enrolled using a read-only role in all student accounts. This means that the Brightspace Pulse application is not an option for parents.
 
+In the future, once ASH moves to the "contacts" feature in PowerSchool SIS, parents can reliably pulled from the database and parent associations can be crated.
+
 #### ASH Staff/Parents
 
 ASH staff that are also parents may not be able to sign using the Google SSO if they use their @ash.nl address as their contact email address in PowerSchool.
 
 **SOLUTIONS**
+
+As of 31 May, 2022 solution 1 is temporarily being implemented. 
+
 1. Teachers use username password login by visiting https://lms.ash.nl/d2l/local 
    - Teachers can choose their own password by clicking on the "Forgot password" link. 
-   - This is not at all obvious and will require a lot of support 
-2. ???
+   - The admissions team is working to update the email addresses of all current staff to use only non @ash.nl addresses.
+2. It is also possible to map the `OrgDefinedID` in BrightSpace to the Google IDP instead of the email address. 
+   - This will require updating the parent `OrgDefinedID` to match
 
 ## PowerSchool Setup and Installation
 
