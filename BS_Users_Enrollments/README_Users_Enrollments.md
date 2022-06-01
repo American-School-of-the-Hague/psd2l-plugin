@@ -1498,7 +1498,7 @@ Enrol parents in classes as view-only members of their children's classes.
 
 **Export Summary and Output Options**
 
-- *Export File Name:* `8-Enrollments_301_parent_audiors-%d.csv`
+- *Export File Name:* `8-Enrollments_301_parent_auditors-%d.csv`
 - *Line Delimiter:* `CR-LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
@@ -1621,7 +1621,7 @@ If the drops are run last, the end result will be that the enrolment from step *
 
 **Export Summary and Output Options**
 
-- *Export File Name:* `8-Enrollments_300_parent_audiors_drops-%d.csv`
+- *Export File Name:* `8-Enrollments_300_parent_auditors_drops-%d.csv`
 - *Line Delimiter:* `CR-LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
@@ -1726,7 +1726,7 @@ order by
 ### Data Export Manager Setup
 
 - **Category:** Show All
-- **Export From:**  `NQ com.txoof.brightspace.enroll.08_students`
+- **Export From:**  `NQ com.txoof.brightspace.enroll.08_s_athl`
 
 **Labels Used on Export**
 
@@ -1836,7 +1836,7 @@ Enrol parents in all athletics classes using the read-only parent role
 
 **Export Summary and Output Options**
 
-- *Export File Name:* `8-Enrollments_301_parents_athletics-%d.csv`
+- *Export File Name:* `8-Enrollments_302_parents_athletics-%d.csv`
 - *Line Delimiter:* `CR-LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
