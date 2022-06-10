@@ -1307,6 +1307,10 @@ ORDER BY "child_code" asc
 **SQL Query**
 
 ```SQL
+/*
+08_e_s.named_queries.xml
+All active student enrollments
+*/
 select 
     'enrollment' as "type",
     'UPDATE' as "action",
@@ -1339,9 +1343,9 @@ select
     and STUDENTS.ENROLL_STATUS =0
     and STUDENTS.GRADE_LEVEL >=5
     and CC.TERMID >= case 
-      when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
+      when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
       THEN (EXTRACT(year from sysdate)-2000+9)*100
-      when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
+      when (EXTRACT(month from sysdate) > 6 and EXTRACT(month from sysdate) <= 12)
       THEN (EXTRACT(year from sysdate)-2000+10)*100
       end
  order by STUDENTS.GRADE_LEVEL ASC, STUDENTS.LASTFIRST ASC, SECTIONS.SECTION_NUMBER ASC
@@ -1400,7 +1404,7 @@ If the drops are run last, the end result will be that the enrolment from step *
 
 ### Query Setup for `named_queries.xml`
 
-- Files: `08_e_s.named_queries.xml`
+- Files: `08_e_s_drop.named_queries.xml`
 
 | header | table.field | value | NOTE |
 |-|-|-|-|
@@ -1428,11 +1432,8 @@ If the drops are run last, the end result will be that the enrolment from step *
 
 ```SQL
 /*
-08_e_s_dropped.named_query.xml
-Delete students from classes they are no longer enrolled in
-NOTE: This will generate an error for every class that has been
-previously dropped by Brightspace; run this at most once per week to
-prevent logs from filling with garbage.
+08_e_s_drop.named_query.xml
+Delete students from classes they are no longer enrolled in.
 */
 select
     'enrollment' as "type",
@@ -1440,30 +1441,33 @@ select
     'S_'||STUDENTS.STUDENT_NUMBER as "child_code",
     'Learner' as "role_name",
     'cs_'||cc.schoolid||'_'||cc.course_number||'_'||REGEXP_REPLACE(cc.termid, '\D+', '')||'_'||DECODE(substr(cc.expression, 1, 1), 
-    
-     1, 'A', 
-     2, 'B', 
-     3, 'C', 
-     4, 'D', 
-     5, 'E', 
-     6, 'F', 
-     7, 'G', 
-     8, 'H', 
-     9, 'ADV', 
-     'UNKNOWN') as "parent_code"
- from
+    1, 'A', 
+    2, 'B', 
+    3, 'C', 
+    4, 'D', 
+    5, 'E', 
+    6, 'F', 
+    7, 'G', 
+    8, 'H', 
+    9, 'ADV', 
+    'UNKNOWN') as "parent_code"
+from
     cc
     join students on cc.studentid = students.id
     join sections on CC.OrigSectionID = Sections.ID
     join courses on sections.course_number = courses.course_number
     join teachers on sections.teacher = teachers.id
- 
- where
-    floor(sections.termid/100) = ~(curyearid)
+
+where
+    sections.TERMID >= case
+    when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
+        THEN (EXTRACT(year from sysdate)-2000+9)*100
+        when (EXTRACT(month from sysdate) > 6 and EXTRACT(month from sysdate) <= 12)
+        THEN (EXTRACT(year from sysdate)-2000+10)*100
+    end
     and students.enroll_status IN (0)
     and students.grade_level >= 5
-order by
-    "child_code" desc
+order by "child_code" desc
 ```
 
 ## 8 Enrollments Parents in Student Classes
@@ -1540,6 +1544,10 @@ Enrol parents in classes as view-only members of their children's classes.
 **SQL Query**
 
 ```SQL
+/*
+08_e_p.named_queries.xml
+all active parent enrollments
+*/
 select 
     'enrollment' as "type",
     'UPDATE' as "action",
@@ -1547,39 +1555,36 @@ select
     'Parent' as "role_name",
     /* using 6-Sections:code as parent_code */
     'cs_'||cc.schoolid||'_'||cc.course_number||'_'||cc.TermID||'_'||DECODE(substr(cc.expression, 1, 1), 
-     1, 'A', 
-     2, 'B', 
-     3, 'C', 
-     4, 'D', 
-     5, 'E', 
-     6, 'F', 
-     7, 'G', 
-     8, 'H', 
-     9, 'ADV', 
-     'UNKNOWN') as "parent_code"   
-    /*
-    GUARDIANSTUDENT.GUARDIANID as GUARDIANID,
-    COURSES.COURSE_NAME as COURSE_NAME,
-    STUDENTS.LASTFIRST as LASTFIRST,
-    STUDENTS.STUDENT_NUMBER as STUDENT_NUMBER,
-    GUARDIAN.LASTNAME as LASTNAME,
-    GUARDIAN.FIRSTNAME as FIRSTNAME 
-    */
- from GUARDIAN GUARDIAN,
+    1, 'A', 
+    2, 'B', 
+    3, 'C', 
+    4, 'D', 
+    5, 'E', 
+    6, 'F', 
+    7, 'G', 
+    8, 'H', 
+    9, 'ADV', 
+    'UNKNOWN') as "parent_code"
+from GUARDIAN GUARDIAN,
     COURSES COURSES,
     SECTIONS SECTIONS,
     STUDENTS STUDENTS,
     CC CC,
     GUARDIANSTUDENT GUARDIANSTUDENT 
- where GUARDIANSTUDENT.STUDENTSDCID=STUDENTS.DCID
+where GUARDIANSTUDENT.STUDENTSDCID=STUDENTS.DCID
     and STUDENTS.ID=CC.STUDENTID
     and CC.SECTIONID=SECTIONS.ID
     and SECTIONS.COURSE_NUMBER=COURSES.COURSE_NUMBER
     and GUARDIANSTUDENT.GUARDIANID=GUARDIAN.GUARDIANID
     and STUDENTS.ENROLL_STATUS =0
     and STUDENTS.GRADE_LEVEL >=5
-    and CC.TERMID >=3100
- order by GUARDIANSTUDENT.GUARDIANID ASC
+    and CC.TERMID >= case 
+        when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
+        THEN (EXTRACT(year from sysdate)-2000+9)*100
+        when (EXTRACT(month from sysdate) > 6 and EXTRACT(month from sysdate) <= 12)
+        THEN (EXTRACT(year from sysdate)-2000+10)*100
+    end
+order by GUARDIANSTUDENT.GUARDIANID ASC
 ```
 
 ## 8 Enrollments Parents in Student Classes - Drop
@@ -1696,9 +1701,9 @@ select
  
  where
     sections.TERMID >= case 
-        when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
+        when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
         THEN (EXTRACT(year from sysdate)-2000+9)*100
-        when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
+        when (EXTRACT(month from sysdate) > 6 and EXTRACT(month from sysdate) <= 12)
         THEN (EXTRACT(year from sysdate)-2000+10)*100
     end
     -- only select students that are "active"
@@ -1754,7 +1759,7 @@ order by
 
 ### Query Setup for `named_queries.xml`
 
-- Files: `08_e_s.named_queries.xml`
+- Files: `08_e_s_athl.named_queries.xml`
 
 | header | table.field | value | NOTE |
 |-|-|-|-|
@@ -1781,6 +1786,10 @@ order by
 **SQL Query**
 
 ```SQL
+/*
+08_e_s_athl.named_queries.xml
+Students involved in athletics for this term
+*/
 SELECT distinct
     'enrollment' as "type",
     'UPDATE' as "action",
