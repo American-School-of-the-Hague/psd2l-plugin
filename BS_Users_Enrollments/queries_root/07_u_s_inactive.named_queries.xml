@@ -52,7 +52,7 @@
             where 
                 STUDENTS.DCID=U_STUDENTSUSERFIELDS.STUDENTSDCID
                 and STUDENTS.ENROLL_STATUS >=2
-                and trunc(sysdate) - STUDENTS.EXITDATE < 180 
+                and trunc(sysdate) - STUDENTS.EXITDATE <= 180 
                 and trunc(sysdate) - STUDENTS.EXITDATE > 0
                 /* Only students grade 5 and up */
                 and STUDENTS.GRADE_LEVEL >= 5

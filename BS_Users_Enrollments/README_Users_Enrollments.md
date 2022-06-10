@@ -202,7 +202,7 @@ where U_STUDENTSUSERFIELDS.STUDENTSDCID=STUDENTS.DCID
     */
     and trim(guardian.firstname)=trim(u_studentsuserfields.father_firstname)
     -- and trim(guardian.lastname)=trim(u_studentsuserfields.father_lastname)
-    and trunc(sysdate) - STUDENTS.EXITDATE < 180 
+    and trunc(sysdate) - STUDENTS.EXITDATE <= 90
     and trunc(sysdate) - STUDENTS.EXITDATE > 0    
     and STUDENTS.ENROLL_STATUS !=0
     and students.grade_level >=5
@@ -246,7 +246,7 @@ where U_STUDENTSUSERFIELDS.STUDENTSDCID=STUDENTS.DCID
     */
     and trim(guardian.firstname)=trim(u_studentsuserfields.mother_firstname)
     -- and trim(guardian.lastname)=trim(u_studentsuserfields.mother_lastname)
-    and trunc(sysdate) - STUDENTS.EXITDATE < 180 
+    and trunc(sysdate) - STUDENTS.EXITDATE <= 90 
     and trunc(sysdate) - STUDENTS.EXITDATE > 0    
     and STUDENTS.ENROLL_STATUS !=0
     and students.grade_level >=5
@@ -758,7 +758,7 @@ select
  where 
     STUDENTS.DCID=U_STUDENTSUSERFIELDS.STUDENTSDCID
     and STUDENTS.ENROLL_STATUS >=2
-    and trunc(sysdate) - STUDENTS.EXITDATE < 180 
+    and trunc(sysdate) - STUDENTS.EXITDATE <= 180 
     and trunc(sysdate) - STUDENTS.EXITDATE > 0
     /* Only students grade 5 and up */
     and STUDENTS.GRADE_LEVEL >= 5
