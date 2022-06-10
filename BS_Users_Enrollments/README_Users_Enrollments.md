@@ -857,6 +857,11 @@ This query includes all active students with Parent and Auditor relationships.
 **ONLY AUDITORS RELATIONSHIP**
 
 ```SQL
+/*
+07_u_s_active.named_queries.xml
+
+update/create accounts for all active students
+*/
 SELECT
     'user' as "type",
     'UPDATE' as "action",
@@ -898,12 +903,12 @@ FROM
                     OR CC.Course_Number = 'OLEA'
                     OR Courses.Sched_Department IN ('MSEAL','MSLSC')
                 )
-                     and CC.TERMID >= case 
-                        when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
+                    and CC.TERMID >= case 
+                        when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
                         THEN (EXTRACT(year from sysdate)-2000+9)*100
-                        when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
+                        when (EXTRACT(month from sysdate) > 6 and EXTRACT(month from sysdate) <= 12)
                         THEN (EXTRACT(year from sysdate)-2000+10)*100
-                     end
+                    end
         ) Helper
         GROUP BY
             Helper.StudentID
@@ -912,10 +917,10 @@ FROM
         parent accounts, but you could use that same approach here if needed. */
         SELECT
             GuardianStudent.StudentsDCID,
-            LISTAGG('Parent' || CHR(58) || 'P_' || GuardianID,'|')
+            LISTAGG('Parent' || CHR(58) || 'P_' )
                 WITHIN GROUP (ORDER BY Guardian.LastName DESC) AS Parents
         FROM
-            Guardian
+            Guardian Guardian
             JOIN GuardianStudent USING(GuardianID)
         GROUP BY
             GuardianStudent.StudentsDCID
@@ -976,9 +981,9 @@ FROM
                     OR Courses.Sched_Department IN ('MSEAL','MSLSC')
                 )
                      and CC.TERMID >= case 
-                        when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
+                        when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
                         THEN (EXTRACT(year from sysdate)-2000+9)*100
-                        when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
+                        when (EXTRACT(month from sysdate) > 6 and EXTRACT(month from sysdate) <= 12)
                         THEN (EXTRACT(year from sysdate)-2000+10)*100
                      end
         ) Helper
@@ -1113,9 +1118,9 @@ select distinct
     and SECTIONTEACHER.TEACHERID=TEACHERS.ID
     and STUDENTS.ENROLL_STATUS =0
     and CC.TERMID >= case 
-      when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
+      when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
       THEN (EXTRACT(year from sysdate)-2000+9)*100
-      when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
+      when (EXTRACT(month from sysdate) > 6 and EXTRACT(month from sysdate) <= 12)
       THEN (EXTRACT(year from sysdate)-2000+10)*100
       end
     and STUDENTS.GRADE_LEVEL >=5
