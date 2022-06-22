@@ -228,7 +228,8 @@ select distinct
     /* Mark students that are not "active" in powerschool (PS !=0) as inactive (BS=0) */
     (CASE STUDENTS.ENROLL_STATUS
         WHEN 0 THEN 1
-        ELSE 0 END) as "is_active",    'Parent' as "role_name",
+        ELSE 0 END) as "is_active",    
+    'Parent' as "role_name",
     trim(U_STUDENTSUSERFIELDS.EMAILMOTHER) as "email",
     '' as "relationships",
     '' as "pref_first_name",
@@ -357,7 +358,7 @@ select distinct
     '' as "password",
     1 as "is_active",
     'Parent' as "role_name",
-    trim(U_STUDENTSUSERFIELDS.EMAILMOTHER) as "email",
+    trim(U_STUDENTSUSERFIELDS.EMAILFATHER) as "email",
     '' as "relationships",
     '' as "pref_first_name",
     '' as "pref_last_name"
@@ -1214,16 +1215,33 @@ This needs to be run prior to the individual course enrollments
 Add all teachers and co-teachers
 
 ```SQL
--- 08_e_t_school.named_queries.xml
+/*
+08_e_t_school.named_queries.xml
+Add all staff to their home schools 
+Default role: Instructor
+Use PS SIS assigned roles to elevate to Admin role
+*/
 select DISTINCT
     'enrollment' as "type",
     'UPDATE' as "action",
     'T_'||users.TEACHERNUMBER as "child_code",
-    'Instructor' as "role_name",
+    /*
+    Use the role assigned in PowerSchool SIS
+    this ensures that the PS SIS assigned role is valid at all organization levels
+    in Brightspace. If this defaults to Instructor, Admins are pushed down to 
+    "Instructor" in their home schools and cannot do admin tasks within that org unit.
+    */
+    case 
+        when U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE is Null or lower(trim(U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE)) = lower('NONE')
+        Then 'Instructor'
+        ELSE trim(U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE)
+    end  as "role_name",    
+    -- 'Instructor' as "role_name",
     users.homeschoolid as "parent_code"
 from 
     users users,
-    schoolstaff schoolstaff
+    schoolstaff schoolstaff,
+    U_SCHOOLSTAFFUSERFIELDS U_SCHOOLSTAFFUSERFIELDS
 where SCHOOLSTAFF.USERS_DCID=USERS.DCID
     /* only the homeschool information for each user; 
     this prevents multiple entries
@@ -1233,6 +1251,7 @@ where SCHOOLSTAFF.USERS_DCID=USERS.DCID
     AND LENGTH(users.EMAIL_ADDR) > 0
     /* only active staff */
     and schoolstaff.status=1
+    and SCHOOLSTAFF.DCID=U_SCHOOLSTAFFUSERFIELDS.SCHOOLSTAFFDCID(+)
 ORDER BY "child_code" asc
 ```
 
