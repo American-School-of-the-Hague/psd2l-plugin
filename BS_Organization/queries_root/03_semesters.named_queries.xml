@@ -57,7 +57,7 @@
                 WHEN (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
                 THEN TERMS.Abbreviation||' '||to_char(EXTRACT(year from sysdate)-1)||'-'||to_char(EXTRACT(year from sysdate))
             WHEN (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
-                THEN to_char(EXTRACT(year from sysdate))||'-'||to_char(EXTRACT(year from sysdate))
+                THEN TERMS.Abbreviation||' '||to_char(EXTRACT(year from sysdate))||'-'||to_char(EXTRACT(year from sysdate)+1)
             END
                 as "name",
             '' as "start_date",
@@ -67,6 +67,7 @@
             '' as "template_code",
             '' as "semester_code",
             '' as "offering_code",
+            terms.abbreviation as "TA",
             '' as "custom_code"
             from TERMS TERMS 
                 where TERMS.YEARID = (CASE 
