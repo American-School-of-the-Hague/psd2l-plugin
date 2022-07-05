@@ -21,6 +21,12 @@
         <!--SQL query in format <![CDATA[QUERY]]>-->
         <sql>
             <![CDATA[
+            /*
+            06_sections.named_queries.xml
+
+            Build sections based on student and teacher schedules
+            */
+
             select distinct
                 'course section' as "type",
                 'UPDATE' as "action",
@@ -64,9 +70,9 @@
                 terms.id = cc.termid and
                 /* select only courses that are in the current yearid (e.g. 2021-2022 == 3100)*/
                 cc.termid >= case 
-                    when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
+                    when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
                     THEN (EXTRACT(year from sysdate)-2000+9)*100
-                    when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
+                    when (EXTRACT(month from sysdate) >=1 and EXTRACT(month from sysdate) <= 12)
                     THEN (EXTRACT(year from sysdate)-2000+10)*100
                     end
             order by "semester code" desc
