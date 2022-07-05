@@ -201,6 +201,11 @@ select
 **SQL Query**
 
 ```SQL
+/*
+02_departments.named_queries.xml
+
+Build departments
+*/
 select distinct
     'course template' as "type",
     'UPDATE' as "action",
@@ -222,13 +227,14 @@ select distinct
     and CC.SCHOOLID=SCHOOLS.SCHOOL_NUMBER
     and CC.COURSE_NUMBER=COURSES.COURSE_NUMBER
     and CC.TERMID >= case 
-            when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
+            when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
             THEN (EXTRACT(year from sysdate)-2000+9)*100
-            when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
+            when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
             THEN (EXTRACT(year from sysdate)-2000+10)*100
-            end
+            end    
+    -- ignore zero length scheduled_departments
     and length(COURSES.SCHED_DEPARTMENT) > 0
- order by "code" asc
+order by "code" asc
 ```
 
 ## 3 Semesters
@@ -305,35 +311,61 @@ select distinct
 **SQL Query**
 
 ```SQL
+/*
+03_semesters.named_queries.xml
+create/update the current term, semester and quarter IDs
+
+PowerSchool uses the year 1990 as the 0 year for the YearID epoch
+Each accademic school year increments by 100:
+* 1990-1991: 000
+* 1991-1992: 100
+* 2021-2022: 3100
+
+Each additional term is an increment of 1 to the term id. Terms can be Semesters, quarters, etc.
+* 2021-2022 Year-Long Classes:    3100
+* 2021-2022 Semester 1 Classes:   3101
+* 2021-2022 Semester 2 Classes:   3102
+* 2021-2022 Quarter 1 Classes:    3103 # Yes, this system is bananas.
+* 2021-2022 Quarter 2 Classes:    3104 
+* 2021-2022 Quarter 3 Classes:    3105 
+* 2021-2022 Quarter 4 Classes:    3106 
+
+For a school year that begins in August and concludes in June, 
+use the following algorithm to calculate the current YearID:
+* current_month >=7 and current_month <=12: (current_year - 1990) * 100 # use july as delimiter to help prepare data prior to August 
+* current_month >=1 and current_month <=6:  (current_year - 1991) * 100
+
+*/
 select distinct
-  'semester' as "type",
-  'UPDATE' as "action",
-  'term_'||TERMS.ID as "code",
-  /*
-  post-pend the school year to the abbreviated term name using the current year and month
-  */
-  CASE 
-    WHEN (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
-     THEN TERMS.Abbreviation||' '||to_char(EXTRACT(year from sysdate)-1)||'-'||to_char(EXTRACT(year from sysdate))
-   WHEN (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
-     THEN to_char(EXTRACT(year from sysdate))||'-'||to_char(EXTRACT(year from sysdate))
-  END
-     as "name",
-  '' as "start_date",
-  '' as "end_date",
-  '' as "is_active",
-  '' as "department_code",
-  '' as "template_code",
-  '' as "semester_code",
-  '' as "offering_code",
+'semester' as "type",
+'UPDATE' as "action",
+'term_'||TERMS.ID as "code",
+/*
+post-pend the school year to the abbreviated term name using the current year and month
+*/
+CASE 
+    WHEN (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
+    THEN TERMS.Abbreviation||' '||to_char(EXTRACT(year from sysdate)-1)||'-'||to_char(EXTRACT(year from sysdate))
+WHEN (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
+    THEN TERMS.Abbreviation||' '||to_char(EXTRACT(year from sysdate))||'-'||to_char(EXTRACT(year from sysdate)+1)
+END
+    as "name",
+'' as "start_date",
+'' as "end_date",
+'' as "is_active",
+'' as "department_code",
+'' as "template_code",
+'' as "semester_code",
+'' as "offering_code",
+terms.abbreviation as "TA",
 '' as "custom_code"
 from TERMS TERMS 
     where TERMS.YEARID = (CASE 
-    WHEN (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
-     THEN EXTRACT(year from sysdate)-2000+9
-    WHEN (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
-     THEN EXTRACT(year from sysdate)-2000+10
-      END)
+    WHEN (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
+    THEN EXTRACT(year from sysdate)-2000+9
+    WHEN (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
+    THEN EXTRACT(year from sysdate)-2000+10
+    END)
 order by "code" asc
 ```
 
@@ -415,34 +447,39 @@ order by "code" asc
 **SQL Query**
 
 ```SQL
-select distinct
-    'department' as "type",
-    'UPDATE' as "action",
-    'Templ_'||CC.SCHOOLID||'_'||COURSES.SCHED_DEPARTMENT as "code",
-    COURSES.SCHED_DEPARTMENT as "name",
-    '' as "start_date",
-    '' as "end_date",
-    '1' as "is_active",
-    CC.SCHOOLID||'_'||COURSES.SCHED_DEPARTMENT as "department_code",
-    '' as "template_code",
-    '' as "semester_code",
-    '' as "offering_code",
-    '' as "custom_code"
- from COURSES COURSES,
-    STUDENTS STUDENTS,
-    CC CC,
-    SCHOOLS SCHOOLS
- where CC.STUDENTID=STUDENTS.ID
-    and CC.SCHOOLID=SCHOOLS.SCHOOL_NUMBER
-    and CC.COURSE_NUMBER=COURSES.COURSE_NUMBER
-    and CC.TERMID >= case 
-            when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
-            THEN (EXTRACT(year from sysdate)-2000+9)*100
-            when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
-            THEN (EXTRACT(year from sysdate)-2000+10)*100
-            end
-    and length(COURSES.SCHED_DEPARTMENT) > 0
- order by "code" asc
+  /*
+  04_templates.named_queries.xml
+
+  create the templates for each department
+  */
+  select distinct
+      'department' as "type",
+      'UPDATE' as "action",
+      'Templ_'||CC.SCHOOLID||'_'||COURSES.SCHED_DEPARTMENT as "code",
+      COURSES.SCHED_DEPARTMENT as "name",
+      '' as "start_date",
+      '' as "end_date",
+      '1' as "is_active",
+      CC.SCHOOLID||'_'||COURSES.SCHED_DEPARTMENT as "department_code",
+      '' as "template_code",
+      '' as "semester_code",
+      '' as "offering_code",
+      '' as "custom_code"
+  from COURSES COURSES,
+      STUDENTS STUDENTS,
+      CC CC,
+      SCHOOLS SCHOOLS
+  where CC.STUDENTID=STUDENTS.ID
+      and CC.SCHOOLID=SCHOOLS.SCHOOL_NUMBER
+      and CC.COURSE_NUMBER=COURSES.COURSE_NUMBER
+      and CC.TERMID >= case 
+              when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
+              THEN (EXTRACT(year from sysdate)-2000+9)*100
+              when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
+              THEN (EXTRACT(year from sysdate)-2000+10)*100
+              end
+      and length(COURSES.SCHED_DEPARTMENT) > 0
+  order by "code" asc
 ```
 
 ## 5 Offerings
@@ -523,19 +560,24 @@ select distinct
 **SQL Query**
 
 ```SQL
+/*
+05_offerings.named_queries.xml
+
+build courses based on student and teacher schedules
+*/
 select distinct
     'course offering' as "type",
     'UPDATE' as "action",
     /* co_cc.schoolid_cc.course_number */
     'co_'||cc.schoolid||'_'||cc.course_number as "code",
-    cc.course_name as "name",
+    c.course_name as "name",
     TERMS.FIRSTDAY as "start_date",
     TERMS.LASTDAY as "end_date",
     /* set courses as inactive by default */
     1 as "is_active",
     '' as "department_code",
     'Templ_'||CC.SCHOOLID||'_'||C.SCHED_DEPARTMENT as "template_code",
-    'term_'||cc.termid as "semester_code",
+    'term_'||cc.termid as "semester code",
     '' as "offering_code",
     '' as "custom_code"
 from 
@@ -550,7 +592,7 @@ where
         cc.termid >= case 
             when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
             THEN (EXTRACT(year from sysdate)-2000+9)*100
-            when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
+            when (EXTRACT(month from sysdate) >= 6 and EXTRACT(month from sysdate) <= 12)
             THEN (EXTRACT(year from sysdate)-2000+10)*100
             end
 order by "semester code" desc
@@ -746,6 +788,12 @@ SELECT distinct
 **SQL Query**
 
 ```SQL
+/*
+06_sections.named_queries.xml
+
+Build sections based on student and teacher schedules
+*/
+
 select distinct
     'course section' as "type",
     'UPDATE' as "action",
@@ -789,9 +837,9 @@ where
     terms.id = cc.termid and
     /* select only courses that are in the current yearid (e.g. 2021-2022 == 3100)*/
     cc.termid >= case 
-        when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 7)
+        when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
         THEN (EXTRACT(year from sysdate)-2000+9)*100
-        when (EXTRACT(month from sysdate) > 7 and EXTRACT(month from sysdate) <= 12)
+        when (EXTRACT(month from sysdate) >=1 and EXTRACT(month from sysdate) <= 12)
         THEN (EXTRACT(year from sysdate)-2000+10)*100
         end
 order by "semester code" desc
