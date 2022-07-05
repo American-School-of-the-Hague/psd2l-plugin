@@ -345,9 +345,9 @@ post-pend the school year to the abbreviated term name using the current year an
 */
 CASE 
     WHEN (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
-    THEN TERMS.Abbreviation||' '||to_char(EXTRACT(year from sysdate)-1)||'-'||to_char(EXTRACT(year from sysdate))
+    THEN to_char(EXTRACT(year from sysdate)-1)||'-'||to_char(EXTRACT(year from sysdate))||' '||TERMS.Abbreviation
 WHEN (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
-    THEN TERMS.Abbreviation||' '||to_char(EXTRACT(year from sysdate))||'-'||to_char(EXTRACT(year from sysdate)+1)
+    THEN to_char(EXTRACT(year from sysdate))||'-'||to_char(EXTRACT(year from sysdate)+1)||' '||TERMS.Abbreviation
 END
     as "name",
 '' as "start_date",
