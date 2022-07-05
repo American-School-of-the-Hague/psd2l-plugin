@@ -357,7 +357,6 @@ END
 '' as "template_code",
 '' as "semester_code",
 '' as "offering_code",
-terms.abbreviation as "TA",
 '' as "custom_code"
 from TERMS TERMS 
     where TERMS.YEARID = (CASE 
