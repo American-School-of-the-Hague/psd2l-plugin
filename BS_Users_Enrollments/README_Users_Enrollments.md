@@ -907,7 +907,11 @@ FROM
                     and CC.TERMID >= case 
                         when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
                         THEN (EXTRACT(year from sysdate)-2000+9)*100
+<<<<<<< HEAD
                         when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
+=======
+                        when (EXTRACT(month from sysdate) > 6 and EXTRACT(month from sysdate) <= 12)
+>>>>>>> main
                         THEN (EXTRACT(year from sysdate)-2000+10)*100
                     end
         ) Helper
@@ -984,7 +988,11 @@ FROM
                      and CC.TERMID >= case 
                         when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
                         THEN (EXTRACT(year from sysdate)-2000+9)*100
+<<<<<<< HEAD
                         when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
+=======
+                        when (EXTRACT(month from sysdate) > 6 and EXTRACT(month from sysdate) <= 12)
+>>>>>>> main
                         THEN (EXTRACT(year from sysdate)-2000+10)*100
                      end
         ) Helper
@@ -1121,7 +1129,11 @@ select distinct
     and CC.TERMID >= case 
       when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
       THEN (EXTRACT(year from sysdate)-2000+9)*100
+<<<<<<< HEAD
       when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
+=======
+      when (EXTRACT(month from sysdate) > 6 and EXTRACT(month from sysdate) <= 12)
+>>>>>>> main
       THEN (EXTRACT(year from sysdate)-2000+10)*100
       end
     and STUDENTS.GRADE_LEVEL >=5
@@ -1364,7 +1376,11 @@ select
     and CC.TERMID >= case 
       when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
       THEN (EXTRACT(year from sysdate)-2000+9)*100
+<<<<<<< HEAD
       when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
+=======
+      when (EXTRACT(month from sysdate) > 6 and EXTRACT(month from sysdate) <= 12)
+>>>>>>> main
       THEN (EXTRACT(year from sysdate)-2000+10)*100
       end
  order by STUDENTS.GRADE_LEVEL ASC, STUDENTS.LASTFIRST ASC, SECTIONS.SECTION_NUMBER ASC
@@ -1481,7 +1497,11 @@ where
     sections.TERMID >= case
     when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
         THEN (EXTRACT(year from sysdate)-2000+9)*100
+<<<<<<< HEAD
         when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
+=======
+        when (EXTRACT(month from sysdate) > 6 and EXTRACT(month from sysdate) <= 12)
+>>>>>>> main
         THEN (EXTRACT(year from sysdate)-2000+10)*100
     end
     and students.enroll_status IN (0)
@@ -1600,7 +1620,11 @@ where GUARDIANSTUDENT.STUDENTSDCID=STUDENTS.DCID
     and CC.TERMID >= case 
         when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
         THEN (EXTRACT(year from sysdate)-2000+9)*100
+<<<<<<< HEAD
         when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
+=======
+        when (EXTRACT(month from sysdate) > 6 and EXTRACT(month from sysdate) <= 12)
+>>>>>>> main
         THEN (EXTRACT(year from sysdate)-2000+10)*100
     end
 order by GUARDIANSTUDENT.GUARDIANID ASC
@@ -1722,7 +1746,11 @@ select
     sections.TERMID >= case 
         when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
         THEN (EXTRACT(year from sysdate)-2000+9)*100
+<<<<<<< HEAD
         when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
+=======
+        when (EXTRACT(month from sysdate) > 6 and EXTRACT(month from sysdate) <= 12)
+>>>>>>> main
         THEN (EXTRACT(year from sysdate)-2000+10)*100
     end
     -- only select students that are "active"
