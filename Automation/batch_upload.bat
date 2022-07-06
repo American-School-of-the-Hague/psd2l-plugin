@@ -24,7 +24,7 @@ REM in the IPSIS configuration screen: https://lms.ash.nl/d2l/im/ipsis/admin/con
 "C:\Program Files (x86)\WinSCP\WinSCP.com" ^
   /log="D:\BS_Script\WinSCP.log" /ini=nul ^
   /command ^
-    "open sftp://sftp-ash-e8fd:_5SReq%%2F4Ln7%%21j7%%5BK@eu01pipsissftp.brightspace.com/ -hostkey=""ssh-ed25519 255 uF/boFruBBag8nZeKtOBTZQO4xWUFyAmEpuZaxeyMvc=""" ^
+    "open sftp://sftp-ash-e8fd:_5SReq%%2F4Ln7%%21j7%%5BK@eu01pipsissftp.brightspace.com/ -hostkey=""ssh-ed25519 255 ENTER_KEY_HERE""" ^
     "put -resumesupport=off D:\BS_Script\%SUBFILENAME%.zip /" ^
     "exit"
 
