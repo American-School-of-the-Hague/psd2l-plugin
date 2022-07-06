@@ -27,7 +27,7 @@
 			Build departments
 			*/
 			select distinct
-				'course template' as "type",
+				'department' as "type",
 				'UPDATE' as "action",
 				CC.SCHOOLID||'_'||COURSES.SCHED_DEPARTMENT as "code",
 				COURSES.SCHED_DEPARTMENT as "name",
