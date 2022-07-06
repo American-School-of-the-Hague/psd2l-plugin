@@ -27,7 +27,7 @@
 				create the templates for each department
 				*/
 				select distinct
-					'department' as "type",
+					'course template' as "type",
 					'UPDATE' as "action",
 					'Templ_'||CC.SCHOOLID||'_'||COURSES.SCHED_DEPARTMENT as "code",
 					COURSES.SCHED_DEPARTMENT as "name",
