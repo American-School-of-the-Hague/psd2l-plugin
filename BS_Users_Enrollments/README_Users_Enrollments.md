@@ -161,98 +161,12 @@ There are two separate Named Queries (NQ) for parents, one for mother and one fo
 |GUARDIAN |
 |U_STUDENTSUSERFIELDS |
 |STUDENTS STUDENTS |
-**SQL Query**
 
-Both mother and father query depend on u_studentuserfields.mother|father_firstname be exactly equal to guardian.firstname. u_studentuserfields is populated via an e-collect form by parents. It is unclear how the guardian fields are populated, so this may break in the future. `¯\_(ツ)_/¯`
+**SQL Query Notes**
 
-**FATHER**
-```SQL
-select distinct
-    'user' as "type",
-    /* mark parents of students that have left in the past N days for deletion */
-    case 
-       WHEN (trunc(sysdate) - STUDENTS.EXITDATE) >=90
-           THEN 'DELETE'
-       ELSE 
-           'UPDATE'
-       END "action",    
-    trim(U_STUDENTSUSERFIELDS.EMAILFATHER) as "username",
-    'P_'||GUARDIAN.GUARDIANID as "org_defined_id",
-    GUARDIAN.FIRSTNAME as "first_name",
-    GUARDIAN.LASTNAME as "last_name",
-    '' as "password",
-    /* Mark students that are not "active" in powerschool (PS !=0) as inactive (BS=0) */
-    (CASE STUDENTS.ENROLL_STATUS
-        WHEN 0 THEN 1
-        ELSE 0 END) as "is_active",    'Parent' as "role_name",
-    trim(U_STUDENTSUSERFIELDS.EMAILFATHER) as "email",
-    '' as "relationships",
-    '' as "pref_first_name",
-    '' as "pref_last_name"
-from GUARDIANSTUDENT GUARDIANSTUDENT,
-    GUARDIAN GUARDIAN,
-    U_STUDENTSUSERFIELDS U_STUDENTSUSERFIELDS,
-    STUDENTS STUDENTS 
-where U_STUDENTSUSERFIELDS.STUDENTSDCID=STUDENTS.DCID
-    and GUARDIAN.GUARDIANID=GUARDIANSTUDENT.GUARDIANID
-    and STUDENTS.DCID=GUARDIANSTUDENT.STUDENTSDCID
-    /* this requires that the names in guardian and u_studentuserfields 
-    match exactly. We're not entirely sure how the guardian fields come to be populated
-    so the sanity and sustainability of this is questionable 
-    */
-    and trim(guardian.firstname)=trim(u_studentsuserfields.father_firstname)
-    -- and trim(guardian.lastname)=trim(u_studentsuserfields.father_lastname)
-    and trunc(sysdate) - STUDENTS.EXITDATE <= 90
-    and trunc(sysdate) - STUDENTS.EXITDATE > 0    
-    and STUDENTS.ENROLL_STATUS !=0
-    and students.grade_level >=5
-order by "org_defined_id" asc
-```
+Both mother and father query depend on u_studentuserfields.mother|father_firstname be exactly equal to guardian.firstname. u_studentuserfields is populated partially by the division office and partially by the admissions office. `¯\_(ツ)_/¯`
 
-**MOTHER**
-```SQL
-select distinct
-    'user' as "type",
-    /* mark parents of students that have left in the past N days for deletion */
-    case 
-       WHEN (trunc(sysdate) - STUDENTS.EXITDATE) >=90
-           THEN 'DELETE'
-       ELSE 
-           'UPDATE'
-       END "action",    
-    trim(U_STUDENTSUSERFIELDS.EMAILMOTHER) as "username",
-    'P_'||GUARDIAN.GUARDIANID as "org_defined_id",
-    GUARDIAN.FIRSTNAME as "first_name",
-    GUARDIAN.LASTNAME as "last_name",
-    '' as "password",
-    /* Mark students that are not "active" in powerschool (PS !=0) as inactive (BS=0) */
-    (CASE STUDENTS.ENROLL_STATUS
-        WHEN 0 THEN 1
-        ELSE 0 END) as "is_active",    
-    'Parent' as "role_name",
-    trim(U_STUDENTSUSERFIELDS.EMAILMOTHER) as "email",
-    '' as "relationships",
-    '' as "pref_first_name",
-    '' as "pref_last_name"
-from GUARDIANSTUDENT GUARDIANSTUDENT,
-    GUARDIAN GUARDIAN,
-    U_STUDENTSUSERFIELDS U_STUDENTSUSERFIELDS,
-    STUDENTS STUDENTS 
-where U_STUDENTSUSERFIELDS.STUDENTSDCID=STUDENTS.DCID
-    and GUARDIAN.GUARDIANID=GUARDIANSTUDENT.GUARDIANID
-    and STUDENTS.DCID=GUARDIANSTUDENT.STUDENTSDCID
-    /* this requires that the names in guardian and u_studentuserfields 
-    match exactly. We're not entirely sure how the guardian fields come to be populated
-    so the sanity and sustainability of this is questionable 
-    */
-    and trim(guardian.firstname)=trim(u_studentsuserfields.mother_firstname)
-    -- and trim(guardian.lastname)=trim(u_studentsuserfields.mother_lastname)
-    and trunc(sysdate) - STUDENTS.EXITDATE <= 90 
-    and trunc(sysdate) - STUDENTS.EXITDATE > 0    
-    and STUDENTS.ENROLL_STATUS !=0
-    and students.grade_level >=5
-order by "org_defined_id" asc
-```
+This can be remedeid by moving to the contacts feature in PowerSchool SIS.
 
 ## 7 Users Parents Active
 
@@ -340,7 +254,7 @@ There are two separate Named Queries (NQ) for parents, one for mother and one fo
 |U_STUDENTSUSERFIELDS |
 |STUDENTS STUDENTS |
 
-**SQL Query**
+**SQL Query Samples**
 
 Both mother and father query depend on u_studentuserfields.mother_firstanme|father_firstname be exactly equal to guardian.firstname. u_studentuserfields is populated via an e-collect form by parents. It is unclear how the guardian fields are populated, so this may break in the future. `¯\_(ツ)_/¯` May the force be with you, future maintainer.
 
@@ -495,46 +409,6 @@ Disable and delete accounts for teachers that are no longer active.
 |TEACHERS|
 |LOGINS|
 
-**SQL Query**
-
-Disable staff that are not "active" (STATUS != 1)
-```SQL
-select distinct
-    'user' as "type",
-    'UPDATE' as "action",
-    /* 
-    use username portion of teacher/staff email addresses for D2L username.
-    This is necessary because some staff use their @ash.nl email address as
-    their guardian contact information. The parent accounts are created first
-    resulting in a colision between the parent account username and teacher 
-    account username.
-    */
-    regexp_replace(TEACHERS.EMAIL_ADDR, '(@.*)', '') as "username",
-    /* prepend a 'T' to make sure there are no studentid/teacherid colisions */
-    'T_'||TEACHERS.TEACHERNUMBER as "org_defined_id",
-    TEACHERS.FIRST_NAME as "first_name",
-    TEACHERS.LAST_NAME as "last_name",
-    '' as "password",
-    0 as "is_active",
-    'Instructor' as "role_name",
-    TEACHERS.EMAIL_ADDR as "email",
-    '' as "relationships",
-    '' as "pref_first_name",
-    '' as "pref_last_name"
- from 
-     TEACHERS TEACHERS,
-     LOGINS LOGINS
- where TEACHERS.HOMESCHOOLID = TEACHERS.SCHOOLID
-    AND LOGINS.USERID=TEACHERS.ID
-    /* Ignore all users with no email address */
-    AND LENGTH(TEACHERS.EMAIL_ADDR) > 0
-    AND TEACHERS.STATUS != 1
-    /* deactivate anyone that is status !=1 and has not logged in in 5 days. This helps ensure that 
-     */
-    AND trunc(sysdate) - trunc(LOGINS.LOGINDATE) > 5
-    ORDER BY "org_defined_id" asc
-```
-
 ## 7 Users Teachers Active
 
 All active staff staff added to ORG (6066) as "Instructor"
@@ -603,53 +477,6 @@ All active staff staff added to ORG (6066) as "Instructor"
 |USERS|
 |schoolstaff|
 
-**SQL Query**
-
-All active staff with Brightspace Roles assigned
-
-```SQL
-select DISTINCT
-    'user' as "type",
-    'UPDATE' as "action",
-    /* 
-    use username portion of teacher/staff email addresses for D2L username.
-    This is necessary because some staff use their @ash.nl email address as
-    their guardian contact information. The parent accounts are created first
-    resulting in a collision between the parent account username and teacher 
-    account username.
-    */
-    regexp_replace(users.EMAIL_ADDR, '(@.*)', '') as "username",
-    /* prepend a 'T' to make sure there are no studentid/teacherid colissions */
-    'T_'||users.TEACHERNUMBER as "org_defined_id",
-    users.FIRST_NAME as "first_name",
-    users.LAST_NAME as "last_name",
-    '' as "password",
-    schoolstaff.STATUS as "is_active",
-    case 
-        when U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE is Null or lower(trim(U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE)) = lower('NONE')
-        Then 'Instructor'
-        ELSE trim(U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE)
-    end  as "role_name",
-    users.EMAIL_ADDR as "email",
-    '' as "relationships",
-    '' as "pref_first_name",
-    '' as "pref_last_name"
-from 
-    users users,
-    schoolstaff schoolstaff,
-    U_SCHOOLSTAFFUSERFIELDS U_SCHOOLSTAFFUSERFIELDS
-where SCHOOLSTAFF.USERS_DCID=USERS.DCID
-    /* only the homeschool information for each user; 
-    this prevents multiple entries
-    */
-    and users.homeschoolid=schoolstaff.schoolid
-    and SCHOOLSTAFF.DCID=U_SCHOOLSTAFFUSERFIELDS.SCHOOLSTAFFDCID(+)
-    /* Ignore all users with no email address */
-    AND LENGTH(users.EMAIL_ADDR) > 0
-    /* only active staff */
-    and schoolstaff.status=1
-ORDER BY users.last_name asc
-```
 
 ## 7 Users Students Inactive
 
@@ -725,48 +552,6 @@ Disable and delete accounts for departed students.
 |-|
 |STUDENTS| |
 |U_STUDENTSUSERFIELDS|
-
-**SQL Query**
-
-```SQL
-select 
-    'user' as "type",
-    /* mark students that have left in the past N days for deletion */
-    case 
-       WHEN (trunc(sysdate) - STUDENTS.EXITDATE) >=90
-           THEN 'DELETE'
-       ELSE 
-           'UPDATE'
-       END "action",
-    REGEXP_REPLACE(U_STUDENTSUSERFIELDS.EMAILSTUDENT, '(^.*)(@.*)', '\1') as "username",
-    /* use student number as unique id - we recycle email addresses and this causes issues */
-    /* prepend a 'S" to the number to distinguish between students & teachers */
-    'S_'||STUDENTS.STUDENT_NUMBER as "org_defined_id",
-    STUDENTS.FIRST_NAME as "first_name",
-    STUDENTS.LAST_NAME as "last_name",
-    '' as "password",
-    /* Mark students that are not "active" in powerschool (PS !=0) as inactive (BS=0) */
-    (CASE STUDENTS.ENROLL_STATUS
-        WHEN 0 THEN 1
-        ELSE 0 END) as "is_active",
-    'Learner' as "role_name",
-    U_STUDENTSUSERFIELDS.EMAILSTUDENT as "email",
-    '' as "relationships",
-    '' as "pref_first_name",
-    '' as "pref_last_name"
- from STUDENTS STUDENTS,
-    U_STUDENTSUSERFIELDS U_STUDENTSUSERFIELDS
- where 
-    STUDENTS.DCID=U_STUDENTSUSERFIELDS.STUDENTSDCID
-    and STUDENTS.ENROLL_STATUS >=2
-    and trunc(sysdate) - STUDENTS.EXITDATE <= 180 
-    and trunc(sysdate) - STUDENTS.EXITDATE > 0
-    /* Only students grade 5 and up */
-    and STUDENTS.GRADE_LEVEL >= 5
-    /* exclude anyone that doesn't have an email address */
-    AND U_StudentsUserFields.EmailStudent IS NOT NULL
- order by STUDENTS.EXITDATE asc
-```
 
 ## 7 Users Students Active
 
@@ -907,11 +692,7 @@ FROM
                     and CC.TERMID >= case 
                         when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
                         THEN (EXTRACT(year from sysdate)-2000+9)*100
-<<<<<<< HEAD
                         when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
-=======
-                        when (EXTRACT(month from sysdate) > 6 and EXTRACT(month from sysdate) <= 12)
->>>>>>> main
                         THEN (EXTRACT(year from sysdate)-2000+10)*100
                     end
         ) Helper
@@ -1091,68 +872,6 @@ Add all teachers to scheduled classes. Class enrolment needs to happen last afte
 |SECTIONS|
 |TEACHERS|
 
-**SQL Query**
-
-Add all teachers and co-teachers
-
-```SQL
-/*
-08_e_t.named_queries.xml
-enroll all section teachers (including primary and co-teachers) into sections/courses
-*/
-select distinct
-    'enrollment' as "type",
-    'UPDATE' as "action",
-    'T_'||teachers.teachernumber as "child_code",
-    'Instructor' as "role_name",
-    'cs_'||CC.SCHOOLID||'_'||cc.COURSE_NUMBER||'_'||CC.TERMID||'_'||DECODE(substr(cc.expression, 1, 1), 
-     1, 'A', 
-     2, 'B', 
-     3, 'C', 
-     4, 'D', 
-     5, 'E', 
-     6, 'F', 
-     7, 'G', 
-     8, 'H', 
-     9, 'ADV', 
-     'UNKNOWN') as "parent_code"
- from TEACHERS TEACHERS,
-    SECTIONTEACHER SECTIONTEACHER,
-    STUDENTS STUDENTS,
-    CC CC,
-    COURSES COURSES 
- where STUDENTS.ID=CC.STUDENTID
-    and CC.COURSE_NUMBER=COURSES.COURSE_NUMBER
-    and CC.SECTIONID=SECTIONTEACHER.SECTIONID
-    and SECTIONTEACHER.TEACHERID=TEACHERS.ID
-    and STUDENTS.ENROLL_STATUS =0
-    and CC.TERMID >= case 
-      when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
-      THEN (EXTRACT(year from sysdate)-2000+9)*100
-<<<<<<< HEAD
-      when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
-=======
-      when (EXTRACT(month from sysdate) > 6 and EXTRACT(month from sysdate) <= 12)
->>>>>>> main
-      THEN (EXTRACT(year from sysdate)-2000+10)*100
-      end
-    and STUDENTS.GRADE_LEVEL >=5
-    /* 
-    exclude teachers that do not have an email address 
-    this helps weed out teachers such as the "HS Learning Support" teacher
-    that is not an actual teacher
-    */
-    and length(teachers.email_addr) > 0
-    /*
-    exclude all teachernumber that are not purely digits
-    This avoids processing `UNASSIGNED` or `NN2`  or similar garbage
-    */
-    and REGEXP_LIKE(teachers.teachernumber, '^\d+$')
-    
-order by "child_code" desc
-```
-
-
 ## 8 Enrollments Teachers - School Level
 
 Enrols staff at the school level matching their powerschool schoolid value. All staff are added to at least one school as an instructor. This allows creating [Intelligent Agents](https://documentation.brightspace.com/EN/le/intelligent_agents/instructor/create_agent.htm?Highlight=intelligent%20agents) that can be used for auto-enroling teachers into courses such as HS and MS Library.
@@ -1222,51 +941,6 @@ This needs to be run prior to the individual course enrollments
 |users|
 |schoostaff|
 
-**SQL Query**
-
-Add all teachers and co-teachers
-
-```SQL
-/*
-08_e_t_school.named_queries.xml
-Add all staff to their home schools 
-Default role: Instructor
-Use PS SIS assigned roles to elevate to Admin role
-*/
-select DISTINCT
-    'enrollment' as "type",
-    'UPDATE' as "action",
-    'T_'||users.TEACHERNUMBER as "child_code",
-    /*
-    Use the role assigned in PowerSchool SIS
-    this ensures that the PS SIS assigned role is valid at all organization levels
-    in Brightspace. If this defaults to Instructor, Admins are pushed down to 
-    "Instructor" in their home schools and cannot do admin tasks within that org unit.
-    */
-    case 
-        when U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE is Null or lower(trim(U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE)) = lower('NONE')
-        Then 'Instructor'
-        ELSE trim(U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE)
-    end  as "role_name",    
-    -- 'Instructor' as "role_name",
-    users.homeschoolid as "parent_code"
-from 
-    users users,
-    schoolstaff schoolstaff,
-    U_SCHOOLSTAFFUSERFIELDS U_SCHOOLSTAFFUSERFIELDS
-where SCHOOLSTAFF.USERS_DCID=USERS.DCID
-    /* only the homeschool information for each user; 
-    this prevents multiple entries
-    */
-    and users.homeschoolid=schoolstaff.schoolid
-    /* Ignore all users with no email address */
-    AND LENGTH(users.EMAIL_ADDR) > 0
-    /* only active staff */
-    and schoolstaff.status=1
-    and SCHOOLSTAFF.DCID=U_SCHOOLSTAFFUSERFIELDS.SCHOOLSTAFFDCID(+)
-ORDER BY "child_code" asc
-```
-
 ## 8 Enrollments Students Active
 
 ### Fields Provided & Used
@@ -1334,57 +1008,6 @@ ORDER BY "child_code" asc
 |COURSES|
 |CC|
 |SECTIONS|
-
-**SQL Query**
-
-```SQL
-/*
-08_e_s.named_queries.xml
-All active student enrollments
-*/
-select 
-    'enrollment' as "type",
-    'UPDATE' as "action",
-    /* using 7-Users:org_defined_id as child_code */
-    'S_'||STUDENTS.STUDENT_NUMBER as "child_code",
-    /* REGEXP_REPLACE(U_STUDENTSUSERFIELDS.EMAILSTUDENT, '(^.*)(@.*)', '\1') as "child_code", */
-    'Learner' as "role_name",
-    /* using 6-Sections:code as parent_code */
-    'cs_'||cc.schoolid||'_'||cc.course_number||'_'||cc.TermID||'_'||DECODE(substr(cc.expression, 1, 1), 
-     1, 'A', 
-     2, 'B', 
-     3, 'C', 
-     4, 'D', 
-     5, 'E', 
-     6, 'F', 
-     7, 'G', 
-     8, 'H', 
-     9, 'ADV', 
-     'UNKNOWN') as "parent_code"
- from 
-    /* U_STUDENTSUSERFIELDS U_STUDENTSUSERFIELDS, */
-    SECTIONS SECTIONS,
-    COURSES COURSES,
-    CC CC,
-    STUDENTS STUDENTS 
- where CC.STUDENTID=STUDENTS.ID
-    and COURSES.COURSE_NUMBER=CC.COURSE_NUMBER
-    and SECTIONS.ID=CC.SECTIONID
-    /* and U_STUDENTSUSERFIELDS.STUDENTSDCID=STUDENTS.DCID */ 
-    and STUDENTS.ENROLL_STATUS =0
-    and STUDENTS.GRADE_LEVEL >=5
-    and CC.TERMID >= case 
-      when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
-      THEN (EXTRACT(year from sysdate)-2000+9)*100
-<<<<<<< HEAD
-      when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
-=======
-      when (EXTRACT(month from sysdate) > 6 and EXTRACT(month from sysdate) <= 12)
->>>>>>> main
-      THEN (EXTRACT(year from sysdate)-2000+10)*100
-      end
- order by STUDENTS.GRADE_LEVEL ASC, STUDENTS.LASTFIRST ASC, SECTIONS.SECTION_NUMBER ASC
-```
 
 ## 8 Enrollments Students Active - Dropped Classes
 
@@ -1463,52 +1086,6 @@ If the drops are run last, the end result will be that the enrolment from step *
 |CC|
 |SECTIONS|
 
-**SQL Query**
-
-```SQL
-/*
-08_e_s_drop.named_query.xml
-Delete students from classes they are no longer enrolled in.
-*/
-select
-    'enrollment' as "type",
-    'DELETE' as "action",
-    'S_'||STUDENTS.STUDENT_NUMBER as "child_code",
-    'Learner' as "role_name",
-    'cs_'||cc.schoolid||'_'||cc.course_number||'_'||REGEXP_REPLACE(cc.termid, '\D+', '')||'_'||DECODE(substr(cc.expression, 1, 1), 
-    1, 'A', 
-    2, 'B', 
-    3, 'C', 
-    4, 'D', 
-    5, 'E', 
-    6, 'F', 
-    7, 'G', 
-    8, 'H', 
-    9, 'ADV', 
-    'UNKNOWN') as "parent_code"
-from
-    cc
-    join students on cc.studentid = students.id
-    join sections on CC.OrigSectionID = Sections.ID
-    join courses on sections.course_number = courses.course_number
-    join teachers on sections.teacher = teachers.id
-
-where
-    sections.TERMID >= case
-    when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
-        THEN (EXTRACT(year from sysdate)-2000+9)*100
-<<<<<<< HEAD
-        when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
-=======
-        when (EXTRACT(month from sysdate) > 6 and EXTRACT(month from sysdate) <= 12)
->>>>>>> main
-        THEN (EXTRACT(year from sysdate)-2000+10)*100
-    end
-    and students.enroll_status IN (0)
-    and students.grade_level >= 5
-order by "child_code" desc
-```
-
 ## 8 Enrollments Parents in Student Classes
 
 Enrol parents in classes as view-only members of their children's classes.
@@ -1579,56 +1156,6 @@ Enrol parents in classes as view-only members of their children's classes.
 |COURSES|
 |CC|
 |SECTIONS|
-
-**SQL Query**
-
-```SQL
-/*
-08_e_p.named_queries.xml
-all active parent enrollments
-*/
-select 
-    'enrollment' as "type",
-    'UPDATE' as "action",
-    'P_'||GUARDIAN.GUARDIANID as "child_code",
-    'Parent' as "role_name",
-    /* using 6-Sections:code as parent_code */
-    'cs_'||cc.schoolid||'_'||cc.course_number||'_'||cc.TermID||'_'||DECODE(substr(cc.expression, 1, 1), 
-    1, 'A', 
-    2, 'B', 
-    3, 'C', 
-    4, 'D', 
-    5, 'E', 
-    6, 'F', 
-    7, 'G', 
-    8, 'H', 
-    9, 'ADV', 
-    'UNKNOWN') as "parent_code"
-from GUARDIAN GUARDIAN,
-    COURSES COURSES,
-    SECTIONS SECTIONS,
-    STUDENTS STUDENTS,
-    CC CC,
-    GUARDIANSTUDENT GUARDIANSTUDENT 
-where GUARDIANSTUDENT.STUDENTSDCID=STUDENTS.DCID
-    and STUDENTS.ID=CC.STUDENTID
-    and CC.SECTIONID=SECTIONS.ID
-    and SECTIONS.COURSE_NUMBER=COURSES.COURSE_NUMBER
-    and GUARDIANSTUDENT.GUARDIANID=GUARDIAN.GUARDIANID
-    and STUDENTS.ENROLL_STATUS =0
-    and STUDENTS.GRADE_LEVEL >=5
-    and CC.TERMID >= case 
-        when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
-        THEN (EXTRACT(year from sysdate)-2000+9)*100
-<<<<<<< HEAD
-        when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
-=======
-        when (EXTRACT(month from sysdate) > 6 and EXTRACT(month from sysdate) <= 12)
->>>>>>> main
-        THEN (EXTRACT(year from sysdate)-2000+10)*100
-    end
-order by GUARDIANSTUDENT.GUARDIANID ASC
-```
 
 ## 8 Enrollments Parents in Student Classes - Drop
 
@@ -1709,59 +1236,6 @@ If the drops are run last, the end result will be that the enrolment from step *
 |SECTIONS|
 |GUARDIANSTUDENT|
 
-**SQL Query**
-
-```SQL
-/*
-08_e_p_drop.named_queries.xml
-Update enrollments for parents: drop parents from classes that students have dropped 
-*/
-select
-    'enrollment' as "type",
-    'DELETE' as "action",
-    'P_'||guardian.guardianid as "child_code",
-    'Learner' as "role_name",
-    'cs_'||cc.schoolid||'_'||cc.course_number||'_'||REGEXP_REPLACE(cc.termid, '\D+', '')||'_'||DECODE(substr(cc.expression, 1, 1), 
-    
-     1, 'A', 
-     2, 'B', 
-     3, 'C', 
-     4, 'D', 
-     5, 'E', 
-     6, 'F', 
-     7, 'G', 
-     8, 'H', 
-     9, 'ADV', 
-     'UNKNOWN') as "parent_code"
- from
-    cc
-    join students on cc.studentid = students.id
-    join sections on CC.OrigSectionID = Sections.ID
-    join courses on sections.course_number = courses.course_number
-    join teachers on sections.teacher = teachers.id
-    join guardianstudent on students.dcid = guardianstudent.studentsdcid
-    join guardian on guardianstudent.guardianid = guardian.guardianid
- 
- where
-    sections.TERMID >= case 
-        when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
-        THEN (EXTRACT(year from sysdate)-2000+9)*100
-<<<<<<< HEAD
-        when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
-=======
-        when (EXTRACT(month from sysdate) > 6 and EXTRACT(month from sysdate) <= 12)
->>>>>>> main
-        THEN (EXTRACT(year from sysdate)-2000+10)*100
-    end
-    -- only select students that are "active"
-    and students.enroll_status IN (0)
-    -- only select students grades 5+
-    and students.grade_level >= 5
-order by
-    "child_code" desc
-```
-
-
 ## 8 Enrollments Students Athletics
 
 ### Fields Provided & Used
@@ -1829,36 +1303,6 @@ order by
 |COURSES|
 |CC|
 |SECTIONS|
-
-**SQL Query**
-
-```SQL
-/*
-08_e_s_athl.named_queries.xml
-Students involved in athletics for this term
-*/
-SELECT distinct
-    'enrollment' as "type",
-    'UPDATE' as "action",
-    'S_'||STUDENTS.STUDENT_NUMBER as "child_code",
-    'Learner' as "role_name",
-    'co_ath_'||Gen.Name AS "parent_code"
-
-  FROM
-      Students
-      JOIN Gen ON Gen.cat='activity'
-  WHERE
-      Students.Enroll_Status = 0
-      and STUDENTS.GRADE_LEVEL >=5
-      AND PS_CustomFields.GetStudentsCF(Students.ID,Gen.Value) IS NOT NULL
-      AND PS_CustomFields.GetStudentsCF(Students.ID,Gen.Value) >=1
-      AND Gen.Name LIKE '%Athletics - %'
-  ORDER BY
-      Students.LastFirst,
-      Gen.Name
-```
-
-
 
 ## 8 Enrollments Parents Athletics
 
@@ -1929,31 +1373,3 @@ Enrol parents in all athletics classes using the read-only parent role
 |GEN|
 |GUARDIAN|
 |GUARDIANSTUDENT|
-
-**SQL Query**
-
-```SQL
-SELECT distinct
-    'enrollment' as "type",
-    'UPDATE' as "action",
-    -- 'S_'||STUDENTS.STUDENT_NUMBER as "child_code",
-    'P_'||GUARDIAN.GUARDIANID as "child_code",
-    'Learner' as "role_name",
-    'co_ath_'||Gen.Name AS "parent_code"
-
-  FROM
-      Students
-      JOIN Gen ON Gen.cat='activity',
-      GUARDIAN GUARDIAN,
-      GUARDIANSTUDENT GUARDIANSTUDENT
-  WHERE
-      Students.Enroll_Status = 0
-      and GUARDIANSTUDENT.STUDENTSDCID=STUDENTS.DCID
-      and GUARDIANSTUDENT.GUARDIANID=GUARDIAN.GUARDIANID
-      and STUDENTS.GRADE_LEVEL >=5
-      AND PS_CustomFields.GetStudentsCF(Students.ID,Gen.Value) IS NOT NULL
-      AND PS_CustomFields.GetStudentsCF(Students.ID,Gen.Value) >=1
-      AND Gen.Name LIKE '%Athletics - %'
-  ORDER BY
-      Gen.Name
-```
