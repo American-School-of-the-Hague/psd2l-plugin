@@ -416,8 +416,6 @@ PowerQuery Plugin for exporting the following information from PowerSchool &rarr
 
 **USES FIELDS:**
 
-***REVIEW THIS***
-
 - `code` from [3-Semesters](#3-semesters) as `semester_code`
 - `code` from [4-Templates](#4-templates) as `template_code`
 
@@ -486,7 +484,7 @@ PowerQuery Plugin for exporting the following information from PowerSchool &rarr
 
 **PROVIDES FIELDS:**
 
-`code` used in ?? as `????` 
+* `code` used in 08_Enrolments as `parent_code` 
 
 |Field |Format |example |
 |:-|:-|:-|
