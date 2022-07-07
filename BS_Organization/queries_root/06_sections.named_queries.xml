@@ -27,9 +27,16 @@
             Build sections based on student and teacher schedules
             */
 
+            -- 06 sections
             select distinct
                 'course section' as "type",
                 'UPDATE' as "action",
+                /*
+                use the following format to ensure that section codes are unique
+                and remain constant even if the teacher is reassigned
+                code: cs_3_SPHYIBS2_3200_D_28636
+                */
+            
                 'cs_'||cc.schoolid||'_'||cc.course_number||'_'||cc.TermID||'_'||DECODE(substr(cc.expression, 1, 1), 
                 1, 'A', 
                 2, 'B', 
@@ -40,7 +47,12 @@
                 7, 'G', 
                 8, 'H', 
                 9, 'ADV', 
-                'UNKNOWN') "code",
+                'UNKNOWN')||'_'||cc.sectionid "code",
+                /*
+                use the following format to ensure that section names are unique 
+                in each class; this will help differentiate sections when splitting classes
+                section names: `SCI IB Physics SL Yr2 - A Block (22-23) Kremer`
+                */
                 c.course_name||' - '||DECODE(substr(cc.expression, 1, 1), 
                 1, 'A', 
                 2, 'B', 
@@ -51,19 +63,20 @@
                 7, 'G', 
                 8, 'H', 
                 9, 'ADV', 
-                'UNKNOWN')||' Block ('||terms.abbreviation||')' as "name",
+                'UNKNOWN')||' Block ('||terms.abbreviation||') '||teachers.last_name as "name",
                 '' as "start_date",
                 '' as "end_date",
                 '' as "is_active",
                 '' as "department_code",
                 '' as "template_code",
-                '' as "semester code",
-                'co_'||cc.schoolid||'_'||cc.course_number as "offering_code",
+                '' as "semester_code",
+                'co_'||cc.schoolid||'_'||cc.course_number||'_'||cc.TermID as "offering_code",
                 '' as "custom_code"
             from 
             students s
             join cc on cc.studentid = s.id
             join schoolstaff ss on ss.id = cc.teacherid
+            join teachers teachers on teachers.id = cc.teacherid
             join courses c on c.course_number = cc.course_number,
             terms terms
             where
@@ -75,7 +88,7 @@
                     when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
                     THEN (EXTRACT(year from sysdate)-2000+10)*100
                     end
-            order by "semester code" desc
+            order by "offering_code" desc
             ]]>
         </sql>
     </query>

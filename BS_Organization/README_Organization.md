@@ -31,7 +31,7 @@ PowerQuery Plugin for exporting the following information from PowerSchool &rarr
     - [Fields Provided & Used](#fields-provided--used-6)
     - [Data Export Manager Setup](#data-export-manager-setup-6)
     - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-6)
-  - [template](#template)
+  - [6 Delete Sections UNUSED](#6-delete-sections-unused)
     - [Fields Provided & Used](#fields-provided--used-7)
     - [Data Export Manager Setup](#data-export-manager-setup-7)
     - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-7)
@@ -380,14 +380,14 @@ PowerQuery Plugin for exporting the following information from PowerSchool &rarr
 |-|-|-|-|
 |type| CC.ID | _course offering_ | N1
 |action| CC.ID | _UPDATE_ | N1
-|code| 'co_'schoolid\_coursenumber' | _co\_3\_ITLDPROG1_
+|code| _'co'\_schoolid\_coursenumber\_termid_ | _co\_3\_ITLDPROG1\_3100_
 |name| C.COURSE_NAME | _IT Programming_ 
 |start_date| CC.ID | '' | N1
 |end_date| CC.ID | '' | N1
 |is_active| CC.ID | _0_ | N1
 |department_code| CC.ID | '' | N1
 |template_code| CC.ID | '' | N1
-|semester_code|   schoolid'\_term\_'cc.termid | _term_3102_ 
+|semester_code|   _'term'\_termid_ | _term\_3102_
 |offering_code| CC.ID | '' | N1
 |custom_code| CC.ID | '' | N1
 
@@ -526,22 +526,21 @@ PowerQuery Plugin for exporting the following information from PowerSchool &rarr
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
 - *Include Column Headers:* `True`
-- *Surround "field values" in Quotes:* TBD
 
 ### Query Setup for `named_queries.xml`
 | header | table.field | value | NOTE |
 |-|-|-|-|
 |type| CC.ID | _course offering_ | N1
 |action| CC.ID | _UPDATE_ | N1
-|code| 'co_'schoolid\_coursenumber\_termid | _cs\_3\_ITLDROB\_3101\_C_
-|name| C.COURSE_NAME | _IT Robotics I - C Block (S1)_
+|code| _'cs'\_schoolid\_coursenumber\_termid\_block\_sectionid_ | _cs\_3\_ITLDROB\_3101\_C\_12345_
+|name| C.COURSE_NAME | _IT Robotics I - B Block (S2) Smith_
 |start_date| CC.ID | '' | N1
 |end_date| CC.ID | '' | N1
 |is_active| CC.ID | '' | N1
 |department_code| CC.ID | '' | N1
 |template_code| CC.ID | '' | N1
 |semester_code|   CC.ID | '' | N1
-|offering_code| 'co_'schoolid\_coursenumber | _co\_3\_ITLDROB1_
+|offering_code| _'co'\_schoolid\_coursenumber\_termid_ | _co\_3\_ITLDROB\_3101_
 |custom_code| CC.ID | '' | N1
 
 **NOTES**
@@ -555,34 +554,74 @@ PowerQuery Plugin for exporting the following information from PowerSchool &rarr
 |STUDENTS|
 |CC|
 |TERMS|
+|TEACHERS|
+|SCHOOLSTAFF|
+|COURSES|
 
+## 6 Delete Sections UNUSED
 
-## template
+Delete sections from previous school year. This query will clean out sections that are no longer in use. This pattern is useful when courses are reused over and over again and each year additional blocks are attached to the courses.
+
 ### Fields Provided & Used
 
+**PROVIDES FIELDS:**
 
+`code` used in ?? as `????` 
+
+|Field |Format |example |
+|:-|:-|:-|
+|`code`| `cs_`_`cc.schoolID`_`_`_`cc.course_number`_`_`_`cc.termid`_| 
+
+**USES FIELDS:**
+
+- `code` from [3-Semesters](#3-semesters) as `semester_code`
+- `code` from [5-Offerings](#5-offerings) as `offering_code`
 
 ### Data Export Manager Setup
+
+- **Category:** Show All
+- **Export From:**  `NQ com.txoof.brightspace.org.06sections`
 
 **Labels Used on Export**
 
 | Label |
 |-|
-
+|type|
+|action|
+|code|
+|name|
+|start_date|
+|end_date|
+|is_active|
+|department_code|
+|template_code|
+|semester_code|
+|offering_code|
+|custom_code|
 
 **Export Summary and Output Options**
 
-- *Export File Name:* `.csv`
+- *Export File Name:* `6-Sections_Delete-%d.csv`
 - *Line Delimiter:* `CR-LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
 - *Include Column Headers:* `True`
-- *Surround "field values" in Quotes:* TBD
 
 ### Query Setup for `named_queries.xml`
 | header | table.field | value | NOTE |
 |-|-|-|-|
-
+|type| CC.ID | _course offering_ | N1
+|action| CC.ID | _DELETE_ | N1
+|code| _'cs'\_schoolid\_coursenumber\_termid\_block\_sectionid_ | _cs\_3\_ITLDROB\_3101\_C\_12345_
+|name| C.COURSE_NAME | _IT Robotics I - B Block (S2) Smith_
+|start_date| CC.ID | '' | N1
+|end_date| CC.ID | '' | N1
+|is_active| CC.ID | '' | N1
+|department_code| CC.ID | '' | N1
+|template_code| CC.ID | '' | N1
+|semester_code|   CC.ID | '' | N1
+|offering_code| _'co'\_schoolid\_coursenumber\_termid_ | _co\_3\_ITLDROB\_3101_
+|custom_code| CC.ID | '' | N1
 
 **NOTES**
 
@@ -592,3 +631,83 @@ PowerQuery Plugin for exporting the following information from PowerSchool &rarr
 
 | Table |
 |-|
+|STUDENTS|
+|CC|
+|TERMS|
+|TEACHERS|
+|SCHOOLSTAFF|
+|COURSES|
+
+**SQL**
+
+```SQL
+            -- 06 sections
+            -- remove expired sections from previous school years
+            select distinct
+                'course section' as "type",
+                'DELETE' as "action",
+                /*
+                use the following format to ensure that section codes are unique
+                and remain constant even if the teacher is reassigned
+                code: cs_3_SPHYIBS2_3200_D_28636
+                */
+                'cs_'||cc.schoolid||'_'||cc.course_number||'_'||cc.TermID||'_'||DECODE(substr(cc.expression, 1, 1), 
+                1, 'A', 
+                2, 'B', 
+                3, 'C', 
+                4, 'D', 
+                5, 'E', 
+                6, 'F', 
+                7, 'G', 
+                8, 'H', 
+                9, 'ADV', 
+                'UNKNOWN')||'_'||cc.sectionid "code",
+                /*
+                use the following format to ensure that section names are unique 
+                in each class; this will help differentiate sections when splitting classes
+                section names: `SCI IB Physics SL Yr2 - A Block (22-23) Kremer`
+                */
+                c.course_name||' - '||DECODE(substr(cc.expression, 1, 1), 
+                1, 'A', 
+                2, 'B', 
+                3, 'C', 
+                4, 'D', 
+                5, 'E', 
+                6, 'F', 
+                7, 'G', 
+                8, 'H', 
+                9, 'ADV', 
+                'UNKNOWN')||' Block ('||terms.abbreviation||') '||teachers.last_name as "name",
+                '' as "start_date",
+                '' as "end_date",
+                '' as "is_active",
+                '' as "department_code",
+                '' as "template_code",
+                '' as "semester_code",
+                'co_'||cc.schoolid||'_'||cc.course_number||'_'||cc.TermID as "offering_code",
+                '' as "custom_code"
+            from 
+            students s
+            join cc on cc.studentid = s.id
+            join schoolstaff ss on ss.id = cc.teacherid
+            join teachers teachers on teachers.id = cc.teacherid
+            join courses c on c.course_number = cc.course_number,
+            terms terms
+            where
+                terms.id = cc.termid and
+                /* select only courses that are in the previous yearid (e.g. 2021-2022 == 3100)*/
+                cc.termid >= case 
+                    when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
+                    THEN (EXTRACT(year from sysdate)-2000+8)*100
+                    when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
+                    THEN (EXTRACT(year from sysdate)-2000+9)*100
+                    end
+                    and 
+                    cc.termid < case
+                    when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
+                    THEN (EXTRACT(year from sysdate)-2000+9)*100
+                    when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
+                    THEN (EXTRACT(year from sysdate)-2000+10)*100
+                    end
+            order by "offering_code" desc
+```
