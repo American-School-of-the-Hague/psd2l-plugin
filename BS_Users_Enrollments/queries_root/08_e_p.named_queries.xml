@@ -18,12 +18,18 @@
             08_e_p.named_queries.xml
             all active parent enrollments
             */
+            -- 08_e_p enroll parents in student classes
             select 
                 'enrollment' as "type",
                 'UPDATE' as "action",
                 'P_'||GUARDIAN.GUARDIANID as "child_code",
                 'Parent' as "role_name",
-                /* using 6-Sections:code as parent_code */
+                /*
+                use the following format to ensure that section codes are unique
+                and remain constant even if the teacher is reassigned
+                code: cs_3_SPHYIBS2_3200_D_28636
+                */
+            
                 'cs_'||cc.schoolid||'_'||cc.course_number||'_'||cc.TermID||'_'||DECODE(substr(cc.expression, 1, 1), 
                 1, 'A', 
                 2, 'B', 
@@ -34,7 +40,7 @@
                 7, 'G', 
                 8, 'H', 
                 9, 'ADV', 
-                'UNKNOWN') as "parent_code"
+                'UNKNOWN')||'_'||cc.sectionid as "parent_code"
             from GUARDIAN GUARDIAN,
                 COURSES COURSES,
                 SECTIONS SECTIONS,

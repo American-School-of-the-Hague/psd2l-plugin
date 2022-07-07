@@ -769,11 +769,7 @@ FROM
                      and CC.TERMID >= case 
                         when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
                         THEN (EXTRACT(year from sysdate)-2000+9)*100
-<<<<<<< HEAD
                         when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
-=======
-                        when (EXTRACT(month from sysdate) > 6 and EXTRACT(month from sysdate) <= 12)
->>>>>>> main
                         THEN (EXTRACT(year from sysdate)-2000+10)*100
                      end
         ) Helper
@@ -810,17 +806,12 @@ Add all teachers to scheduled classes. Class enrolment needs to happen last afte
 
 **PROVIDES FIELDS:**
 
-- `child_code` used in ?? as `??` 
-
-|Field |Format |example |
-|:-|:-|:-|
-|`child_code`| `'cs_'\|\|cc.schoolid\|\|'_'\|\|cc.course_number\|\|'_'\|\|cc.TermID` | cs_2_C5A_3100
+None
 
 **USES FIELDS:**
 
 - `org_defined_id` from [07-Users_Teachers_Active](#7-usersteachersactive) as `child_code`
 - `code` from [06-Sections](../BS_Organization/README_Organization.md/#6-sections) as `parent_code`
-- ALTERNATIVE: `code` from [05-Offerings](../BS_Organization/README_Organization.md/#5-offerings) as `parent_code`
 
 ### Data Export Manager Setup
 
@@ -854,9 +845,9 @@ Add all teachers to scheduled classes. Class enrolment needs to happen last afte
 |-|-|-|-|
 |type| TEACHERS.ID | _enrollment_ | N1
 |action| TEACHERS.ID | _UPDATE_ | N1
-|child_code| `T_`_`TEACHERS.TEACHERNUMBER`_ | _T\_765_
+|child_code| _'T'\_TEACHERS.TEACHERNUMBER_ | _T\_765_
 |role_name| CC.ID | _Instructor_ | N1
-|parent_code| `cs_`_`cc.schoolid`_`_`_`cc.course_number`_`_`_`cc.termid`_ | _cs_2_E0DNS_3100_ 
+|parent_code| _'cs'\_schoolid\_coursenumber\_termid\_block\_sectionid_ | _cs\_3\_ITLDROB\_3101\_C\_12345_
 
 **NOTES**
 
@@ -867,9 +858,9 @@ Add all teachers to scheduled classes. Class enrolment needs to happen last afte
 | Table |
 |-|
 |STUDENTS|
+|SECTIONTEACHER|
 |COURSES|
 |CC|
-|SECTIONS|
 |TEACHERS|
 
 ## 8 Enrollments Teachers - School Level
@@ -947,17 +938,12 @@ This needs to be run prior to the individual course enrollments
 
 **PROVIDES FIELDS:**
 
-- `child_code` used in ?? as `??` 
-
-|Field |Format |example |
-|:-|:-|:-|
-|`child_code`| `'cs_'\|\|cc.schoolid\|\|'_'\|\|cc.course_number\|\|'_'\|\|cc.TermID` | cs_2_C5A_3100
+None
 
 **USES FIELDS:**
 
 - `org_defined_id` from [07-Users - Students](../BS_07_Users_Students/README.md) as `child_code`
 - `code` from [06-Sections](../BS_06_Offerings/README.md) as `parent_code`
-- ALTERNATIVE: `code` from [05-Offerings](../BS_05_Offerings/README.md) as `parent_code`
 
 ### Data Export Manager Setup
 
@@ -981,7 +967,7 @@ This needs to be run prior to the individual course enrollments
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
 - *Include Column Headers:* `True`
-- *Surround "field values" in Quotes:* TBD
+- *Surround "field values" in Quotes:* `False`
 
 ### Query Setup for `named_queries.xml`
 
@@ -989,12 +975,11 @@ This needs to be run prior to the individual course enrollments
 
 | header | table.field | value | NOTE |
 |-|-|-|-|
-|-|-|-|-|
 |type| CC.ID | _enrollment_ | N1
 |action| CC.ID | _UPDATE_ | N1
-|child_code| `S_`_`STUDENTS.STUDENT_NUMBER`_ | _S\_506113_
+|child_code| _'S'\_STUDENT\_NUMBER_ | _S\_506113_
 |role_name| CC.ID | _Learner_ | N1
-|parent_code| `cs_`_`cc.schoolid`_`_`_`cc.course_number`_`_`_`cc.termid`_ | _cs_2_E0DNS_3100_ 
+|parent_code| _'cs'\_schoolid\_coursenumber\_termid\_block\_sectionid_ | _cs\_3\_ITLDROB\_3101\_C\_12345_ 
 
 **NOTES**
 
@@ -1071,7 +1056,7 @@ If the drops are run last, the end result will be that the enrolment from step *
 |action| CC.ID | _UPDATE_ | N1
 |child_code| `S_`_`STUDENTS.STUDENT_NUMBER`_ | _S\_506113_
 |role_name| CC.ID | _Learner_ | N1
-|parent_code| `cs_`_`cc.schoolid`_`_`_`cc.course_number`_`_`_`cc.termid`_ | _cs_2_E0DNS_3100_ 
+|parent_code| _'cs'\_schoolid\_coursenumber\_termid\_block\_sectionid_ | _cs\_3\_ITLDROB\_3101\_C\_12345_ 
 
 **NOTES**
 
@@ -1141,7 +1126,7 @@ Enrol parents in classes as view-only members of their children's classes.
 |action| CC.ID | _UPDATE_ | N1
 |child_code| `S_`_`GUARDIAN.GUARDIANID`_ | _S\_506113_
 |role_name| CC.ID | _Parent-Auditor_ | N1
-|parent_code| `cs_`_`cc.schoolid`_`_`_`cc.course_number`_`_`_`cc.termid`_ | _cs_2_E0DNS_3100_ 
+|parent_code| _'cs'\_schoolid\_coursenumber\_termid\_block\_sectionid_ | _cs\_3\_ITLDROB\_3101\_C\_12345_ 
 
 **NOTES**
 
@@ -1219,7 +1204,7 @@ If the drops are run last, the end result will be that the enrolment from step *
 |action| CC.ID | _UPDATE_ | N1
 |child_code| `S_`_`GUARDIAN.GUARDIANID`_ | _P\_506113_
 |role_name| CC.ID | _Parent-Auditor_ | N1
-|parent_code| `cs_`_`cc.schoolid`_`_`_`cc.course_number`_`_`_`cc.termid`_ | _cs_2_E0DNS_3100_ 
+|parent_code| _'cs'\_schoolid\_coursenumber\_termid\_block\_sectionid_ | _cs\_3\_ITLDROB\_3101\_C\_12345_ 
 
 **NOTES**
 

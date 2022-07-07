@@ -47,7 +47,7 @@
                 7, 'G', 
                 8, 'H', 
                 9, 'ADV', 
-                'UNKNOWN')||'_'||cc.sectionid "code",
+                'UNKNOWN')||'_'||cc.sectionid as "code",
                 /*
                 use the following format to ensure that section names are unique 
                 in each class; this will help differentiate sections when splitting classes

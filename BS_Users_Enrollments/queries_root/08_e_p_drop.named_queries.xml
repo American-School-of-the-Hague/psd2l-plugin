@@ -18,13 +18,20 @@
             08_e_p_drop.named_queries.xml
             Update enrollments for parents: drop parents from classes that students have dropped 
             */
+            -- 08_e_p_drop enrol parents; drop courses
             select
                 'enrollment' as "type",
                 'DELETE' as "action",
                 'P_'||guardian.guardianid as "child_code",
                 'Learner' as "role_name",
+                /*
+                use the following format to ensure that section codes are unique
+                and remain constant even if the teacher is reassigned
+                code: cs_3_SPHYIBS2_3200_D_28636
+                */
+                -- at some points during the year the TERMID and SECTIONID values become negative
+                -- use regexp_replace to remove any non-digit characters 
                 'cs_'||cc.schoolid||'_'||cc.course_number||'_'||REGEXP_REPLACE(cc.termid, '\D+', '')||'_'||DECODE(substr(cc.expression, 1, 1), 
-                
                 1, 'A', 
                 2, 'B', 
                 3, 'C', 
@@ -34,7 +41,7 @@
                 7, 'G', 
                 8, 'H', 
                 9, 'ADV', 
-                'UNKNOWN') as "parent_code"
+                'UNKNOWN')||'_'||REGEXP_REPLACE(cc.sectionid, '\D+', '') as "parent_code"
             from
                 cc
                 join students on cc.studentid = students.id
@@ -45,7 +52,7 @@
                 join guardian on guardianstudent.guardianid = guardian.guardianid
             
             where
-                sections.TERMID >= case 
+                sections.TERMID  >= case 
                     when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
                     THEN (EXTRACT(year from sysdate)-2000+9)*100
                     when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)

@@ -18,12 +18,19 @@
             08_e_t.named_queries.xml
             enroll all section teachers (including primary and co-teachers) into sections/courses
             */
+            -- 08_e_t enrollments teachers
             select distinct
                 'enrollment' as "type",
                 'UPDATE' as "action",
                 'T_'||teachers.teachernumber as "child_code",
                 'Instructor' as "role_name",
-                'cs_'||CC.SCHOOLID||'_'||cc.COURSE_NUMBER||'_'||CC.TERMID||'_'||DECODE(substr(cc.expression, 1, 1), 
+                /*
+                use the following format to ensure that section codes are unique
+                and remain constant even if the teacher is reassigned
+                code: cs_3_SPHYIBS2_3200_D_28636
+                */
+            
+                'cs_'||cc.schoolid||'_'||cc.course_number||'_'||cc.TermID||'_'||DECODE(substr(cc.expression, 1, 1), 
                 1, 'A', 
                 2, 'B', 
                 3, 'C', 
@@ -33,7 +40,7 @@
                 7, 'G', 
                 8, 'H', 
                 9, 'ADV', 
-                'UNKNOWN') as "parent_code"
+                'UNKNOWN')||'_'||cc.sectionid as "parent_code"
             from TEACHERS TEACHERS,
                 SECTIONTEACHER SECTIONTEACHER,
                 STUDENTS STUDENTS,
