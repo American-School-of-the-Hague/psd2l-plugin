@@ -26,7 +26,6 @@
 
             Build sections based on student and teacher schedules
             */
-
             -- 06 sections
             select distinct
                 'course section' as "type",
@@ -34,9 +33,10 @@
                 /*
                 use the following format to ensure that section codes are unique
                 and remain constant even if the teacher is reassigned
+
+                cs_cc.schoolid_cc.course_number_cc.termid_cc.expression_cc.sectionid
                 code: cs_3_SPHYIBS2_3200_D_28636
                 */
-            
                 'cs_'||cc.schoolid||'_'||cc.course_number||'_'||cc.TermID||'_'||DECODE(substr(cc.expression, 1, 1), 
                 1, 'A', 
                 2, 'B', 

@@ -30,7 +30,11 @@
             select distinct
                 'course offering' as "type",
                 'UPDATE' as "action",
-                /* co_cc.schoolid_cc.course_number */
+                /* 
+                Include schoolid, course_number and termid
+                co_cc.schoolid_cc.course_number_cc.termid 
+                co_3_SPHYIBS2_3200
+                */
                 'co_'||cc.schoolid||'_'||cc.course_number||'_'||cc.termid as "code",
                 c.course_name||' ('||terms.abbreviation||')' as "name",
                 TERMS.FIRSTDAY as "start_date",
