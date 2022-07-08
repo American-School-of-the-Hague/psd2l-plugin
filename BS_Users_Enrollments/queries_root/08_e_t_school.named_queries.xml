@@ -20,6 +20,7 @@
             Default role: Instructor
             Use PS SIS assigned roles to elevate to Admin role
             */
+            -- 08_e_t_school enrol teachers in home schools
             select DISTINCT
                 'enrollment' as "type",
                 'UPDATE' as "action",
