@@ -4,7 +4,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		description="B rightSpace Organizational Export (Other, Departments, Semesters, Templates, Offerings, Sections) see https://github.com/txoof/PowerQuery"
 		name="BrightSpace Organization Export"
-		version="1.2.1.20220707.1415"
+		version="1.2.02.20220708"
 		xsi:schemaLocation="http://plugin.powerschool.pearson.com plugin.xsd">
 		
 	<publisher name="Aaron Ciuffo">
