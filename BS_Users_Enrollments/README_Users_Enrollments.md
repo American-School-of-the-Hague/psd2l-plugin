@@ -937,6 +937,10 @@ This needs to be run prior to the individual course enrollments
 
 ## 8 Enrollments Students Active
 
+Enrol students into current courses. Current courses are considered courses that have a terms.firstday that is equal to today or earlier.
+
+PowerSchool does not track enrolment changes prior to the first day of classes. This means that the queries that track DROPs return no data. This results in erroneous student enrolments that have to be tidied up after school starts.
+
 ### Fields Provided & Used
 
 **PROVIDES FIELDS:**
@@ -1139,6 +1143,10 @@ If the drops are run last, the end result will be that the enrolment from step *
 ## 8 Enrollments Parents in Student Classes
 
 Enrol parents in classes as view-only members of their children's classes.
+
+Enrol parents into current courses. Current courses are considered courses that have a terms.firstday that is equal to today or earlier.
+
+PowerSchool does not track enrolment changes prior to the first day of classes. This means that the queries that track DROPs return no data. This results in erroneous student/parent enrolments that have to be tidied up after school starts.
 
 ### Fields Provided & Used
 
