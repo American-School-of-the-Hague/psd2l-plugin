@@ -19,7 +19,7 @@
             all active parent enrollments
             */
             -- 08_e_p enroll parents in student classes
-            select 
+            select distinct
                 'enrollment' as "type",
                 'UPDATE' as "action",
                 'P_'||GUARDIAN.GUARDIANID as "child_code",
@@ -51,6 +51,7 @@
             where GUARDIANSTUDENT.STUDENTSDCID=STUDENTS.DCID
                 and STUDENTS.ID=CC.STUDENTID
                 and CC.SECTIONID=SECTIONS.ID
+                and TERMS.id = cc.termid
                 and SECTIONS.COURSE_NUMBER=COURSES.COURSE_NUMBER
                 and GUARDIANSTUDENT.GUARDIANID=GUARDIAN.GUARDIANID
                 and STUDENTS.ENROLL_STATUS =0
@@ -61,10 +62,16 @@
                     when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
                     THEN (EXTRACT(year from sysdate)-2000+10)*100
                 end
-                and TERMS.id = cc.termid
+                /*
+                Only pull courses with firstday that is lessthan or equal to the current date.
+                This prevents adding enrolments changes that are not tracked by powerschool; 
+                changes are only tracked on or after the first day of the course.
+                */
                 and trunc(terms.firstday) <= trunc(sysdate)    
-                
-            order by GUARDIANSTUDENT.GUARDIANID ASC	
+
+            order by 
+                "child_code" ASC,
+                "parent_code" asc
             ]]>
         </sql>
     </query>
