@@ -15,12 +15,11 @@
         <sql>
             <![CDATA[
             -- 08_e_s enrol students in sections
-            select 
+            select distinct
                 'enrollment' as "type",
                 'UPDATE' as "action",
                 /* using 7-Users:org_defined_id as child_code */
                 'S_'||STUDENTS.STUDENT_NUMBER as "child_code",
-                /* REGEXP_REPLACE(U_STUDENTSUSERFIELDS.EMAILSTUDENT, '(^.*)(@.*)', '\1') as "child_code", */
                 'Learner' as "role_name",
                 /*
                 use the following format to ensure that section codes are unique
@@ -46,13 +45,10 @@
                 CC CC,
                 STUDENTS STUDENTS,
                 TERMS TERMS
-                
-                -- join terms on sections.termid = terms.id
-
             where CC.STUDENTID=STUDENTS.ID
+                and terms.id = cc.termid
                 and COURSES.COURSE_NUMBER=CC.COURSE_NUMBER
                 and SECTIONS.ID=CC.SECTIONID
-                /* and U_STUDENTSUSERFIELDS.STUDENTSDCID=STUDENTS.DCID */ 
                 and STUDENTS.ENROLL_STATUS =0
                 and STUDENTS.GRADE_LEVEL >=5
                 and CC.TERMID >= case 
@@ -62,15 +58,14 @@
                     THEN (EXTRACT(year from sysdate)-2000+10)*100
                 end
                 /*
-                only pull courses with start dates that are earlier than or equal to today's date
-                this prevents courses all the changes prior to the first day from being loaded 
-                prematurely while schedules are still in flux and drops are not tracked
-                **see README**
+                Only pull courses with firstday that is lessthan or equal to the current date.
+                This prevents adding enrolments changes that are not tracked by powerschool; 
+                changes are only tracked on or after the first day of the course.
                 */
-                and TERMS.id = cc.termid
                 and trunc(terms.firstday) <= trunc(sysdate)
-                
-            order by STUDENTS.GRADE_LEVEL ASC, STUDENTS.LASTFIRST ASC, SECTIONS.SECTION_NUMBER ASC
+            order by 
+                "child_code" asc,
+                "parent_code" asc
             ]]>
         </sql>
     </query>
