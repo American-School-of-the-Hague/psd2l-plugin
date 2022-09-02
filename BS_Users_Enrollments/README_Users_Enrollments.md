@@ -37,34 +37,38 @@ PowerQuery Plugin for exporting the following information from PowerSchool &rarr
   - [Fields Provided & Used](#fields-provided--used-7)
   - [Data Export Manager Setup](#data-export-manager-setup-7)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-7)
-- [8 Enrollments Students Active](#8-enrollments-students-active)
+- [8 Enrollments Learner Support Teachers - School Level](#8-enrollments-learner-support-teachers---school-level)
   - [Fields Provided & Used](#fields-provided--used-8)
   - [Data Export Manager Setup](#data-export-manager-setup-8)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-8)
-- [8 Enrollments Students - School Level](#8-enrollments-students---school-level)
+- [8 Enrollments Students Active](#8-enrollments-students-active)
   - [Fields Provided & Used](#fields-provided--used-9)
   - [Data Export Manager Setup](#data-export-manager-setup-9)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-9)
-- [8 Enrollments Students Active - Dropped Classes](#8-enrollments-students-active---dropped-classes)
+- [8 Enrollments Students - School Level](#8-enrollments-students---school-level)
   - [Fields Provided & Used](#fields-provided--used-10)
   - [Data Export Manager Setup](#data-export-manager-setup-10)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-10)
-- [8 Enrollments Parents in Student Classes](#8-enrollments-parents-in-student-classes)
+- [8 Enrollments Students Active - Dropped Classes](#8-enrollments-students-active---dropped-classes)
   - [Fields Provided & Used](#fields-provided--used-11)
   - [Data Export Manager Setup](#data-export-manager-setup-11)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-11)
-- [8 Enrollments Parents in Student Classes - Drop](#8-enrollments-parents-in-student-classes---drop)
+- [8 Enrollments Parents in Student Classes](#8-enrollments-parents-in-student-classes)
   - [Fields Provided & Used](#fields-provided--used-12)
   - [Data Export Manager Setup](#data-export-manager-setup-12)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-12)
-- [8 Enrollments Students Athletics](#8-enrollments-students-athletics)
+- [8 Enrollments Parents in Student Classes - Drop](#8-enrollments-parents-in-student-classes---drop)
   - [Fields Provided & Used](#fields-provided--used-13)
   - [Data Export Manager Setup](#data-export-manager-setup-13)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-13)
-- [8 Enrollments Parents Athletics](#8-enrollments-parents-athletics)
+- [8 Enrollments Students Athletics](#8-enrollments-students-athletics)
   - [Fields Provided & Used](#fields-provided--used-14)
   - [Data Export Manager Setup](#data-export-manager-setup-14)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-14)
+- [8 Enrollments Parents Athletics](#8-enrollments-parents-athletics)
+  - [Fields Provided & Used](#fields-provided--used-15)
+  - [Data Export Manager Setup](#data-export-manager-setup-15)
+  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-15)
 
 ## Important Implementation Notes
 
@@ -559,7 +563,18 @@ Disable and delete accounts for departed students.
 
 ## 7 Users Students Active
 
-This query includes all active students with Parent and Auditor relationships.
+This query includes all active students with Auditor relationships. Teacher _Auditors_ are added to all students that participate in Learner Support classes such as English as an Additional Language, Learning Support, Special Education.
+
+Teacher _Auditors_ can track learner usage as well as impersonate students to view courses in a _learner_ view. 
+
+Auditor relationships are based on student enrolments in the following courses:
+
+* EAL Support Classes in HS
+  * `courses.course_name like '%english essentials%'`
+  * `courses.course_name like 'eng%foundations%'`
+* EAL, Learning Suport, Special Education 
+  * `cc.course_number like '%olea%'`
+  * `courses.sched_department in('mseal', 'mslsc', 'hsse', 'msse', 'hslsc')`
 
 ### Fields Provided & Used
 
@@ -934,6 +949,73 @@ This needs to be run prior to the individual course enrollments
 |-|
 |users|
 |schoostaff|
+
+## 8 Enrollments Learner Support Teachers - School Level
+
+Enrolls Learner Support Staff into the Learner Support School within Brightspace (0_LS). This enables the Brightspace [Auditors Tool](https://documentation.brightspace.com/EN/le/classlist/instructor/what_is_an_auditor.htm). The Auditors tool allows teachers to impersonate their auditees and view their progress and course material.
+
+The Auditor Tool only works from the Root OU (6606) level. It is not technically possible (as of 09.2022) to use the Auditor tool at any other OU level. For the Auditors to have access to the Root OU, they must be enrolled in two or more schools.
+
+### Fields Provided & Used
+
+**PROVIDES FIELDS:**
+
+|Field |Format |example |
+|:-|:-|:-|
+|`child_code`| `teachers.homeschoolid` | 2
+
+**USES FIELDS:**
+
+- `org_defined_id` from [07-Users_Students_Active](#7-users-students-active) as `child_code`
+- `code` from [BS_Organization/01-Other](../BS_Organization/README_Organization.md/#1-other)
+
+### Data Export Manager Setup
+
+- **Category:** Show All
+- **Export From:**  `NQ com.txoof.brightspace.enroll.08_teacher_school`
+
+**Labels Used on Export**
+
+| Label |
+|-|
+|type|
+|action|
+|child_code|
+|role_name|
+|parent_code|
+
+**Export Summary and Output Options**
+
+- *Export File Name:* `8-Enrollments_102_teachers_ls_eal_school-%d.csv`
+- *Line Delimiter:* `CR-LF`
+- *Field Delimiter:* `,`
+- *Character Set:* `UTF-8`
+- *Include Column Headers:* `True`
+- *Surround "field values" in Quotes:* False
+
+### Query Setup for `named_queries.xml`
+
+- File: `08_e_t_ls_eal_school.named_queries.xml`
+
+| header | table.field | value | NOTE |
+|-|-|-|-|
+|type| TEACHERS.ID | _enrollment_ | N1
+|action| TEACHERS.ID | _UPDATE_ | N1
+|child_code| TEACHERS.TEACHERNUMBER | _T\_765_
+|role_name| TEACHERS.ID | _Instructor_ | N1
+|parent_code| _0\_LS_ | _0\_LS_ | N1
+
+**NOTES**
+
+**N1:** Field does not appear in database; use a known field such as `<column column=STUDENT.ID>header<\column>` to prevent an "unknown column error"
+
+**Tables Used**
+
+| Table |
+|-|
+|COURSES|
+|CC|
+|TEACHERS|
 
 ## 8 Enrollments Students Active
 

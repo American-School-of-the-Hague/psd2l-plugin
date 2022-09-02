@@ -42,7 +42,7 @@
                     WHEN Auditors.Auditors IS NOT NULL AND Parents.Parents IS NOT NULL
                     THEN Auditors.Auditors || ''
                     ELSE Auditors.Auditors
-                END AS "relationship",
+                END AS "relationships",
                 '' as "pref_first_name",
                 '' as "pref_last_name"
             FROM
@@ -62,11 +62,25 @@
                             JOIN Courses ON CC.Course_Number = Courses.Course_Number
                             JOIN Teachers ON CC.TeacherID = Teachers.ID
                         WHERE
-                            (
-                                Courses.Course_Name LIKE 'ENG English Foundations%'
-                                OR Courses.Course_name LIKE 'Grade%English Essentials%'
-                                OR CC.Course_Number = 'OLEA'
-                                OR Courses.Sched_Department IN ('MSEAL','MSLSC')
+                            ( 
+                                /* 
+                                English Essentials, English Foundations, English for Accademic Purposes
+                                courses are in the MS/HS English Department, but service
+                                EAL students in both divisions
+                                */
+                                lower(courses.course_name) like '%english essentials%'
+                                or lower(courses.course_name) like '%english%accademic%purposes%'
+                                or lower(courses.course_name) like 'eng%foundations%'
+                                /*
+                                HS Learning Support clasess are in the OTH department, MS
+                                Learning Suport classes are in the mslsc department
+                                */
+                                or lower(cc.course_number) like '%olea%'
+                                /*
+                                capture all EAL, LSC and Special Education classes in MS and HS
+                                */
+                                or lower(courses.sched_department) in('mseal', 'mslsc', 'msse')
+                                or lower(courses.sched_department) in('hseal', 'hslsc', 'hsse')
                             )
                                 and CC.TERMID >= case 
                                     when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
