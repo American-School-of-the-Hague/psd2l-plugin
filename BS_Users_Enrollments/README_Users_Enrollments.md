@@ -565,16 +565,18 @@ Disable and delete accounts for departed students.
 
 This query includes all active students with Auditor relationships. Teacher _Auditors_ are added to all students that participate in Learner Support classes such as English as an Additional Language, Learning Support, Special Education.
 
-Teacher _Auditors_ can track learner usage as well as impersonate students to view courses in a _learner_ view. 
+Teacher _Auditors_ can track learner usage as well as impersonate students to view courses in a _learner_ view.
 
-Auditor relationships are based on student enrolments in the following courses:
+**NOTE:** Any changes made here must also be updated in [8 Enrollments Learner Support Teachers - School Level](#8-enrollments-learner-support-teachers---school-level)
 
-* EAL Support Classes in HS
-  * `courses.course_name like '%english essentials%'`
-  * `courses.course_name like 'eng%foundations%'`
-* EAL, Learning Suport, Special Education 
-  * `cc.course_number like '%olea%'`
-  * `courses.sched_department in('mseal', 'mslsc', 'hsse', 'msse', 'hslsc')`
+Students in any course matching the list below will be associated with an _Auditor_.
+
+* `courses.course_name like '%english essentials%'`
+* `courses.course_name like '%english%accademic%purposes%'`
+* `courses.course_name like 'eng%foundations%'`
+* `cc.course_number like '%olea%'` -- HS Learning Support
+* `courses.sched_department in('mseal', 'mslsc', 'msse')`
+* `courses.sched_department in('hseal', 'hslsc', 'hsse')`
 
 ### Fields Provided & Used
 
@@ -955,6 +957,17 @@ This needs to be run prior to the individual course enrollments
 Enrolls Learner Support Staff into the Learner Support School within Brightspace (0_LS). This enables the Brightspace [Auditors Tool](https://documentation.brightspace.com/EN/le/classlist/instructor/what_is_an_auditor.htm). The Auditors tool allows teachers to impersonate their auditees and view their progress and course material.
 
 The Auditor Tool only works from the Root OU (6606) level. It is not technically possible (as of 09.2022) to use the Auditor tool at any other OU level. For the Auditors to have access to the Root OU, they must be enrolled in two or more schools.
+
+**NOTE:** Any changes made here must also be updated in [07-Users_Students_Active](#7-users-students-active)
+
+Teachers of any course matching the list below will be provided access to the _Auditor_ tool:
+
+* `courses.course_name like '%english essentials%'`
+* `courses.course_name like '%english%accademic%purposes%'`
+* `courses.course_name like 'eng%foundations%'`
+* `cc.course_number like '%olea%'` -- HS Learning Support
+* `courses.sched_department in('mseal', 'mslsc', 'msse')`
+* `courses.sched_department in('hseal', 'hslsc', 'hsse')`
 
 ### Fields Provided & Used
 
