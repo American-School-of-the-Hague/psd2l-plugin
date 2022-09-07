@@ -58,7 +58,7 @@
                     EAL students in both divisions
                     */
                     lower(courses.course_name) like '%english essentials%'
-                    or lower(courses.course_name) like '%english%accademic%purposes%'
+                    or lower(courses.course_name) like '%english%academic%purposes%'
                     or lower(courses.course_name) like 'eng%foundations%'
                     /*
                     HS Learning Support clasess are in the OTH department, MS
