@@ -87,6 +87,10 @@ See the *Data Export Manager* section for each Named Query below.
 
 There are two separate Named Queries (NQ) for parents, one for mother and one for father. These are listed as m_inactive and f_inactive respectively. These could potentially be combined in the future.
 
+Parents are makred as inactive when their children become inactive. This means that the `inactive` IPSIS job for inactive parents needs to be run prior to the `active` job. Parents may become inactive because a student in grade 12 graduatets; however if there is a younger sibling in grade 11, the parent needs to be reactivated by the `active` job.
+
+Parents are queued for deletion on the 364th day after their children are marked inactive.
+
 ### Fields Provided & Used
 
 **PROVIDES FIELDS:**
@@ -489,6 +493,8 @@ All active staff staff added to ORG (6066) as "Instructor"
 ## 7 Users Students Inactive
 
 Disable and delete accounts for departed students.
+
+Students are marked as inactive when their powerschool students.enroll_status != 0. Students with enroll_status != 0 are deleted 364 days after students.exitdate.
 
 ### Fields Provided & Used
 

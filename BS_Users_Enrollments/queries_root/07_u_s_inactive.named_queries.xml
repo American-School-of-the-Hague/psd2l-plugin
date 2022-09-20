@@ -22,11 +22,20 @@
         <!--SQL query in format <![CDATA[QUERY]]>-->
         <sql>
             <![CDATA[
+            -- 07s_inactive
+            /*
+            reduce period that "deleted" students appear in the
+            query -- IN PROGRESS
+            */
             select 
                 'user' as "type",
-                /* mark students that have left in the past N days for deletion */
+                /* 
+                mark students that have left in the past N days for deletion 
+                the deletion horizon should be within a few days of the end of the period 
+                for the report
+                */
                 case 
-                WHEN (trunc(sysdate) - STUDENTS.EXITDATE) >=90
+                WHEN (trunc(sysdate) - STUDENTS.EXITDATE) >= 364
                     THEN 'DELETE'
                 ELSE 
                     'UPDATE'
@@ -52,7 +61,16 @@
             where 
                 STUDENTS.DCID=U_STUDENTSUSERFIELDS.STUDENTSDCID
                 and STUDENTS.ENROLL_STATUS >=2
-                and trunc(sysdate) - STUDENTS.EXITDATE <= 180 
+                /*
+                report period
+                NOTE: The deletion horizon should be within a few days of this to prevent
+                attempting to delete the same user over and over again. This results in the
+                following error.
+                    IPSIS error: `No user mapping found for source system`
+                This error occurs when a non-existant user is queued for deletion multiple
+                times
+                */
+                and trunc(sysdate) - STUDENTS.EXITDATE <= 365
                 and trunc(sysdate) - STUDENTS.EXITDATE > 0
                 /* Only students grade 5 and up */
                 and STUDENTS.GRADE_LEVEL >= 5

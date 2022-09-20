@@ -27,7 +27,7 @@
                 'user' as "type",
                 /* mark parents of students that have left in the past N days for deletion */
                 case 
-                WHEN (trunc(sysdate) - STUDENTS.EXITDATE) >=90
+                WHEN (trunc(sysdate) - STUDENTS.EXITDATE) >=364
                     THEN 'DELETE'
                 ELSE 
                     'UPDATE'
@@ -58,7 +58,7 @@
                 */
                 and trim(guardian.firstname)=trim(u_studentsuserfields.mother_firstname)
                 -- and trim(guardian.lastname)=trim(u_studentsuserfields.mother_lastname)
-                and trunc(sysdate) - STUDENTS.EXITDATE < 90
+                and trunc(sysdate) - STUDENTS.EXITDATE <= 365
                 and trunc(sysdate) - STUDENTS.EXITDATE > 0    
                 and STUDENTS.ENROLL_STATUS !=0
                 and students.grade_level >=5
