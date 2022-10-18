@@ -27,16 +27,14 @@
                 'T_'||users.TEACHERNUMBER as "child_code",
                 /*
                 Use the role assigned in PowerSchool SIS
-                this ensures that the PS SIS assigned role is valid at all organization levels
-                in Brightspace. If this defaults to Instructor, Admins are pushed down to 
-                "Instructor" in their home schools and cannot do admin tasks within that org unit.
+                this ensures that the PS SIS assigned role is valid at the organization levels
+                in Brightspace.
                 */
                 case 
                     when U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE is Null or lower(trim(U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE)) = lower('NONE')
                     Then 'Instructor'
                     ELSE trim(U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE)
                 end  as "role_name",    
-                -- 'Instructor' as "role_name",
                 users.homeschoolid as "parent_code"
             from 
                 users users,

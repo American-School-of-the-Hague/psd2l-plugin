@@ -39,11 +39,21 @@
                 users.LAST_NAME as "last_name",
                 '' as "password",
                 schoolstaff.STATUS as "is_active",
-                case 
-                    when U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE is Null or lower(trim(U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE)) = lower('NONE')
-                    Then 'Instructor'
-                    ELSE trim(U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE)
-                end  as "role_name",
+                /*
+                Add cascading system roles -- this should only be administrators/super admins or other global roles
+                
+                School level roles such as counselors should be added at the school level 
+                */
+                case
+                    when lower(U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE) like '%administrator%'
+                    then U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE
+                    else 'Instructor'
+                end as "role_name",
+            --    case 
+            --        when U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE is Null or lower(trim(U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE)) = lower('NONE')
+            --        Then 'Instructor'
+            --        ELSE trim(U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE)
+            --    end  as "role_name",
                 users.EMAIL_ADDR as "email",
                 '' as "relationships",
                 '' as "pref_first_name",
