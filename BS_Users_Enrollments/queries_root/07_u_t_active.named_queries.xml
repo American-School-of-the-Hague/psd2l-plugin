@@ -42,10 +42,17 @@
                 /*
                 Add cascading system roles -- this should only be administrators/super admins or other global roles
                 
-                School level roles such as counselors should be added at the school level 
+                School level roles such as counselors will be handled at the school level in
+                08_e_t_school.named_queries
+
+                Counselor roles will eventually be assigned through PowerSchool; this is 
+                a native assignment to PowerSchool and is not managed through the custom
+                Brightspace table in PowerSchool. 
+                
+                See Intranet > PS > FAQ: how to assign staff to counselor role
                 */
                 case
-                    when lower(U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE) like '%administrator%'
+                    when lower(U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE) like '%-org%'
                     then U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE
                     else 'Instructor'
                 end as "role_name",
