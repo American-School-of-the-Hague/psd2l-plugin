@@ -6,67 +6,67 @@ PowerQuery Plugin for exporting the following information from PowerSchool &rarr
 - [Important Implementation Notes](#important-implementation-notes)
   - [User creation](#user-creation)
 - [7 Users Parents Inactive](#7-users-parents-inactive)
-  - [Fields Provided & Used](#fields-provided--used)
+  - [Fields Provided \& Used](#fields-provided--used)
   - [Data Export Manager Setup](#data-export-manager-setup)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml)
 - [7 Users Parents Active](#7-users-parents-active)
-  - [Fields Provided & Used](#fields-provided--used-1)
+  - [Fields Provided \& Used](#fields-provided--used-1)
   - [Data Export Manager Setup](#data-export-manager-setup-1)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-1)
 - [7 Users Teachers Inactive](#7-users-teachers-inactive)
-  - [Fields Provided & Used](#fields-provided--used-2)
+  - [Fields Provided \& Used](#fields-provided--used-2)
   - [Data Export Manager Setup](#data-export-manager-setup-2)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-2)
 - [7 Users Teachers Active](#7-users-teachers-active)
-  - [Fields Provided & Used](#fields-provided--used-3)
+  - [Fields Provided \& Used](#fields-provided--used-3)
   - [Data Export Manager Setup](#data-export-manager-setup-3)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-3)
 - [7 Users Students Inactive](#7-users-students-inactive)
-  - [Fields Provided & Used](#fields-provided--used-4)
+  - [Fields Provided \& Used](#fields-provided--used-4)
   - [Data Export Manager Setup](#data-export-manager-setup-4)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-4)
 - [7 Users Students Active](#7-users-students-active)
-  - [Fields Provided & Used](#fields-provided--used-5)
+  - [Fields Provided \& Used](#fields-provided--used-5)
   - [Data Export Manager Setup](#data-export-manager-setup-5)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-5)
 - [8 Enrollments Teachers](#8-enrollments-teachers)
-  - [Fields Provided & Used](#fields-provided--used-6)
+  - [Fields Provided \& Used](#fields-provided--used-6)
   - [Data Export Manager Setup](#data-export-manager-setup-6)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-6)
 - [8 Enrollments Teachers - School Level](#8-enrollments-teachers---school-level)
-  - [Fields Provided & Used](#fields-provided--used-7)
+  - [Fields Provided \& Used](#fields-provided--used-7)
   - [Data Export Manager Setup](#data-export-manager-setup-7)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-7)
 - [8 Enrollments Learner Support Teachers - School Level](#8-enrollments-learner-support-teachers---school-level)
-  - [Fields Provided & Used](#fields-provided--used-8)
+  - [Fields Provided \& Used](#fields-provided--used-8)
   - [Data Export Manager Setup](#data-export-manager-setup-8)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-8)
 - [8 Enrollments Students Active](#8-enrollments-students-active)
-  - [Fields Provided & Used](#fields-provided--used-9)
+  - [Fields Provided \& Used](#fields-provided--used-9)
   - [Data Export Manager Setup](#data-export-manager-setup-9)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-9)
 - [8 Enrollments Students - School Level](#8-enrollments-students---school-level)
-  - [Fields Provided & Used](#fields-provided--used-10)
+  - [Fields Provided \& Used](#fields-provided--used-10)
   - [Data Export Manager Setup](#data-export-manager-setup-10)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-10)
 - [8 Enrollments Students Active - Dropped Classes](#8-enrollments-students-active---dropped-classes)
-  - [Fields Provided & Used](#fields-provided--used-11)
+  - [Fields Provided \& Used](#fields-provided--used-11)
   - [Data Export Manager Setup](#data-export-manager-setup-11)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-11)
 - [8 Enrollments Parents in Student Classes](#8-enrollments-parents-in-student-classes)
-  - [Fields Provided & Used](#fields-provided--used-12)
+  - [Fields Provided \& Used](#fields-provided--used-12)
   - [Data Export Manager Setup](#data-export-manager-setup-12)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-12)
 - [8 Enrollments Parents in Student Classes - Drop](#8-enrollments-parents-in-student-classes---drop)
-  - [Fields Provided & Used](#fields-provided--used-13)
+  - [Fields Provided \& Used](#fields-provided--used-13)
   - [Data Export Manager Setup](#data-export-manager-setup-13)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-13)
 - [8 Enrollments Students Athletics](#8-enrollments-students-athletics)
-  - [Fields Provided & Used](#fields-provided--used-14)
+  - [Fields Provided \& Used](#fields-provided--used-14)
   - [Data Export Manager Setup](#data-export-manager-setup-14)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-14)
 - [8 Enrollments Parents Athletics](#8-enrollments-parents-athletics)
-  - [Fields Provided & Used](#fields-provided--used-15)
+  - [Fields Provided \& Used](#fields-provided--used-15)
   - [Data Export Manager Setup](#data-export-manager-setup-15)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-15)
 
@@ -642,17 +642,19 @@ Students in any course matching the list below will be associated with an _Audit
 |action| STUDENTS.ID | UPDATE | N1 |
 |username| U_STUDENTSUSERFIELDS.EMAILSTUDENT | _bar@ash.nl_ |
 |org_define_id| STUDENTS.STUDENT_NUMBER | _S\_123456_ |
-|first_name| STUDENTS.FIRST_NAME | _Jane_ |
+|first_name| STUDENTS.FIRST_NAME | _Janette_ |
 |last_name| STUDENTS.LAST_NAME |_Doe_ | 
 |password| STUDENTS.ID | '' | N1 |
 |role_name| STUDENTS.ID | _Learner_ | N1 |
 |relationships| STUDENTS.ID | _Parent:P\_12233\Auditor:T\_12345_ | N1 |
-|pref_frist_name| STUDENTS.ID | '' | N1 |
+|pref_frist_name| STUDENTS.MIDDLE_NAME | _Jane_ | N1, N2 |
 |pref_last_name| STUDENTS.ID | '' | N1 |
 
 **NOTES**
 
 **N1:** Field does not appear in database; use a known field such as `<column column=STUDENT.ID>header<\column>` to prevent an "unknown column error"
+
+**N2:** As of December 2022 the PowerSchool Middle Name field is used for "preferred" names. The preferred name is indicated as `FirstName (PreferredName) LastName`. The preferred name is always surrounded with literal parentheses `()`. The parentheses are stripped of during the report creation.
 
 **Tables Used**
 
