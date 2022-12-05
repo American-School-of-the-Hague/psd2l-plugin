@@ -43,7 +43,7 @@
                     THEN Auditors.Auditors || ''
                     ELSE Auditors.Auditors
                 END AS "relationships",
-                '' as "pref_first_name",
+                regexp_replace(students.middle_name, '[()]+', '') as "pref_first_name",
                 '' as "pref_last_name"
             FROM
                 Students
