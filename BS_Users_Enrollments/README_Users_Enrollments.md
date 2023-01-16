@@ -769,7 +769,7 @@ SELECT
         WHEN Auditors.Auditors IS NOT NULL AND Parents.Parents IS NOT NULL
         THEN Auditors.Auditors || '|' || Parents.Parents
         ELSE COALESCE(Auditors.Auditors,Parents.Parents)
-    END AS "relationship",
+    END AS "relationships",
     '' as "pref_first_name",
     '' as "pref_last_name"
 FROM
@@ -1245,9 +1245,9 @@ If the drops are run last, the end result will be that the enrolment from step *
 
 ## 8 Enrollments Parents in Student Classes
 
-Enrol parents in classes as view-only members of their children's classes.
+Enrol Mothers and Fathers in classes as view-only members of their children's current classes. Current courses are considered courses that have a terms.firstday that is equal to today or earlier.
 
-Enrol parents into current courses. Current courses are considered courses that have a terms.firstday that is equal to today or earlier.
+Only `guardianstudent.guardianrelationshiptypeid` equal to 10 or 20 (mother/father) will be considered. As of Jan 2023 it is only possible to reliably create parent/guaridan accounts for guaridans that appear on the Office/Admin screen under mother/father fields. See [7 Users Parents Active](#7-users-parents-active) for more details.
 
 PowerSchool does not track enrolment changes prior to the first day of classes. This means that the queries that track DROPs return no data. This results in erroneous student/parent enrolments that have to be tidied up after school starts.
 

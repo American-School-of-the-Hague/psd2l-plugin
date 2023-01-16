@@ -56,6 +56,17 @@
                 and GUARDIANSTUDENT.GUARDIANID=GUARDIAN.GUARDIANID
                 and STUDENTS.ENROLL_STATUS =0
                 and STUDENTS.GRADE_LEVEL >=5
+                /*
+                Explicitly only include guardianstudent.guardianrelationshiptypeid
+                of type 10, 20.
+                
+                As of Jan 2023 we can only reliably create parent accounts that appear on the 
+                Admissions Screen in PowerSchool SIS under the mother/father contact details.
+                
+                It may be possible to improve this when moving to the PS SIS Contacts feature
+
+                */
+                and guardianstudent.guardianrelationshiptypeid in(10, 20)
                 and CC.TERMID >= case 
                     when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
                     THEN (EXTRACT(year from sysdate)-2000+9)*100
@@ -67,7 +78,7 @@
                 This prevents adding enrolments changes that are not tracked by powerschool; 
                 changes are only tracked on or after the first day of the course.
                 */
-                and trunc(terms.firstday) <= trunc(sysdate)    
+                and trunc(terms.firstday) <= trunc(sysdate)
 
             order by 
                 "child_code" ASC,
