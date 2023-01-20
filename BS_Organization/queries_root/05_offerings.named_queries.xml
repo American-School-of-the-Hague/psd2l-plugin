@@ -38,7 +38,7 @@
                 'co_'||cc.schoolid||'_'||cc.course_number||'_'||cc.termid as "code",
                 c.course_name||' ('||terms.abbreviation||')' as "name",
                 TERMS.FIRSTDAY as "start_date",
-                TERMS.LASTDAY as "end_date",
+                TERMS.LASTDAY + 1 as "end_date",
                 /* set courses as inactive by default */
                 1 as "is_active",
                 '' as "department_code",
