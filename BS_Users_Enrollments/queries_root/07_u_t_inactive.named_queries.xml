@@ -28,7 +28,7 @@
                 Deactivate teachers with departure dates less than 181 days
                 Delete teachers with transaction dates greaterthan or equal to 181
 
-                The interval here should be exactly equal to the value used below
+                The interval here should be exactly one day less than the value used below
                 in the `WHERE` clause
                 */
                 case 
@@ -89,7 +89,7 @@
                 the value here should be equal exactly to the value in the 'action'
                 field
                 */
-                and sysdate - schoolstaff.transaction_date < to_dsinterval('181 00:00:00')
+                and sysdate - schoolstaff.transaction_date < to_dsinterval('182 00:00:00')
             ]]>
         </sql>
     </query>
