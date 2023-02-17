@@ -30,28 +30,22 @@
 
             */
             -- 08_e_t_ls_eal_school enrol teachers in home schools
-            select DISTINCT
+            select distinct
                 'enrollment' as "type",
                 'UPDATE' as "action",
-                'T_'||users.TEACHERNUMBER as "child_code",
+                'T_'||teachers.TEACHERNUMBER as "child_code",
                 'Learner' as "role_name",   
                 '0_LS' as "parent_code"
             from 
-                users users,
-                schoolstaff schoolstaff,
-                courses courses,
-                cc cc
-            where 
-                SCHOOLSTAFF.USERS_DCID=USERS.DCID
-                and courses.course_number = cc.course_number
-                and cc.teacherid = schoolstaff.id
-
-                /* Ignore all users with no email address */
-                AND LENGTH(users.EMAIL_ADDR) > 0
-                /* only active staff */
-                and schoolstaff.status=1
+                teachers teachers
+                inner join sectionteacher on sectionteacher.teacherid = teachers.id
+                inner join cc on cc.sectionid = sectionteacher.sectionid
+                inner join students on students.id = cc.studentid
+                inner join courses on courses.course_number = cc.course_number
                 
-                and ( 
+            where     
+                students.enroll_status = 0
+                and  (
                     /* 
                     English Essentials, English Foundations, English for Accademic Purposes
                     courses are in the MS/HS English Department, but service
@@ -71,14 +65,15 @@
                     or lower(courses.sched_department) in('mseal', 'mslsc', 'msse')
                     or lower(courses.sched_department) in('hseal', 'hslsc', 'hsse')
                 )
+                -- only the current term
                 and CC.TERMID >= case 
                     when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
                     THEN (EXTRACT(year from sysdate)-2000+9)*100
                     when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
                     THEN (EXTRACT(year from sysdate)-2000+10)*100
-                end
-            order by 
-                "child_code" asc
+                end 
+                order by
+                    "child_code" asc
             ]]>
         </sql>
     </query>

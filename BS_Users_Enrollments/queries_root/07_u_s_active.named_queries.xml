@@ -58,9 +58,11 @@
                             CC.StudentID,
                             Teachers.TeacherNumber
                         FROM
-                            CC
-                            JOIN Courses ON CC.Course_Number = Courses.Course_Number
-                            JOIN Teachers ON CC.TeacherID = Teachers.ID
+                            teachers teachers
+                            inner join sectionteacher on sectionteacher.teacherid = teachers.id
+                            inner join cc on cc.sectionid = sectionteacher.sectionid
+                            inner join students on students.id = cc.studentid
+                            inner join courses on courses.course_number = cc.course_number                
                         WHERE
                             ( 
                                 /* 
