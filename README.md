@@ -1,33 +1,102 @@
 <!-- omit in toc -->
+
 # D2L BrightSpace IPSIS exports from PowerSchool SIS
 
 Feb-June 2022 : Aaron Ciuffo : aciuffo@ash.nl : aaron.ciuffo@gmail.com
-- [To Do](#to-do)
-- [Implementation Notes](#implementation-notes)
-  - [Important Implementation Choices](#important-implementation-choices)
-    - [Parents](#parents)
-    - [ASH Staff/Parents](#ash-staffparents)
-- [PowerSchool Setup and Installation](#powerschool-setup-and-installation)
-  - [SIS Installation](#sis-installation)
-  - [Data Export Manager Configuration](#data-export-manager-configuration)
-- [Automated Exports from PSL to BrightSpace](#automated-exports-from-psl-to-brightspace)
-  - [IPSIS Upload](#ipsis-upload)
-- [List of Plugins and Functions](#list-of-plugins-and-functions)
-- [Plugin Errors & Resolutions](#plugin-errors--resolutions)
-  - [Data Export Manager](#data-export-manager)
-- [Plugin Documentation](#plugin-documentation)
-  - [Updating a Plugin](#updating-a-plugin)
-- [Reference Documentation](#reference-documentation)
-  - [Basic PowerQuery Plugin Structure](#basic-powerquery-plugin-structure)
-- [IPSIS Import Errors and Solutions](#ipsis-import-errors-and-solutions)
-  - [Course Offerings](#course-offerings)
-  - [Users](#users)
+- [D2L BrightSpace IPSIS exports from PowerSchool SIS](#d2l-brightspace-ipsis-exports-from-powerschool-sis)
+  - [To Do](#to-do)
+  - [Additional Tools](#additional-tools)
+    - [Package PowerQuery Plugins](#package-powerquery-plugins)
+    - [SFTP Script for PowerSchool Server](#sftp-script-for-powerschool-server)
+    - [Comparison and Validation Script](#comparison-and-validation-script)
+  - [Implementation Notes](#implementation-notes)
+    - [Important Implementation Choices](#important-implementation-choices)
+      - [Parents](#parents)
+      - [ASH Staff/Parents](#ash-staffparents)
+  - [PowerSchool Setup and Installation](#powerschool-setup-and-installation)
+    - [SIS Installation](#sis-installation)
+    - [Data Export Manager Configuration](#data-export-manager-configuration)
+  - [Automated Exports from PSL to BrightSpace](#automated-exports-from-psl-to-brightspace)
+    - [IPSIS Upload](#ipsis-upload)
+  - [List of Plugins and Functions](#list-of-plugins-and-functions)
+  - [Plugin Errors \& Resolutions](#plugin-errors--resolutions)
+    - [Data Export Manager](#data-export-manager)
+  - [Plugin Documentation](#plugin-documentation)
+    - [Updating a Plugin](#updating-a-plugin)
+  - [Reference Documentation](#reference-documentation)
+    - [Basic PowerQuery Plugin Structure](#basic-powerquery-plugin-structure)
+  - [IPSIS Import Errors and Solutions](#ipsis-import-errors-and-solutions)
+    - [Course Offerings](#course-offerings)
+    - [Users](#users)
+
+*****
 
 ## To Do
 
-* Add parent-student associations
-  * allows parents to see grades, etc.
-  * depends on moving to contacts module and use of guardian tables in powerschool see [Parents](#parents) section below for details.
+- [ ] Add parent-student associations
+  - [ ] allows parents to see grades, etc.
+  - [ ] depends on moving to contacts module and use of guardian tables in powerschool see [Parents](#parents) section below for details.
+
+*****
+
+## Additional Tools
+
+Several tools are provided by this repo to help package PowerQuery plugins and manage IPSIS imports.
+
+### Package PowerQuery Plugins
+
+`package.sh`: create a .zip file that is appropriately structured for upload into PowerSchool's plugin interface. The script will append the current version sourced from the version string in `PackageDir/plugin.xml` and the date and time.
+
+**Usage:**
+
+`package.sh /path/to/directory`
+
+Example
+
+```shell
+$ ./package.sh BS_Organization
+~/Documents/src/PowerQuery/BS_Organization ~/Documents/src/PowerQuery
+  adding: permissions_root/ (stored 0%)
+  adding: permissions_root/05_offerings.permission_mappings.xml (deflated 33%)
+  adding: permissions_root/02_departments.permission_mappings.xml (deflated 33%)
+  adding: permissions_root/05_offerings_ath.permission_mappings.xml (deflated 33%)
+  adding: permissions_root/01_template.permission_mappings.xml (deflated 33%)
+  adding: permissions_root/04_templates.permission_mappings.xml (deflated 33%)
+  adding: permissions_root/06_sections.permission_mappings.xml (deflated 33%)
+  adding: permissions_root/03_semesters.permission_mappings.xml (deflated 33%)
+  adding: plugin.xml (deflated 39%)
+  adding: queries_root/ (stored 0%)
+  adding: queries_root/01_template.named_queries.xml (deflated 66%)
+  adding: queries_root/05_offerings_ath.named_queries.xml (deflated 68%)
+  adding: queries_root/05_offerings.named_queries.xml (deflated 68%)
+  adding: queries_root/06_sections.named_queries.xml (deflated 70%)
+  adding: queries_root/04_templates.named_queries.xml (deflated 66%)
+  adding: queries_root/02_departments.named_queries.xml (deflated 65%)
+  adding: queries_root/03_semesters.named_queries.xml (deflated 70%)
+
+CREATED PLUGIN: BS_Organization-V1.2.03-20230227_081756.zip
+```
+
+### SFTP Script for PowerSchool Server
+
+The CSV files created by the PowerSchool Data Export Manager (DEM) need to be sent to D2L via SFTP as a single zip file. The .zip file must:
+
+* Be a flat directory with no folders
+* Contain a [`manifest.json`](./manifest.json) file that declares the IPSIS implementation version
+
+The [`run_SFTP_BS.bat`](./run_SFTP_BS.bat) can be run from the Windows OS that hosts the PowerSchool instance as a scheduled job. The script hard-codes the username and password for the D2L SFTP service. The username and password can be found in the [IPSIS configuration screen](https://lms.ash.nl/d2l/im/ipsis/admin/console/integration/3/configuration).
+
+### Comparison and Validation Script
+
+To ensure that an upgrade to the PowerSchool system does not result in major changes to the IPSIS CSV files, the following procedure is recommended:
+
+1. Prior to the PowerSchool upgrade, switch IPSIS integration to *Mode: Validate* from the IPSIS [Administration](https://lms.ash.nl/d2l/im/ipsis/admin/console/integration/3/dashboard) screen.
+2. Obtain an IPSIS .zip file from the day prior to the upgrade **and** the day after the upgrade. The last seven days of IPSIS imports are stored on [pkg.ash.nl/Downloads](sftp://pkg.ash.nl/Downloads). 
+3. Use the [`bspace_comparison.sh`](./bspace_compare.sh) script to compare the two files.
+
+The `bspace_comparison` tool compares two zip files that contain similar sets of IPSIS exports. If any of the archives have a change delta of more than 10%, the file will be flagged. 
+
+In the event a file is flagged, the related export and PowerQuery should be investigated to find the source of the change. 
 
 ## Implementation Notes
 
@@ -37,6 +106,7 @@ Each CSV Export for Brightspace is managed through an individual plugin. Each pl
 
 ### Important Implementation Choices
 
+<!-- TOC ignore:True -->
 #### Parents
 
 Parent/Auditor Association in Brightspace cannot be used as of May 2022. 
@@ -47,6 +117,7 @@ The work around is to break the parent/auditor association and rely only on pare
 
 In the future, once ASH moves to the "contacts" feature in PowerSchool SIS, parents can reliably pulled from the database and parent associations can be crated.
 
+e <!-- TOC ignore:True -->
 #### ASH Staff/Parents
 
 ASH staff that are also parents may not be able to sign using the Google SSO if they use their @ash.nl address as their contact email address in PowerSchool.
@@ -146,6 +217,7 @@ Files are sent to IPSIS via SFTP. Find SFTP details within the platform [here](h
 ## Plugin Errors & Resolutions
 
 ### Data Export Manager
+
 **SCREEN:** *Data Export Manager > Select/Edit Records from NQ... > Show Records [button]*
 
 **ERROR:** `Unable to execute the query operation due to an invalid parameter. Update your filter values and try again.`
@@ -158,7 +230,6 @@ Files are sent to IPSIS via SFTP. Find SFTP details within the platform [here](h
 
 * Ensure that all `order by` statements in the SQL query are fields that are directly represented in the `select` section. 
 * Entirely remove the `order by` statements -- in some cases this resolves the above error entirely
-
 
 
 **NON FUNCTIONAL EXAMPLE:**
@@ -267,6 +338,7 @@ Sets access permissions for this query plugin. See this [blog post](https://cook
 ```
 
 ## IPSIS Import Errors and Solutions
+
 ### Course Offerings
 
 **ERROR:** *Course Offerings.Parent org unit mapping not found*
