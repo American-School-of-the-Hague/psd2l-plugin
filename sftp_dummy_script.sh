@@ -11,7 +11,7 @@ ZIPFILE="C:\BrightSpace\export.zip"
 MANIFESTJSON='{ "version":"2.0" }'
 MANIFESTFILE="manifest.json"
 SFTPSITE="sftp://eu01pipsissftp.brightspace.com"
-SFTPUSER="sftp-ash-0a8b"
+SFTPUSER="sftp-0x-deadbeef"
 SFTPPASS="enter password here"
 
 
