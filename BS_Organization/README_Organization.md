@@ -4,35 +4,35 @@ PowerQuery Plugin for exporting the following information from PowerSchool &rarr
 
 - [BrightSpace D2L Organization Plugin](#brightspace-d2l-organization-plugin)
   - [1 Other](#1-other)
-    - [Fields Provided & Used](#fields-provided--used)
+    - [Fields Provided \& Used](#fields-provided--used)
     - [Data Export Manager Setup](#data-export-manager-setup)
     - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml)
   - [2 Departments](#2-departments)
-    - [Fields Provided & Used](#fields-provided--used-1)
+    - [Fields Provided \& Used](#fields-provided--used-1)
     - [Data Export Manager Setup](#data-export-manager-setup-1)
     - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-1)
   - [3 Semesters](#3-semesters)
-    - [Fields Provided & Used](#fields-provided--used-2)
+    - [Fields Provided \& Used](#fields-provided--used-2)
     - [Data Export Manager Setup](#data-export-manager-setup-2)
     - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-2)
   - [4 Templates](#4-templates)
-    - [Fields Provided & Used](#fields-provided--used-3)
+    - [Fields Provided \& Used](#fields-provided--used-3)
     - [Data Export Manager Setup](#data-export-manager-setup-3)
     - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-3)
   - [5 Offerings](#5-offerings)
-    - [Fields Provided & Used](#fields-provided--used-4)
+    - [Fields Provided \& Used](#fields-provided--used-4)
     - [Data Export Manager Setup](#data-export-manager-setup-4)
     - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-4)
   - [5 Athletic Offerings](#5-athletic-offerings)
-    - [Fields Provided & Used](#fields-provided--used-5)
+    - [Fields Provided \& Used](#fields-provided--used-5)
     - [Data Export Manager Setup](#data-export-manager-setup-5)
     - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-5)
   - [6 Sections](#6-sections)
-    - [Fields Provided & Used](#fields-provided--used-6)
+    - [Fields Provided \& Used](#fields-provided--used-6)
     - [Data Export Manager Setup](#data-export-manager-setup-6)
     - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-6)
   - [6 Delete Sections UNUSED](#6-delete-sections-unused)
-    - [Fields Provided & Used](#fields-provided--used-7)
+    - [Fields Provided \& Used](#fields-provided--used-7)
     - [Data Export Manager Setup](#data-export-manager-setup-7)
     - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-7)
 
@@ -73,7 +73,7 @@ PowerQuery Plugin for exporting the following information from PowerSchool &rarr
 **Export Summary and Output Options**
 
 - *Export File Name:* `1-Other-%d.csv`
-- *Line Delimiter:* `CR-LF`
+- *Line Delimiter:* `LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
 - *Include Column Headers:* `True`
@@ -145,7 +145,7 @@ PowerQuery Plugin for exporting the following information from PowerSchool &rarr
 **Export Summary and Output Options**
 
 - *Export File Name:* `2-Departments-%d.csv`
-- *Line Delimiter:* `CR-LF`
+- *Line Delimiter:* `LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
 - *Include Column Headers:* `True`
@@ -218,7 +218,7 @@ PowerQuery Plugin for exporting the following information from PowerSchool &rarr
 **Export Summary and Output Options**
 
 - *Export File Name:* `3-Semesters-%d.csv`
-- *Line Delimiter:* `CR-LF`
+- *Line Delimiter:* `LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
 - *Include Column Headers:* `True`
@@ -294,7 +294,7 @@ PowerQuery Plugin for exporting the following information from PowerSchool &rarr
 **Export Summary and Output Options**
 
 - *Export File Name:* `4-Templates-%d.csv`
-- *Line Delimiter:* `CR-LF`
+- *Line Delimiter:* `LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
 - *Include Column Headers:* `True`
@@ -369,7 +369,7 @@ PowerQuery Plugin for exporting the following information from PowerSchool &rarr
 **Export Summary and Output Options**
 
 - *Export File Name:* `5-Offerings_500-%d.csv`
-- *Line Delimiter:* `CR-LF`
+- *Line Delimiter:* `LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
 - *Include Column Headers:* `True`
@@ -444,7 +444,7 @@ PowerQuery Plugin for exporting the following information from PowerSchool &rarr
 **Export Summary and Output Options**
 
 - *Export File Name:* `5-Offerings_501_Ath-%d.csv`
-- *Line Delimiter:* `CR-LF`
+- *Line Delimiter:* `LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
 - *Include Column Headers:* `True`
@@ -520,7 +520,7 @@ PowerQuery Plugin for exporting the following information from PowerSchool &rarr
 **Export Summary and Output Options**
 
 - *Export File Name:* `6-Sections-%d.csv`
-- *Line Delimiter:* `CR-LF`
+- *Line Delimiter:* `LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
 - *Include Column Headers:* `True`
@@ -600,7 +600,7 @@ Delete sections from previous school year. This query will clean out sections th
 **Export Summary and Output Options**
 
 - *Export File Name:* `6-Sections_Delete-%d.csv`
-- *Line Delimiter:* `CR-LF`
+- *Line Delimiter:* `LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
 - *Include Column Headers:* `True`

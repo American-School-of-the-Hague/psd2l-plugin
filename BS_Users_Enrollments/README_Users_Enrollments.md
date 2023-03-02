@@ -133,7 +133,7 @@ Parents are queued for deletion on the 364th day after their children are marked
 - *Export File Name:* 
   - `7-Users_000_mother_inactive-%d.csv`
   - `7-Users_001_father_inactive-%d.csv`
-- *Line Delimiter:* `CR-LF`
+- *Line Delimiter:* `LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
 - *Include Column Headers:* `True`
@@ -226,7 +226,7 @@ There are two separate Named Queries (NQ) for parents, one for mother and one fo
 - *Export File Name:* 
   - `7-Users_002_mother_active-%d.csv`
   - `7-Users_003_father_active-%d.csv`
-- *Line Delimiter:* `CR-LF`
+- *Line Delimiter:* `LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
 - *Include Column Headers:* `True`
@@ -385,7 +385,7 @@ Disable and delete accounts for teachers that are no longer active.
 **Export Summary and Output Options**
 
 - *Export File Name:* `7-Users_100_teachers_inactive-%d.csv`
-- *Line Delimiter:* `CR-LF`
+- *Line Delimiter:* `LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
 - *Include Column Headers:* `True`
@@ -454,7 +454,7 @@ All active staff staff added to ORG (6066) as "Instructor"
 **Export Summary and Output Options**
 
 - *Export File Name:* `7-Users_101_teachers_active-%d.csv`
-- *Line Delimiter:* `CR-LF`
+- *Line Delimiter:* `LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
 - *Include Column Headers:* `True`
@@ -532,7 +532,7 @@ Students are marked as inactive when their powerschool students.enroll_status !=
 **Export Summary and Output Options**
 
 - *Export File Name:* `7-Users_200_students_inactive-%d.csv`
-- *Line Delimiter:* `CR-LF`
+- *Line Delimiter:* `LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
 - *Include Column Headers:* `True`
@@ -627,7 +627,7 @@ Students in any course matching the list below will be associated with an _Audit
 **Export Summary and Output Options**
 
 - *Export File Name:* `7-Users_201_students_active.csv`
-- *Line Delimiter:* `CR-LF`
+- *Line Delimiter:* `LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
 - *Include Column Headers:* `True`
@@ -860,7 +860,7 @@ None
 **Export Summary and Output Options**
 
 - *Export File Name:* `8-Enrollments_100_teachers-%d.csv`
-- *Line Delimiter:* `CR-LF`
+- *Line Delimiter:* `LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
 - *Include Column Headers:* `True`
@@ -931,7 +931,7 @@ This needs to be run prior to the individual course enrollments
 **Export Summary and Output Options**
 
 - *Export File Name:* `8-Enrollments_101_teachers_school-%d.csv`
-- *Line Delimiter:* `CR-LF`
+- *Line Delimiter:* `LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
 - *Include Column Headers:* `True`
@@ -1008,7 +1008,7 @@ Teachers of any course matching the list below will be provided access to the _A
 **Export Summary and Output Options**
 
 - *Export File Name:* `8-Enrollments_102_teachers_ls_eal_school-%d.csv`
-- *Line Delimiter:* `CR-LF`
+- *Line Delimiter:* `LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
 - *Include Column Headers:* `True`
@@ -1073,7 +1073,7 @@ None
 **Export Summary and Output Options**
 
 - *Export File Name:* `8-Enrollments_205_students-%d.csv`
-- *Line Delimiter:* `CR-LF`
+- *Line Delimiter:* `LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
 - *Include Column Headers:* `True`
@@ -1135,7 +1135,7 @@ Enrols students at the school level matching their powerschool schoolid value. A
 **Export Summary and Output Options**
 
 - *Export File Name:* `8-Enrollments_201_students_school-%d.csv`
-- *Line Delimiter:* `CR-LF`
+- *Line Delimiter:* `LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
 - *Include Column Headers:* `True`
@@ -1211,7 +1211,7 @@ If the drops are run last, the end result will be that the enrolment from step *
 **Export Summary and Output Options**
 
 - *Export File Name:* `8-Enrollments_200_students_dropped-%d.csv`
-- *Line Delimiter:* `CR-LF`
+- *Line Delimiter:* `LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
 - *Include Column Headers:* `True`
@@ -1285,7 +1285,7 @@ PowerSchool does not track enrolment changes prior to the first day of classes. 
 **Export Summary and Output Options**
 
 - *Export File Name:* `8-Enrollments_301_parent_auditors-%d.csv`
-- *Line Delimiter:* `CR-LF`
+- *Line Delimiter:* `LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
 - *Include Column Headers:* `True`
@@ -1363,7 +1363,7 @@ If the drops are run last, the end result will be that the enrolment from step *
 **Export Summary and Output Options**
 
 - *Export File Name:* `8-Enrollments_300_parent_auditors_drops-%d.csv`
-- *Line Delimiter:* `CR-LF`
+- *Line Delimiter:* `LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
 - *Include Column Headers:* `True`
@@ -1433,7 +1433,7 @@ If the drops are run last, the end result will be that the enrolment from step *
 **Export Summary and Output Options**
 
 - *Export File Name:* `8-Enrollments_202_students_athletics-%d.csv`
-- *Line Delimiter:* `CR-LF`
+- *Line Delimiter:* `LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
 - *Include Column Headers:* `True`
@@ -1503,7 +1503,7 @@ Enrol parents in all athletics classes using the read-only parent role
 **Export Summary and Output Options**
 
 - *Export File Name:* `8-Enrollments_302_parents_athletics-%d.csv`
-- *Line Delimiter:* `CR-LF`
+- *Line Delimiter:* `LF`
 - *Field Delimiter:* `,`
 - *Character Set:* `UTF-8`
 - *Include Column Headers:* `True`

@@ -32,7 +32,7 @@ Powerschool &rarr; BrightSpace CSV x for 00-xx
 #### Export Format
 
 - *Export File Name:* `BASE_PLUGIN.csv`
-- *Line Delimiter:* `CR-LF`
+- *Line Delimiter:* `LF`
 - *Field Delimiter:* `,`
 - *Character Set:* TBD
 
