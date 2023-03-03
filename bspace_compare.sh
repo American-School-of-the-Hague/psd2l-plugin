@@ -4,14 +4,30 @@
 # Script will alert to differences greater than 10% between old and new files
 # Usage: bspace_compare ZipOne.zip ZipTwo.zip
 
-set -e
+# set -e
 
 VERSION="Version 2.0_2023.03.02"
-
 DELTA_THRESHOLD=5
+
+
+if [ -z $1 ] || [ -z $2 ]
+then
+  echo "Compare two PowerSchool - Brightspace exports for consistency. 
+  Files with more than $DELTA_THRESHOLD% change in total lines, or 
+  $DELTA_THRESHOLD% changed records will be flagged.
+  "
+  echo $VERSION
+  echo "No argumnets provided. Usage:
+  $0 OLD.zip NEW.zip"
+  exit 0
+fi
+
+
 
 OLD_ZIP=$1
 NEW_ZIP=$2
+
+
 
 TEMP_DIR=$(mktemp -d)
 echo $TEMP_DIR
@@ -30,6 +46,9 @@ mkdir -p $NEW
 echo "decompressing into $TEMP_DIR"
 unzip -q -o -d ${OLD} ${OLD_ZIP}
 unzip -q -o -d ${NEW} ${NEW_ZIP}
+
+echo "Stripping MS DOS line endings"
+find $TEMP_DIR -type file -name "*.csv" -exec sed -i '' 's/\r$//g' {} \;
 
 echo "Comparing CSVs from $(basename $OLD_ZIP) and $(basename $NEW_ZIP)
 "
@@ -73,12 +92,29 @@ do
 
     if [[ $MATCH -gt 0 ]] 
     then
+
+      echo "checking $NEW_FN"
+
       # pop the matching item from the NEW_LIST
       unset NEW_LIST["$j"]
       
       # total number of lines in old and new file
       OLD_LINES=$(cat $OLD_PATH | wc -l)
       NEW_LINES=$(cat $NEW_MATCH_PATH | wc -l)
+
+      
+
+      if [ $OLD_LINES -lt 1 ] || [ $NEW_LINES -lt 1 ]
+      then
+        echo "**********WARNING************"
+        echo "ZERO LENGTH FILE DECTECTED! SKIPPING FURTHER CHECKS!"
+        echo "This may be due to a mixture of CR/LF or CR line endings."
+        echo "Exports should be set for LF line endings only!
+        "
+        echo "$OLD_ZIP - $OLD_BASENAME: $OLD_LINES LINES"
+        echo "$NEW_ZIP - $NEW_BASENAME: $NEW_LINES LINES"
+        continue
+      fi
       # difference between the old and new files
       DELTA_LINES=$( echo "scale=0; sqrt(($OLD_LINES - $NEW_LINES)^2)" | bc -l )
       # compare the difference with the "old" file (assuming the old is good)
@@ -94,7 +130,6 @@ do
       # compare the difference with the OLD file
       UNIQUE_PCT_CHANGE=$( echo "scale=3; ($TOTAL_UNIQUE/$COMMON)*100" | bc -l )
 
-      echo "checking $NEW_FN..."
 
       # check the delta percentages for the total number of lines or total uniqueness
       if  (( $(echo "$DELTA_PCT_OLD >= $DELTA_THRESHOLD" |bc -l) || $(echo "$UNIQUE_PCT_CHANGE >= $DELTA_THRESHOLD"|bc -l) ))
@@ -140,4 +175,4 @@ done
 # echo "NO MATCH NEW: ${NEW_LIST[@]}"
 
 # clean up
-rm -rf $TEMP_DIR
+# rm -rf $TEMP_DIR
