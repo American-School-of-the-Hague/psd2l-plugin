@@ -1,43 +1,38 @@
 <!-- omit in toc -->
-
 # D2L BrightSpace IPSIS exports from PowerSchool SIS
 
 Feb-June 2022 : Aaron Ciuffo : aciuffo@ash.nl : aaron.ciuffo@gmail.com
-- [D2L BrightSpace IPSIS exports from PowerSchool SIS](#d2l-brightspace-ipsis-exports-from-powerschool-sis)
-  - [To Do](#to-do)
-  - [Additional Tools](#additional-tools)
-    - [Package PowerQuery Plugins](#package-powerquery-plugins)
-    - [SFTP Script for PowerSchool Server](#sftp-script-for-powerschool-server)
-    - [Comparison and Validation Script](#comparison-and-validation-script)
-  - [Implementation Notes](#implementation-notes)
-    - [Important Implementation Choices](#important-implementation-choices)
-      - [Parents](#parents)
-      - [ASH Staff/Parents](#ash-staffparents)
-  - [PowerSchool Setup and Installation](#powerschool-setup-and-installation)
-    - [SIS Installation](#sis-installation)
-    - [Data Export Manager Configuration](#data-export-manager-configuration)
-  - [Automated Exports from PSL to BrightSpace](#automated-exports-from-psl-to-brightspace)
-    - [IPSIS Upload](#ipsis-upload)
-  - [List of Plugins and Functions](#list-of-plugins-and-functions)
-  - [Plugin Errors \& Resolutions](#plugin-errors--resolutions)
-    - [Data Export Manager](#data-export-manager)
-  - [Plugin Documentation](#plugin-documentation)
-    - [Updating a Plugin](#updating-a-plugin)
-  - [Reference Documentation](#reference-documentation)
-    - [Basic PowerQuery Plugin Structure](#basic-powerquery-plugin-structure)
-  - [IPSIS Import Errors and Solutions](#ipsis-import-errors-and-solutions)
-    - [Course Offerings](#course-offerings)
-    - [Users](#users)
+- [Data Flow and Integration](#data-flow-and-integration)
+- [Additional Tools](#additional-tools)
+  - [Package PowerQuery Plugins](#package-powerquery-plugins)
+  - [SFTP Script for PowerSchool Server](#sftp-script-for-powerschool-server)
+  - [Comparison and Validation Script](#comparison-and-validation-script)
+- [Implementation Notes](#implementation-notes)
+  - [Important Implementation Choices](#important-implementation-choices)
+    - [Parents](#parents)
+    - [ASH Staff/Parents](#ash-staffparents)
+- [PowerSchool Setup and Installation](#powerschool-setup-and-installation)
+  - [SIS Installation](#sis-installation)
+  - [Data Export Manager Configuration](#data-export-manager-configuration)
+- [Automated Exports from PSL to BrightSpace](#automated-exports-from-psl-to-brightspace)
+  - [Important IPSIS Notes](#important-ipsis-notes)
+  - [IPSIS Upload](#ipsis-upload)
+- [List of Plugins and Functions](#list-of-plugins-and-functions)
+- [Plugin Errors \& Resolutions](#plugin-errors--resolutions)
+  - [Data Export Manager](#data-export-manager)
+- [Plugin Documentation](#plugin-documentation)
+  - [Updating a Plugin](#updating-a-plugin)
+- [Reference Documentation](#reference-documentation)
+  - [Basic PowerQuery Plugin Structure](#basic-powerquery-plugin-structure)
+- [IPSIS Import Errors and Solutions](#ipsis-import-errors-and-solutions)
+  - [Course Offerings](#course-offerings)
+  - [Users](#users)
 
 *****
 
-## To Do
+## Data Flow and Integration
 
-- [ ] Add parent-student associations
-  - [ ] allows parents to see grades, etc.
-  - [ ] depends on moving to contacts module and use of guardian tables in powerschool see [Parents](#parents) section below for details.
-
-*****
+Data is exported from PowerSchool SIS (PS) using the Plugin structure and imported to Brightspace using [IPSIS](https://documentation.brightspace.com/EN/integrations/ipsis/admin/about_ipsis.htm). Plugins contain PS/SQL queries and are executed using the Data Export Manager functionality in PS. More information regarding the structure of the plugins can be found below.
 
 ## Additional Tools
 
@@ -181,22 +176,32 @@ The basic settings are as follows:
 
 ## Automated Exports from PSL to BrightSpace
 
-Data is uploaded to Brightspace via the [IPSIS interface](https://lms.ash.nl/d2l/im/ipsis/admin/console/integration/3/dashboard). The data upload is managed from the PowerSchool Windows server using a scheduled task and is executed via a windows BATCH file.
+Data is uploaded to Brightspace via the [IPSIS interface](https://documentation.brightspace.com/EN/integrations/ipsis/admin/about_ipsis.htm). The data upload is managed from the PowerSchool Windows server using a scheduled task and is executed via a windows BATCH file.
 
-* [batch_upload.bat](./Automation/batch_upload.bat)
+* [batch_upload.bat](./Automation/run_SFTP_BS.bat)
 
 The automated uploads should be scheduled at the following times:
-* 07:30
-* 12:00
-* 16:00
-* 19:00
+* 06:00
   
-
-
 The batch file depends on the following software:
 * [Win-SCP](https://winscp.net/eng/download.php)
   * **DO NOT** use the "endurance" setting in Win-SCP; this is incompatible with the IPSIS SFTP server
 * [7-Zip](https://www.7-zip.org/)
+
+### Important IPSIS Notes
+
+Though it is possible to create ORG Units such as Schools, Departments, Templates and Courses by hand within the Brightspace ORG Unit editor interface, IPSIS cannot access these ORG Units. IPSIS maintains its own internal records of ORG Units created and removed based on the imports that are processed vai the IPSIS tool (both by SFTP and web upload). 
+
+This means that creating a School ORG Unit with code 999 manually through the ORG Unit editor **cannot** be referenced an enrollment `.csv` upload (e.g. `08_e_s_school.named_queries.xml`). 
+
+To resolve this, a `.csv` must be uploaded via IPSIS that contains a row that references the new name and code (see below)
+
+`01-Other.csv`
+
+```csv
+action,code,custom_code,department_code,end_date,is_active,name,offering_code,semester_code,start_date,template_code,type
+UPDATE,999,,,,,New School,,,,,school
+```
 
 ### IPSIS Upload
 
