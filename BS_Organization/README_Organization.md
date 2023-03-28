@@ -7,36 +7,42 @@ PowerQuery Plugin for exporting the following information from PowerSchool &rarr
     - [Fields Provided \& Used](#fields-provided--used)
     - [Data Export Manager Setup](#data-export-manager-setup)
     - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml)
-  - [2 Departments](#2-departments)
+  - [1 Other - Parent Schools](#1-other---parent-schools)
     - [Fields Provided \& Used](#fields-provided--used-1)
     - [Data Export Manager Setup](#data-export-manager-setup-1)
     - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-1)
-  - [3 Semesters](#3-semesters)
+  - [2 Departments](#2-departments)
     - [Fields Provided \& Used](#fields-provided--used-2)
     - [Data Export Manager Setup](#data-export-manager-setup-2)
     - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-2)
-  - [4 Templates](#4-templates)
+  - [3 Semesters](#3-semesters)
     - [Fields Provided \& Used](#fields-provided--used-3)
     - [Data Export Manager Setup](#data-export-manager-setup-3)
     - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-3)
-  - [5 Offerings](#5-offerings)
+  - [4 Templates](#4-templates)
     - [Fields Provided \& Used](#fields-provided--used-4)
     - [Data Export Manager Setup](#data-export-manager-setup-4)
     - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-4)
-  - [5 Athletic Offerings](#5-athletic-offerings)
+  - [5 Offerings](#5-offerings)
     - [Fields Provided \& Used](#fields-provided--used-5)
     - [Data Export Manager Setup](#data-export-manager-setup-5)
     - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-5)
-  - [6 Sections](#6-sections)
+  - [5 Athletic Offerings](#5-athletic-offerings)
     - [Fields Provided \& Used](#fields-provided--used-6)
     - [Data Export Manager Setup](#data-export-manager-setup-6)
     - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-6)
-  - [6 Delete Sections UNUSED](#6-delete-sections-unused)
+  - [6 Sections](#6-sections)
     - [Fields Provided \& Used](#fields-provided--used-7)
     - [Data Export Manager Setup](#data-export-manager-setup-7)
     - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-7)
+  - [6 Delete Sections UNUSED](#6-delete-sections-unused)
+    - [Fields Provided \& Used](#fields-provided--used-8)
+    - [Data Export Manager Setup](#data-export-manager-setup-8)
+    - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-8)
 
 ## 1 Other
+
+Create school level org units. Creates/updates schools: 0: District Office, 1: UE, 10: ECC, 2: MS, 2: HS, 5: Transfered Out, 999999: Graduated
 
 ### Fields Provided & Used
 
@@ -106,6 +112,77 @@ PowerQuery Plugin for exporting the following information from PowerSchool &rarr
 |-|
 |SCHOOLS|
 
+
+## 1 Other - Parent Schools
+
+Creates parent schools. Parent schools are special purpose schools that are used for enrolling parents as `Learners`. Parents enrolled with type `Guardian` are not visible to Intelligent Agent tools and do not appear in rosters. To make parents visible to IA tools, they need to appear as `Learners`.
+### Fields Provided & Used
+
+**PROVIDES FIELDS**
+
+- `code` used in [2-Department](#2-departments) as `custom_code` 
+
+|Field |Format |example |
+|:-|:-|:-|
+|`code`| _P\_`SCHOOLS.SCHOOL_NUMBER`_| P_1
+
+### Data Export Manager Setup
+
+- **Category:** Show All
+- **Export From:** `NQ com.txoof.brightspace.org.01other`
+ 
+**Labels Used on Export**
+
+| Label |
+|-|
+|type|
+|action|
+|code|
+|name|
+|start_date|
+|end_date|
+|is_active|
+|department_code|
+|template_code|
+|semester_code|
+|offering_code|
+|custom_code|
+
+**Export Summary and Output Options**
+
+- *Export File Name:* `1-Other_Parent_School-%d.csv`
+- *Line Delimiter:* `LF`
+- *Field Delimiter:* `,`
+- *Character Set:* `UTF-8`
+- *Include Column Headers:* `True`
+- *Surround "field values" in Quotes:* TBD
+
+### Query Setup for `named_queries.xml`
+
+| header | table.field | value | NOTE |
+|-|-|-|-|
+|type| SCHOOLS.ID | _School_ | N1
+|action| SCHOOLS.ID | _UPDATE_ | N1
+|code| 'P_'||SCHOOLS.SCHOOL_NUMBER | _P\_2_ |
+|name| COURSES.SCHED_DEPARTMENT | _ASH Middle School - Parents_ |
+|start_date| SCHOOLS.ID | '' | N1
+|end_date| SCHOOLS.ID | '' | N1
+|is_active| SCHOOLS.ID | '' | N1
+|department_code| SCHOOLS.ID | '' | N1
+|template_code| SCHOOLS.ID | '' | N1
+|semester_code| SCHOOLS.ID | '' | N1
+|offering_code| SCHOOLS.ID | '' | N1
+|custom_code| SCHOOLS.ID | '' | N1
+
+**NOTES**
+
+**N1:** Field does not appear in database; use a known field such as `<column column=STUDENT.ID>header<\column>` to prevent an "unknown column error"
+
+**Tables Used**
+
+| Table |
+|-|
+|SCHOOLS|
 
 
 ## 2 Departments

@@ -1,0 +1,76 @@
+<queries>
+    <!--set name here (also applies to permissions_root-->
+    <query name="com.txoof.brightspace.enroll.08_parents_schl_lrnr" coreTable="students" flattened="false">
+        <!--add description here-->
+        <description>parents as learners in schools</description>
+        <!--number of columns here must match number sql returns-->
+        <columns>
+            <column column="STUDENTS.ID">type</column>
+            <column column="STUDENTS.ID">action</column>
+            <column column="STUDENTS.STUDENT_NUMBER">child_code</column>
+            <column column="STUDENTS.ID">role_name</column>
+            <column column="STUDENTS.SCHOOLID">parent_code</column>
+         </columns>
+        <!--SQL query in format <![CDATA[QUERY]]>-->
+        <sql>
+            <![CDATA[
+             /*
+             Add parents to special school org units as Learners.
+             The schools run parallel to thier children's school enrollment.
+             Adding parents as "Learners" allows intelligent agents to pick
+             them up and auto-enroll in training courses and library courses
+             */
+            -- 08_e_p_school_learners.named_queries.xml
+                select distinct
+                'enrollment' as "type",
+                'UPDATE' as "action",
+                'P_'||GUARDIAN.GUARDIANID as "child_code",
+                'Learner' as "role_name",
+                'P_'||students.schoolid as "parent_code"    
+            from GUARDIAN GUARDIAN,
+                COURSES COURSES,
+                SECTIONS SECTIONS,
+                STUDENTS STUDENTS,
+                CC CC,
+                GUARDIANSTUDENT GUARDIANSTUDENT,
+                TERMS TERMS
+            where GUARDIANSTUDENT.STUDENTSDCID=STUDENTS.DCID
+                and STUDENTS.ID=CC.STUDENTID
+                and CC.SECTIONID=SECTIONS.ID
+                and TERMS.id = cc.termid
+                and SECTIONS.COURSE_NUMBER=COURSES.COURSE_NUMBER
+                and GUARDIANSTUDENT.GUARDIANID=GUARDIAN.GUARDIANID
+                and STUDENTS.ENROLL_STATUS =0
+                and STUDENTS.GRADE_LEVEL >= 5
+                /*
+                Explicitly only include guardianstudent.guardianrelationshiptypeid
+                of type 10, 20.
+                
+                As of Jan 2023 we can only reliably create parent accounts that appear on the 
+                Admissions Screen in PowerSchool SIS under the mother/father contact details.
+                
+                It may be possible to improve this when moving to the PS SIS Contacts feature
+
+                */
+                and guardianstudent.guardianrelationshiptypeid in(10, 20)
+                and CC.TERMID >= case 
+                    when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
+                    THEN (EXTRACT(year from sysdate)-2000+9)*100
+                    when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
+                    THEN (EXTRACT(year from sysdate)-2000+10)*100
+                end
+                /*
+                Only pull courses with firstday that is lessthan or equal to the current date.
+                This prevents adding enrolments changes that are not tracked by powerschool; 
+                changes are only tracked on or after the first day of the course.
+                */
+                and trunc(terms.firstday) <= trunc(sysdate)
+            order by
+                "parent_code" asc
+            
+                
+            ]]>
+        </sql>
+    </query>
+
+</queries>

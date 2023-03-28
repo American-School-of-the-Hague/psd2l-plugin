@@ -61,14 +61,18 @@ PowerQuery Plugin for exporting the following information from PowerSchool &rarr
   - [Fields Provided \& Used](#fields-provided--used-13)
   - [Data Export Manager Setup](#data-export-manager-setup-13)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-13)
-- [8 Enrollments Students Athletics](#8-enrollments-students-athletics)
+- [8 Enrollments Parents - School Level](#8-enrollments-parents---school-level)
   - [Fields Provided \& Used](#fields-provided--used-14)
   - [Data Export Manager Setup](#data-export-manager-setup-14)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-14)
-- [8 Enrollments Parents Athletics](#8-enrollments-parents-athletics)
+- [8 Enrollments Students Athletics](#8-enrollments-students-athletics)
   - [Fields Provided \& Used](#fields-provided--used-15)
   - [Data Export Manager Setup](#data-export-manager-setup-15)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-15)
+- [8 Enrollments Parents Athletics](#8-enrollments-parents-athletics)
+  - [Fields Provided \& Used](#fields-provided--used-16)
+  - [Data Export Manager Setup](#data-export-manager-setup-16)
+  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-16)
 
 ## Important Implementation Notes
 
@@ -894,7 +898,7 @@ None
 
 ## 8 Enrollments Teachers - School Level
 
-Enrols staff at the school level matching their powerschool schoolid value. All staff are added to at least one school as an instructor. This allows creating [Intelligent Agents](https://documentation.brightspace.com/EN/le/intelligent_agents/instructor/create_agent.htm?Highlight=intelligent%20agents) that can be used for auto-enroling teachers into courses such as HS and MS Library.
+Enrolls staff at the school level matching their powerschool schoolid value. All staff are added to at least one school as an instructor. This allows creating [Intelligent Agents](https://documentation.brightspace.com/EN/le/intelligent_agents/instructor/create_agent.htm?Highlight=intelligent%20agents) that can be used for auto-enroling teachers into courses such as HS and MS Library.
 
 This needs to be run prior to the individual course enrollments
 
@@ -1106,10 +1110,9 @@ None
 
 ## 8 Enrollments Students - School Level
 
-Enrols students at the school level matching their powerschool schoolid value. All students are added to at least one school as a learner. This allows creating [Intelligent Agents](https://documentation.brightspace.com/EN/le/intelligent_agents/instructor/create_agent.htm?Highlight=intelligent%20agents) that can be used for auto-enroling students into courses such as HS and MS Library.
+Enrolls students, at the school level matching their powerschool schoolid value. All students are added to at least one school as a learner. This allows creating [Intelligent Agents](https://documentation.brightspace.com/EN/le/intelligent_agents/instructor/create_agent.htm?Highlight=intelligent%20agents) that can be used for auto-enroling students into courses such as HS and MS Library.
 
-<!-- This should to be run prior to the individual course enrollments.  -->
-
+This should to be run prior to the individual course enrollments.
 ### Fields Provided & Used
 
 **USES FIELDS:**
@@ -1396,6 +1399,80 @@ If the drops are run last, the end result will be that the enrolment from step *
 |CC|
 |SECTIONS|
 |GUARDIANSTUDENT|
+
+## 8 Enrollments Parents - School Level
+
+Enrolls all parents for all students at the school level matching their childrens' schoolid values. All parents are added to at least one special parent school as a `Learner`. This allows creating [Intelligent Agents](https://documentation.brightspace.com/EN/le/intelligent_agents/instructor/create_agent.htm?Highlight=intelligent%20agents) that can be used for auto-enrolling parents into courses such as HS and MS Library.
+
+This needs to be run prior to the individual course enrollments.
+
+**NOTE:** Parents are added to special parallel schools with the codes P_1: UE, P_10: ECC, P_2: MS, P_3: HS. These values are parallel to the student school values (P_10:10, P_1:1, P_2:P_2, P_3:23). The special schools only contain parents and are held separate from the normal schools. The intention of these schools is to allow Intelligent agents to be run against the `learners` within the school and preform auto-enrollments for training and HS/MS library courses.
+
+As of March 2023, only parents with students in MS or HS are currently enrolled in brightspace and therefore in _Parent_ parallel schools.
+
+### Fields Provided & Used
+
+**PROVIDES FIELDS:**
+
+|Field |Format |example |
+|:-|:-|:-|
+|`child_code`| 'P_'||`students.homeschoolid` | P_2
+
+**USES FIELDS:**
+
+- `org_defined_id` from [07-Users_003_father_active/07-Users_002_mother_active](#7-users-parents-active) as `child_code`
+- `code` from [BS_Organization/01-Other_Parent_School](../BS_Organization/README_Organization.md/#1-other---parent-schools)
+
+### Data Export Manager Setup
+
+- **Category:** Show All
+- **Export From:**  `NQ com.txoof.brightspace.enroll.08_parents_schl_lrnr`
+
+**Labels Used on Export**
+
+| Label |
+|-|
+|type|
+|action|
+|child_code|
+|role_name|
+|parent_code|
+
+**Export Summary and Output Options**
+
+- *Export File Name:* `8-Enrollments_302_parents_school_learner-%d.csv`
+- *Line Delimiter:* `LF`
+- *Field Delimiter:* `,`
+- *Character Set:* `UTF-8`
+- *Include Column Headers:* `True`
+- *Surround "field values" in Quotes:* TBD
+
+### Query Setup for `named_queries.xml`
+
+- File: `08_e_p_school_learners.named_queries.xml`
+
+| header | table.field | value | NOTE |
+|-|-|-|-|
+|type| STUDENTS.ID | _enrollment_ | N1
+|action| STUDENTS.ID | _UPDATE_ | N1
+|child_code| 'P_'||GUARDIAN.GUARDIANID | _T\_878765_
+|role_name| STUDENTS.ID | _Learner_ | N1
+|parent_code| STUDENTS.SCHOOLID | _P\_2_ 
+
+**NOTES**
+
+**N1:** Field does not appear in database; use a known field such as `<column column=STUDENT.ID>header<\column>` to prevent an "unknown column error"
+
+**Tables Used**
+
+| Table |
+|-|
+|guardian|
+|sections|
+|students|
+|cc|
+|guardianstudent|
+|terms|
 
 ## 8 Enrollments Students Athletics
 
