@@ -129,7 +129,7 @@ Creates parent schools. Parent schools are special purpose schools that are used
 ### Data Export Manager Setup
 
 - **Category:** Show All
-- **Export From:** `NQ com.txoof.brightspace.org.01other`
+- **Export From:** `NQ com.txoof.brightspace.org.01other_parents`
  
 **Labels Used on Export**
 
