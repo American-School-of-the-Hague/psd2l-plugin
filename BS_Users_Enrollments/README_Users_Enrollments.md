@@ -145,9 +145,9 @@ Parents are queued for deletion on the 364th day after their children are marked
 
 ### Query Setup for `named_queries.xml`
 
-- File: `07_u_m_inactive.named_queries.xml`
-- File: `07_u_f_inactive.named_queries.xml`
-- 
+- File: [`07_u_m_inactive.named_queries.xml`](./queries_root/07_u_m_inactive.named_queries.xml)
+- File: [`07_u_f_inactive.named_queries.xml`](./queries_root/07_u_f_inactive.named_queries.xml)
+  
 | header | table.field | value | NOTE |
 |-|-|-|-|
 |type| STUDENT.ID | user | N1, N2 |
@@ -237,8 +237,8 @@ There are two separate Named Queries (NQ) for parents, one for mother and one fo
 
 ### Query Setup for `named_queries.xml`
 
-- File: `07_u_m_active.named_queries.xml`
-- File: `07_u_f_active.named_queries.xml`
+- File: [`07_u_m_active.named_queries.xml`](./queries_root/07_u_m_active.named_queries.xml)
+- File: [`07_u_f_active.named_queries.xml`](./queries_root/07_u_f_active.named_queries.xml)
 
 | header | table.field | value | NOTE |
 |-|-|-|-|
@@ -397,7 +397,7 @@ Disable and delete accounts for teachers that are no longer active.
 
 ### Query Setup for `named_queries.xml`
 
-- File: 07_u_t_inactive.named_queries.xml
+- File: [`07_u_t_inactive.named_queries.xml`](./queries_root/07_u_t_inactive.named_queries.xml)
 
 | header | table.field | value | NOTE |
 |-|-|-|-|
@@ -466,7 +466,7 @@ All active staff staff added to ORG (6066) as "Instructor"
 
 ### Query Setup for `named_queries.xml`
 
-- File: `07_u_t_active.named_queries.xml`
+- File: [`07_u_t_active.named_queries.xml`](./queries_root/07_u_t_active.named_queries.xml)
 
 | header | table.field | value | NOTE |
 |-|-|-|-|
@@ -544,7 +544,7 @@ Students are marked as inactive when their powerschool students.enroll_status !=
 
 ### Query Setup for `named_queries.xml`
 
-- File: `07_u_s_inactive.named_queries.xml`
+- File: [`07_u_s_inactive.named_queries.xml`](./queries_root/07_u_s_inactive.permission_mappings.xml)
 
 | header | table.field | value | NOTE |
 |-|-|-|-|
@@ -638,7 +638,7 @@ Students in any course matching the list below will be associated with an _Audit
 
 ### Query Setup for `named_queries.xml`
 
-- File: `07_u_s_active.named_queries.xml`
+- File: [`07_u_s_active.named_queries.xml`](./queries_root/07_u_s_active.named_queries.xml)
 
 | header | table.field | value | NOTE |
 |-|-|-|-|
@@ -872,7 +872,7 @@ None
 
 ### Query Setup for `named_queries.xml`
 
-- File: `08_e_t.named_queries.xml`
+- File: [`08_e_t.named_queries.xml`](./queries_root/08_e_t.named_queries.xml)
 
 | header | table.field | value | NOTE |
 |-|-|-|-|
@@ -943,7 +943,8 @@ This needs to be run prior to the individual course enrollments
 
 ### Query Setup for `named_queries.xml`
 
-- File: `08_e_t_school.named_queries.xml`
+- File: [`08_e_t_school.named_queries.xml`](./queries_root/08_e_t_school.named_queries.xml)
+  
 
 | header | table.field | value | NOTE |
 |-|-|-|-|
@@ -1020,7 +1021,7 @@ Teachers of any course matching the list below will be provided access to the _A
 
 ### Query Setup for `named_queries.xml`
 
-- File: `08_e_t_ls_eal_school.named_queries.xml`
+- File: [`08_e_t_ls_eal_school.named_queries.xml`](./queries_root/08_e_t_ls_eal_school.named_queries.xml)
 
 | header | table.field | value | NOTE |
 |-|-|-|-|
@@ -1045,6 +1046,8 @@ Teachers of any course matching the list below will be provided access to the _A
 ## 8 Enrollments Students Active
 
 Enrol students into current courses. Current courses are considered courses that have a terms.firstday that is equal to today or earlier.
+
+Students will only be enrolled in courses that are currently running. No students will be added 
 
 PowerSchool does not track enrolment changes prior to the first day of classes. This means that the queries that track DROPs return no data. This results in erroneous student enrolments that have to be tidied up after school starts.
 
@@ -1145,7 +1148,7 @@ This should to be run prior to the individual course enrollments.
 
 ### Query Setup for `named_queries.xml`
 
-- File: `08_e_t_school.named_queries.xml`
+- File: [`08_e_t_school.named_queries.xml`](./queries_root/08_e_t_school.named_queries.xml)
 
 | header | table.field | value | NOTE |
 |-|-|-|-|
@@ -1449,7 +1452,7 @@ As of March 2023, only parents with students in MS or HS are currently enrolled 
 
 ### Query Setup for `named_queries.xml`
 
-- File: `08_e_p_school_learners.named_queries.xml`
+- File: [`08_e_p_school_learners.named_queries.xml`](./queries_root/08_e_p_school_learners.named_queries.xml)
 
 | header | table.field | value | NOTE |
 |-|-|-|-|
