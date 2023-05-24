@@ -460,7 +460,7 @@ Creates parent schools. Parent schools are special purpose schools that are used
 |code| _'co'\_schoolid\_coursenumber\_termid_ | _co\_3\_ITLDPROG1\_3100_
 |name| C.COURSE_NAME | _IT Programming_ 
 |start_date| CC.ID | '' | N1
-|end_date| CC.ID | '' | N1
+|end_date| CC.ID | _term.lastday_ + 60 | N1
 |is_active| CC.ID | _0_ | N1
 |department_code| CC.ID | '' | N1
 |template_code| CC.ID | '' | N1
