@@ -3,6 +3,8 @@
 PowerQuery Plugin for exporting the following information from PowerSchool &rarr; BrightSpace. This plugin creates the following exports:
 
 - [BrightSpace D2L Organization Plugin](#brightspace-d2l-organization-plugin)
+  - [Notes](#notes)
+    - [SCH Plugins](#sch-plugins)
   - [1 Other](#1-other)
     - [Fields Provided \& Used](#fields-provided--used)
     - [Data Export Manager Setup](#data-export-manager-setup)
@@ -39,6 +41,14 @@ PowerQuery Plugin for exporting the following information from PowerSchool &rarr
     - [Fields Provided \& Used](#fields-provided--used-8)
     - [Data Export Manager Setup](#data-export-manager-setup-8)
     - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-8)
+
+## Notes
+
+### SCH Plugins
+
+`SCH-` versions of named queries pull the same data from PowerSchool, but use the `schedule` versions of the tables. The `schedule` tables contain the non-committed version of the schedule for the following school year. This is typically done by creating an alias from `SCHEDULECC` to `CC` and `SCHEDULETERMS` to `TERMS` unless otherwise noted.
+
+The CSV files produced by the `SCH-` versions should **not ever** be used on the production version of Brightspace. They create departments, semesters, templates and offerings with TEST in the name. These can, however, be safely run on the production side of PowerSchool.
 
 ## 1 Other
 
