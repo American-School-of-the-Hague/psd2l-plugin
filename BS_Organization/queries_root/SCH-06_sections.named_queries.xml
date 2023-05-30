@@ -1,0 +1,102 @@
+<queries>
+    <!--set name here (also applies to permissions_root-->
+    <query name="com.txoof.brightspace.org.sch06sections" coreTable="cc" flattened="false">
+        <!--add description here-->
+        <description>active students</description>
+        <!--number of columns here must match number sql returns-->
+        <columns>
+            <column column="CC.ID">type</column> <!-- for columns not in database use a core filed-->
+            <column column="CC.ID">action</column>
+            <column column="CC.SCHOOLID">code</column>
+            <column column="COURSES.COURSE_NAME">name</column>
+            <column column="CC.ID">start_date</column>
+            <column column="CC.ID">end_date</column>
+            <column column="CC.ID">is_active</column>
+            <column column="CC.ID">department_code</column>
+            <column column="CC.ID">template_code</column>
+            <column column="CC.TERMID">semester_code</column>
+            <column column="CC.ID">offering_code</column>
+            <column column="CC.ID">custom_code</column>			
+         </columns>
+        <!--SQL query in format <![CDATA[QUERY]]>-->
+        <sql>
+            <![CDATA[
+            /*
+            SCH-06_sections.named_queries.xml
+
+            Build sections based on student and teacher schedules to test against the SCHESDULECC table
+            for the following school year
+            */
+            -- 06 SCHEDULE TEST sections
+            select distinct
+                'course section' as "type",
+                'UPDATE' as "action",
+                /*
+                use the following format to ensure that section codes are unique
+                and remain constant even if the teacher is reassigned
+
+                cs_cc.schoolid_cc.course_number_cc.termid_cc.expression_cc.sectionid
+                code: cs_3_SPHYIBS2_3200_D_28636
+                
+                NOTE: X block is added as a place-holder for courses that do not appear on the 
+                schedule such as MS Enrichment, self study IB courses SSST
+                */
+                'cs_'||cc.schoolid||'_'||cc.course_number||'_'||cc.TermID||'_'||DECODE(substr(cc.expression, 1, 1), 
+                1, 'A', 
+                2, 'B', 
+                3, 'C', 
+                4, 'D', 
+                5, 'E', 
+                6, 'F', 
+                7, 'G', 
+                8, 'H', 
+                9, 'ADV',
+                10, 'X',
+                'UNKNOWN')||'_'||cc.sectionid as "code",
+                /*
+                use the following format to ensure that section names are unique 
+                in each class; this will help differentiate sections when splitting classes
+                section names: `SCI IB Physics SL Yr2 - A Block (22-23) Kremer`
+                */
+                c.course_name||' - '||DECODE(substr(cc.expression, 1, 1), 
+                1, 'A', 
+                2, 'B', 
+                3, 'C', 
+                4, 'D', 
+                5, 'E', 
+                6, 'F', 
+                7, 'G', 
+                8, 'H', 
+                9, 'ADV', 
+                10, 'X', 
+                'UNKNOWN')||' Block ('||terms.abbreviation||') '||teachers.last_name as "name",
+                '' as "start_date",
+                '' as "end_date",
+                '' as "is_active",
+                '' as "department_code",
+                '' as "template_code",
+                '' as "semester_code",
+                'co_'||cc.schoolid||'_'||cc.course_number||'_'||cc.TermID as "offering_code",
+                '' as "custom_code"
+            from 
+            students s
+            join schedulecc cc on cc.studentid = s.id
+            join schoolstaff ss on ss.id = cc.teacherid
+            join teachers teachers on teachers.id = cc.teacherid
+            join courses c on c.course_number = cc.course_number,
+            terms terms
+            where
+                terms.id = cc.termid and
+                /* select only courses that are in the current yearid (e.g. 2021-2022 == 3100)*/
+                cc.termid >= case 
+                    when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
+                    THEN (EXTRACT(year from sysdate)-2000+10)*100
+                    when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
+                    THEN (EXTRACT(year from sysdate)-2000+11)*100
+                    end
+            order by "offering_code" desc
+            ]]>
+        </sql>
+    </query>
+
+</queries>

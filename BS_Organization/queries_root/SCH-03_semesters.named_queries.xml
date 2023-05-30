@@ -1,0 +1,85 @@
+<queries>
+    <!--set name here (also applies to permissions_root-->
+    <query name="com.txoof.brightspace.org.sch03semesters" coreTable="terms" flattened="false">
+        <!--add description here-->
+        <description>active students</description>
+        <!--number of columns here must match number sql returns-->
+        <columns>
+            <column column="TERMS.ID">type</column>
+            <column column="TERMS.ID">action</column>
+            <column column="TERMS.ID">code</column>
+            <column column="TERMS.NAME">name</column>
+            <column column="TERMS.FIRSTDAY">start_date</column>
+            <column column="TERMS.LASTDAY">end_date</column>
+            <column column="TERMS.LASTDAY">is_active</column>
+            <column column="TERMS.ID">department_code</column>
+            <column column="TERMS.ID">template_code</column>
+            <column column="TERMS.ID">semester_code</column>
+            <column column="TERMS.ID">offering_code</column>
+            <column column="TERMS.ID">custom_code</column>			
+         </columns>
+        <!--SQL query in format <![CDATA[QUERY]]>-->
+        <sql>
+            <![CDATA[
+            /*
+            SCH-03_semesters.named_queries.xml
+            create/update the current term, semester and quarter IDs 
+
+            This is for testing against the SCHEDULE Tables for the up-comming school year
+
+            PowerSchool uses the year 1990 as the 0 year for the YearID epoch
+            Each accademic school year increments by 100:
+            * 1990-1991: 000
+            * 1991-1992: 100
+            * 2021-2022: 3100
+
+            Each additional term is an increment of 1 to the term id. Terms can be Semesters, quarters, etc.
+            * 2021-2022 Year-Long Classes:    3100
+            * 2021-2022 Semester 1 Classes:   3101
+            * 2021-2022 Semester 2 Classes:   3102
+            * 2021-2022 Quarter 1 Classes:    3103 # Yes, this system is bananas.
+            * 2021-2022 Quarter 2 Classes:    3104 
+            * 2021-2022 Quarter 3 Classes:    3105 
+            * 2021-2022 Quarter 4 Classes:    3106 
+
+            For a school year that begins in August and concludes in June, 
+            use the following algorithm to calculate the current YearID:
+            * current_month >=7 and current_month <=12: (current_year - 1990) * 100 # use july as delimiter to help prepare data prior to August 
+            * current_month >=1 and current_month <=6:  (current_year - 1991) * 100
+
+            */
+            select distinct
+            'semester' as "type",
+            'UPDATE' as "action",
+            'term_TEST_'||TERMS.ID as "code",
+            /*
+            post-pend the school year to the abbreviated term name using the current year and month
+            */
+            CASE 
+                WHEN (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
+                THEN 'TEST '||to_char(EXTRACT(year from sysdate)-0)||'-'||to_char(EXTRACT(year from sysdate)+1)||' '||TERMS.Abbreviation
+            WHEN (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
+                THEN 'TEST '||to_char(EXTRACT(year from sysdate))||'-'||to_char(EXTRACT(year from sysdate)+1)||' '||TERMS.Abbreviation
+            END
+                as "name",
+            '' as "start_date",
+            '' as "end_date",
+            '' as "is_active",
+            '' as "department_code",
+            '' as "template_code",
+            '' as "semester_code",
+            '' as "offering_code",
+            '' as "custom_code"
+            from SCHEDULETERMS TERMS 
+                where TERMS.YEARID = (CASE 
+                WHEN (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
+                THEN EXTRACT(year from sysdate)-2000+10
+                WHEN (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
+                THEN EXTRACT(year from sysdate)-2000+11
+                END)
+            order by "code" asc
+            ]]>
+        </sql>
+    </query>
+
+</queries>
