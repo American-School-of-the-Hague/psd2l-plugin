@@ -48,7 +48,7 @@
 				and CC.COURSE_NUMBER=COURSES.COURSE_NUMBER
 				and CC.TERMID >= case 
 						when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
-						THEN (EXTRACT(year from sysdate)-2000+9)*100
+						THEN (EXTRACT(year from sysdate)-2000+10)*100
 						when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
 						THEN (EXTRACT(year from sysdate)-2000+10)*100
 						end    

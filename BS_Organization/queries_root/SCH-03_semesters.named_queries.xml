@@ -75,7 +75,7 @@
                 WHEN (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
                 THEN EXTRACT(year from sysdate)-2000+10
                 WHEN (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
-                THEN EXTRACT(year from sysdate)-2000+11
+                THEN EXTRACT(year from sysdate)-2000+10
                 END)
             order by "code" asc
             ]]>
