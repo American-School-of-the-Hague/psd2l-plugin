@@ -1,0 +1,71 @@
+<queries>
+    <!--set name here (also applies to permissions_root-->
+    <query name="com.txoof.brightspace.enroll.sch08_students" coreTable="cc" flattened="false">
+        <!--add description here-->
+        <description>enroll active students</description>
+        <!--number of columns here must match number sql returns-->
+        <columns>
+            <column column="CC.ID">type</column>
+            <column column="CC.ID">action</column>
+            <column column="STUDENTS.STUDENT_NUMBER">child_code</column>
+            <column column="CC.ID">role_name</column>
+            <column column="CC.schoolid">parent_code</column>
+         </columns>
+        <!--SQL query in format <![CDATA[QUERY]]>-->
+        <sql>
+            <![CDATA[
+            /*
+            08_e_t.named_queries.xml
+            enroll all  students into sections
+
+            Pull from the tables for the FOLLOWING school year after schedules have been made, but
+            before they are committed
+            
+            */            
+            -- 08_e_s enrol students in sections
+            select distinct
+                'enrollment' as "type",
+                'UPDATE' as "action",
+                /* using 7-Users:org_defined_id as child_code */
+                'S_'||STUDENTS.STUDENT_NUMBER as "child_code",
+                'Learner' as "role_name",
+                /*
+                use the following format to ensure that section codes are unique
+                and remain constant even if the teacher is reassigned
+                code: cs_3_SPHYIBS2_3200_D_28636
+                */
+
+                'cs_'||cc.schoolid||'_'||cc.course_number||'_'||cc.TermID||'_'||DECODE(substr(cc.expression, 1, 1), 
+                1, 'A', 
+                2, 'B', 
+                3, 'C', 
+                4, 'D', 
+                5, 'E', 
+                6, 'F', 
+                7, 'G', 
+                8, 'H', 
+                9, 'ADV', 
+                'UNKNOWN')||'_'||cc.sectionid as "parent_code"
+            from 
+                schedulecc cc
+                join scheduleterms terms on cc.termid = terms.id
+                join schedulesections sections on cc.sectionid = sections.id
+                join students students on students.id = cc.studentid
+                join courses courses on courses.course_number = cc.course_number
+            where
+                students.enroll_status = 0
+                and CC.TERMID >= case 
+                    when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
+                    THEN (EXTRACT(year from sysdate)-2000+10)*100
+                    when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
+                    THEN (EXTRACT(year from sysdate)-2000+11)*100
+                end
+                and students.grade_level >= 5
+            order by 
+                "child_code" asc,
+                "parent_code" asc    
+            ]]>
+        </sql>
+    </query>
+
+</queries>
