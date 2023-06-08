@@ -736,7 +736,7 @@ Delete sections from previous school year. This query will clean out sections th
                 and remain constant even if the teacher is reassigned
                 code: cs_3_SPHYIBS2_3200_D_28636
                 */
-                'cs_'||cc.schoolid||'_'||cc.course_number||'_'||cc.TermID||'_'||DECODE(substr(cc.expression, 1, 1), 
+                'cs_'||cc.schoolid||'_'||cc.course_number||'_'||cc.TermID||'_'||DECODE(regexp_replace(cc.expression, '[^0-9]', ''), 
                 1, 'A', 
                 2, 'B', 
                 3, 'C', 
@@ -745,14 +745,15 @@ Delete sections from previous school year. This query will clean out sections th
                 6, 'F', 
                 7, 'G', 
                 8, 'H', 
-                9, 'ADV', 
-                'UNKNOWN')||'_'||cc.sectionid "code",
+                9, 'ADV',
+                10, 'X',
+                'UNKNOWN')||'_'||cc.sectionid as "code",
                 /*
                 use the following format to ensure that section names are unique 
                 in each class; this will help differentiate sections when splitting classes
                 section names: `SCI IB Physics SL Yr2 - A Block (22-23) Kremer`
                 */
-                c.course_name||' - '||DECODE(substr(cc.expression, 1, 1), 
+                c.course_name||' - '||DECODE(regexp_replace(cc.expression, '[^0-9]', ''), 
                 1, 'A', 
                 2, 'B', 
                 3, 'C', 
@@ -762,7 +763,16 @@ Delete sections from previous school year. This query will clean out sections th
                 7, 'G', 
                 8, 'H', 
                 9, 'ADV', 
+                10, 'X', 
                 'UNKNOWN')||' Block ('||terms.abbreviation||') '||teachers.last_name as "name",
+                '' as "start_date",
+                '' as "end_date",
+                '' as "is_active",
+                '' as "department_code",
+                '' as "template_code",
+                '' as "semester_code",
+                'co_'||cc.schoolid||'_'||cc.course_number||'_'||cc.TermID as "offering_code",
+                '' as "custom_code"
                 '' as "start_date",
                 '' as "end_date",
                 '' as "is_active",
