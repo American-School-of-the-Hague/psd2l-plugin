@@ -37,7 +37,7 @@
                 cs_cc.schoolid_cc.course_number_cc.termid_cc.expression_cc.sectionid
                 code: cs_3_SPHYIBS2_3200_D_28636
                 */
-                'cs_'||cc.schoolid||'_'||cc.course_number||'_'||cc.TermID||'_'||DECODE(substr(cc.expression, 1, 1), 
+                'cs_'||cc.schoolid||'_'||cc.course_number||'_'||cc.TermID||'_'||DECODE(regexp_replace(cc.expression, '[^0-9]', ''), 
                 1, 'A', 
                 2, 'B', 
                 3, 'C', 
@@ -46,14 +46,15 @@
                 6, 'F', 
                 7, 'G', 
                 8, 'H', 
-                9, 'ADV', 
+                9, 'ADV',
+                10, 'X',
                 'UNKNOWN')||'_'||cc.sectionid as "code",
                 /*
                 use the following format to ensure that section names are unique 
                 in each class; this will help differentiate sections when splitting classes
                 section names: `SCI IB Physics SL Yr2 - A Block (22-23) Kremer`
                 */
-                c.course_name||' - '||DECODE(substr(cc.expression, 1, 1), 
+                c.course_name||' - '||DECODE(regexp_replace(cc.expression, '[^0-9]', ''), 
                 1, 'A', 
                 2, 'B', 
                 3, 'C', 
@@ -63,6 +64,7 @@
                 7, 'G', 
                 8, 'H', 
                 9, 'ADV', 
+                10, 'X', 
                 'UNKNOWN')||' Block ('||terms.abbreviation||') '||teachers.last_name as "name",
                 '' as "start_date",
                 '' as "end_date",

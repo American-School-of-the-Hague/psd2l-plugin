@@ -34,7 +34,7 @@
                 */
                 -- at some points during the year the TERMID and SECTIONID values become negative
                 -- use regexp_replace to remove any non-digit characters 
-                'cs_'||cc.schoolid||'_'||cc.course_number||'_'||REGEXP_REPLACE(cc.termid, '\D+', '')||'_'||DECODE(substr(cc.expression, 1, 1), 
+                'cs_'||cc.schoolid||'_'||cc.course_number||'_'||REGEXP_REPLACE(cc.termid, '\D+', '')||'_'||DECODE(regexp_replace(cc.expression, '[^0-9]', ''), 
                 1, 'A', 
                 2, 'B', 
                 3, 'C', 
@@ -43,7 +43,8 @@
                 6, 'F', 
                 7, 'G', 
                 8, 'H', 
-                9, 'ADV', 
+                9, 'ADV',
+                10, 'X', 
                 'UNKNOWN')||'_'||REGEXP_REPLACE(cc.sectionid, '\D+', '') as "parent_code"
             from
                 cc

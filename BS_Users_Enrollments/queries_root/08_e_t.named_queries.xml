@@ -27,10 +27,14 @@
                 /*
                 use the following format to ensure that section codes are unique
                 and remain constant even if the teacher is reassigned
+
+                cs_cc.schoolid_cc.course_number_cc.termid_cc.expression_cc.sectionid
                 code: cs_3_SPHYIBS2_3200_D_28636
+                
+                NOTE: X block is added as a place-holder for courses that do not appear on the 
+                schedule such as MS Enrichment, self study IB courses SSST
                 */
-            
-                'cs_'||cc.schoolid||'_'||cc.course_number||'_'||cc.TermID||'_'||DECODE(substr(cc.expression, 1, 1), 
+                'cs_'||cc.schoolid||'_'||cc.course_number||'_'||cc.TermID||'_'||DECODE(regexp_replace(cc.expression, '[^0-9]', ''), 
                 1, 'A', 
                 2, 'B', 
                 3, 'C', 
@@ -39,7 +43,8 @@
                 6, 'F', 
                 7, 'G', 
                 8, 'H', 
-                9, 'ADV', 
+                9, 'ADV',
+                10, 'X',
                 'UNKNOWN')||'_'||cc.sectionid as "parent_code"
             from TEACHERS TEACHERS,
                 SECTIONTEACHER SECTIONTEACHER,
