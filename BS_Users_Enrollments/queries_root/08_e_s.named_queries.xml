@@ -42,7 +42,7 @@
                 8, 'H', 
                 9, 'ADV',
                 10, 'X',
-                'UNKNOWN')||'_'||cc.sectionid as "parent_code",
+                'UNKNOWN')||'_'||cc.sectionid as "parent_code"
             from 
                 /* U_STUDENTSUSERFIELDS U_STUDENTSUSERFIELDS, */
                 SECTIONS SECTIONS,
