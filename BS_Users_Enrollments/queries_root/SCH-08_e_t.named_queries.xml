@@ -49,7 +49,7 @@
                 8, 'H', 
                 9, 'ADV',
                 10, 'X',
-                'UNKNOWN')||'_'||cc.sectionid as "parent_code",
+                'UNKNOWN')||'_'||cc.sectionid as "parent_code"
             from 
                 schedulecc cc
                 join scheduleterms terms on cc.termid = terms.id
