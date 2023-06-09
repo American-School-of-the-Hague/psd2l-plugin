@@ -41,38 +41,41 @@ PowerQuery Plugin for exporting the following information from PowerSchool &rarr
   - [Fields Provided \& Used](#fields-provided--used-8)
   - [Data Export Manager Setup](#data-export-manager-setup-8)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-8)
-- [8 Enrollments Students Active](#8-enrollments-students-active)
-  - [Fields Provided \& Used](#fields-provided--used-9)
+- [8 Enrollments Teachers - ASH101](#8-enrollments-teachers---ash101)
   - [Data Export Manager Setup](#data-export-manager-setup-9)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-9)
-- [8 Enrollments Students - School Level](#8-enrollments-students---school-level)
-  - [Fields Provided \& Used](#fields-provided--used-10)
+- [8 Enrollments Students Active](#8-enrollments-students-active)
+  - [Fields Provided \& Used](#fields-provided--used-9)
   - [Data Export Manager Setup](#data-export-manager-setup-10)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-10)
-- [8 Enrollments Students Active - Dropped Classes](#8-enrollments-students-active---dropped-classes)
-  - [Fields Provided \& Used](#fields-provided--used-11)
+- [8 Enrollments Students - School Level](#8-enrollments-students---school-level)
+  - [Fields Provided \& Used](#fields-provided--used-10)
   - [Data Export Manager Setup](#data-export-manager-setup-11)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-11)
-- [8 Enrollments Parents in Student Classes](#8-enrollments-parents-in-student-classes)
-  - [Fields Provided \& Used](#fields-provided--used-12)
+- [8 Enrollments Students Active - Dropped Classes](#8-enrollments-students-active---dropped-classes)
+  - [Fields Provided \& Used](#fields-provided--used-11)
   - [Data Export Manager Setup](#data-export-manager-setup-12)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-12)
-- [8 Enrollments Parents in Student Classes - Drop](#8-enrollments-parents-in-student-classes---drop)
-  - [Fields Provided \& Used](#fields-provided--used-13)
+- [8 Enrollments Parents in Student Classes](#8-enrollments-parents-in-student-classes)
+  - [Fields Provided \& Used](#fields-provided--used-12)
   - [Data Export Manager Setup](#data-export-manager-setup-13)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-13)
-- [8 Enrollments Parents - School Level](#8-enrollments-parents---school-level)
-  - [Fields Provided \& Used](#fields-provided--used-14)
+- [8 Enrollments Parents in Student Classes - Drop](#8-enrollments-parents-in-student-classes---drop)
+  - [Fields Provided \& Used](#fields-provided--used-13)
   - [Data Export Manager Setup](#data-export-manager-setup-14)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-14)
-- [8 Enrollments Students Athletics](#8-enrollments-students-athletics)
-  - [Fields Provided \& Used](#fields-provided--used-15)
+- [8 Enrollments Parents - School Level](#8-enrollments-parents---school-level)
+  - [Fields Provided \& Used](#fields-provided--used-14)
   - [Data Export Manager Setup](#data-export-manager-setup-15)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-15)
-- [8 Enrollments Parents Athletics](#8-enrollments-parents-athletics)
-  - [Fields Provided \& Used](#fields-provided--used-16)
+- [8 Enrollments Students Athletics](#8-enrollments-students-athletics)
+  - [Fields Provided \& Used](#fields-provided--used-15)
   - [Data Export Manager Setup](#data-export-manager-setup-16)
   - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-16)
+- [8 Enrollments Parents Athletics](#8-enrollments-parents-athletics)
+  - [Fields Provided \& Used](#fields-provided--used-16)
+  - [Data Export Manager Setup](#data-export-manager-setup-17)
+  - [Query Setup for `named_queries.xml`](#query-setup-for-named_queriesxml-17)
 
 ## Important Implementation Notes
 
@@ -1022,6 +1025,61 @@ Teachers of any course matching the list below will be provided access to the _A
 ### Query Setup for `named_queries.xml`
 
 - File: [`08_e_t_ls_eal_school.named_queries.xml`](./queries_root/08_e_t_ls_eal_school.named_queries.xml)
+
+| header | table.field | value | NOTE |
+|-|-|-|-|
+|type| TEACHERS.ID | _enrollment_ | N1
+|action| TEACHERS.ID | _UPDATE_ | N1
+|child_code| TEACHERS.TEACHERNUMBER | _T\_765_
+|role_name| TEACHERS.ID | _Instructor_ | N1
+|parent_code| _0\_LS_ | _0\_LS_ | N1
+
+**NOTES**
+
+**N1:** Field does not appear in database; use a known field such as `<column column=STUDENT.ID>header<\column>` to prevent an "unknown column error"
+
+**Tables Used**
+
+| Table |
+|-|
+|COURSES|
+|CC|
+|TEACHERS|
+
+
+## 8 Enrollments Teachers - ASH101
+
+Enrolls teachers from ECC, UE, MS, HS into [ASH101](https://lms.ash.nl/d2l/home/10822), a course designed to provide timely information and procedures for staff members. Each division is associated with 
+
+All staff members that are associated with any course in ECC, UE, MS, HS are included in this export and added by IPSIS to the ASH101 course
+
+### Data Export Manager Setup
+
+- **Category:** Show All
+- **Export From:**  `NQ com.txoof.brightspace.enroll.08_teacher_ash101`
+
+**Labels Used on Export**
+
+| Label |
+|-|
+|type|
+|action|
+|child_code|
+|role_name|
+|parent_code|
+
+**Export Summary and Output Options**
+
+- *Export File Name:* `8-Enrollments_110_teachers_ash101-%d.csv`
+- *Line Delimiter:* `LF`
+- *Field Delimiter:* `,`
+- *Character Set:* `UTF-8`
+- *Include Column Headers:* `True`
+- *Surround "field values" in Quotes:* False
+
+### Query Setup for `named_queries.xml`
+
+- File: [`08_e_t_ash101.named_queries.xml`](./queries_root/08_e_t_ash101.named_queries.xml)
 
 | header | table.field | value | NOTE |
 |-|-|-|-|
