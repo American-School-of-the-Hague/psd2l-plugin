@@ -1049,9 +1049,11 @@ Teachers of any course matching the list below will be provided access to the _A
 
 ## 8 Enrollments Teachers - ASH101
 
-Enrolls teachers from ECC, UE, MS, HS into [ASH101](https://lms.ash.nl/d2l/home/10822), a course designed to provide timely information and procedures for staff members. Each division is associated with 
+Enrolls teachers from ECC, UE, MS, HS into [ASH101](https://lms.ash.nl/d2l/home/10822), a course designed to provide timely information and procedures for staff members. Each division is associated with a section within the course. Content can be published to various sections independently using *Release Conditions* in Brightspace.
 
-All staff members that are associated with any course in ECC, UE, MS, HS are included in this export and added by IPSIS to the ASH101 course
+All staff members that are associated with any course in ECC, UE, MS, HS are included in this export and added by IPSIS to the ASH101 course as *learners*. IPSIS trumps admin and instructor roles within courses. This means that super-admins that are registered as instructors of any course within PowerSchool will be demoted to the role of *learner*.
+
+To ensure that the appropriate users are enrolled in the ASH101 course as instructors, an Intelligent Agent runs daily and promotes staff members. See the [Course Administration Information](https://lms.ash.nl/d2l/le/lessons/10822/units/134806) unit within the course for more details and information.
 
 ### Data Export Manager Setup
 
