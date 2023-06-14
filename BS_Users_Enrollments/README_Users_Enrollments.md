@@ -1053,7 +1053,7 @@ Enrolls teachers from ECC, UE, MS, HS into [ASH101](https://lms.ash.nl/d2l/home/
 
 All staff members that are associated with any course in ECC, UE, MS, HS are included in this export and added by IPSIS to the ASH101 course as *learners*. IPSIS trumps admin and instructor roles within courses. This means that super-admins that are registered as instructors of any course within PowerSchool will be demoted to the role of *learner*.
 
-To ensure that the appropriate users are enrolled in the ASH101 course as instructors, an Intelligent Agent runs daily and promotes staff members. See the [Course Administration Information](https://lms.ash.nl/d2l/le/lessons/10822/units/134806) unit within the course for more details and information.
+Super Admin accounts that are not associated with PowerSchool should be used for maintaining this course on Brightspace.
 
 ### Data Export Manager Setup
 
