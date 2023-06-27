@@ -46,6 +46,7 @@
 				where CC.TERMID >= (SELECT MAX(yearid) FROM TERMS)*100
 					and length(COURSES.SCHED_DEPARTMENT) > 0
 				order by "code" asc
+			]]>
         </sql>
     </query>
 
