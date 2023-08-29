@@ -42,7 +42,17 @@
                 /* set courses as inactive by default */
                 1 as "is_active",
                 '' as "department_code",
-                'Templ_'||CC.SCHOOLID||'_'||C.SCHED_DEPARTMENT as "template_code",
+                /*
+                build template from schoolid and department; if department is unset
+                assign "UNDEFINED" as the department
+                This can happen in the UE/ECC: Templ_10_UNDEFINED
+                */
+                'Templ_'||CC.SCHOOLID||'_'||
+                case 
+                    when c.sched_department is NULL or trim(c.sched_department) = '' 
+                    then 'UNDEFINED'
+                    else c.sched_department
+                 end as "template_code",
                 'term_'||cc.termid as "semester_code",
                 '' as "offering_code",
                 '' as "custom_code"
@@ -50,12 +60,12 @@
                 students s
                 join cc on cc.studentid = s.id
                 join schoolstaff ss on ss.id = cc.teacherid
-                join courses c on c.course_number = cc.course_number,
-                terms terms
+                join courses c on c.course_number = cc.course_number
+                join terms on terms.id = cc.termid
             where
-                    terms.id = cc.termid and
+                    terms.id = cc.termid 
                     /* select only courses that are in the current yearid (e.g. 2021-2022 == 3100)*/
-                    cc.termid >= case 
+                    and cc.termid >= case 
                         when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
                         THEN (EXTRACT(year from sysdate)-2000+9)*100
                         when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
