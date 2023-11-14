@@ -1,0 +1,87 @@
+<queries>
+    <!--set name here (also applies to permissions_root-->
+    <query name="com.txoof.brightspace.users.c07t_active" coreTable="teachers" flattened="true">
+        <!--add description here-->
+        <description>export all active teachers for use with a BrightSpace 7-User import</description>
+        <!--number of columns here must match number sql returns-->
+        <columns>
+            <column column="TEACHERS.ID">type</column> <!-- for columns not in database use a core filed-->
+            <column column="TEACHERS.ID">action</column> <!-- for columns not in database use a core filed-->
+            <column column="TEACHERS.EMAIL_ADDR">username</column> 
+            <column column="TEACHERS.ID">org_defined_id</column>
+            <column column="TEACHERS.FIRST_NAME">first_name</column>
+            <column column="TEACHERS.LAST_NAME">last_name</column>
+            <column column="TEACHERS.ID">password</column>
+            <column column="TEACHERS.ID">is_active</column>
+            <column column="TEACHERS.ID">role_name</column>
+            <column column="TEACHERS.EMAIL_ADDR">email</column>
+            <column column="TEACHERS.ID">relationships</column>
+            <column column="TEACHERS.ID">pref_first_name</column>
+            <column column="TEACHERS.ID">pref_last_name</column>
+         </columns>
+        <!--SQL query in format <![CDATA[QUERY]]>-->
+        <sql>
+            <![CDATA[
+            select DISTINCT
+                'user' as "type",
+                'UPDATE' as "action",
+                /* 
+                use username portion of teacher/staff email addresses for D2L username.
+                This is necessary because some staff use their @ash.nl email address as
+                their guardian contact information. The parent accounts are created first
+                resulting in a collision between the parent account username and teacher 
+                account username.
+                */
+                regexp_replace(users.EMAIL_ADDR, '(@.*)', '') as "username",
+                /* prepend a 'T' to make sure there are no studentid/teacherid colissions */
+                'T_'||users.TEACHERNUMBER as "org_defined_id",
+                users.FIRST_NAME as "first_name",
+                users.LAST_NAME as "last_name",
+                '' as "password",
+                schoolstaff.STATUS as "is_active",
+                /*
+                Add cascading system roles -- this should only be administrators/super admins or other global roles
+                
+                School level roles such as counselors will be handled at the school level in
+                08_e_t_school.named_queries
+
+                Counselor roles will eventually be assigned through PowerSchool; this is 
+                a native assignment to PowerSchool and is not managed through the custom
+                Brightspace table in PowerSchool. 
+                
+                See Intranet > PS > FAQ: how to assign staff to counselor role
+                */
+                case
+                    when lower(U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE) like '%-org%'
+                    then U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE
+                    else 'Instructor'
+                end as "role_name",
+            --    case 
+            --        when U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE is Null or lower(trim(U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE)) = lower('NONE')
+            --        Then 'Instructor'
+            --        ELSE trim(U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE)
+            --    end  as "role_name",
+                users.EMAIL_ADDR as "email",
+                '' as "relationships",
+                '' as "pref_first_name",
+                '' as "pref_last_name"
+            from 
+                users users,
+                schoolstaff schoolstaff,
+                U_SCHOOLSTAFFUSERFIELDS U_SCHOOLSTAFFUSERFIELDS
+            where SCHOOLSTAFF.USERS_DCID=USERS.DCID
+                /* only the homeschool information for each user; 
+                this prevents multiple entries
+                */
+                and users.homeschoolid=schoolstaff.schoolid
+                and SCHOOLSTAFF.DCID=U_SCHOOLSTAFFUSERFIELDS.SCHOOLSTAFFDCID(+)
+                /* Ignore all users with no email address */
+                AND LENGTH(users.EMAIL_ADDR) > 0
+                /* only active staff */
+                and schoolstaff.status=1
+            ORDER BY users.last_name asc
+            ]]>
+        </sql>
+    </query>
+
+</queries>

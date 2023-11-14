@@ -1,0 +1,76 @@
+<queries>
+    <!--set name here (also applies to permissions_root-->
+    <query name="com.txoof.brightspace.enroll.c08_students" coreTable="cc" flattened="false">
+        <!--add description here-->
+        <description>enroll active students</description>
+        <!--number of columns here must match number sql returns-->
+        <columns>
+            <column column="CC.ID">type</column>
+            <column column="CC.ID">action</column>
+            <column column="STUDENTS.STUDENT_NUMBER">child_code</column>
+            <column column="CC.ID">role_name</column>
+            <column column="CC.schoolid">parent_code</column>
+         </columns>
+        <!--SQL query in format <![CDATA[QUERY]]>-->
+        <sql>
+            <![CDATA[
+            select distinct
+                'enrollment' as "type",
+                'UPDATE' as "action",
+                /* using 7-Users:org_defined_id as child_code */
+                'S_'||STUDENTS.STUDENT_NUMBER as "child_code",
+                'Learner' as "role_name",
+                /*
+                use the following format to ensure that section codes are unique
+                and remain constant even if the teacher is reassigned
+
+                cs_cc.schoolid_cc.course_number_cc.termid_cc.expression_cc.sectionid
+                code: cs_3_SPHYIBS2_3200_D_28636
+                
+                NOTE: X block is added as a place-holder for courses that do not appear on the 
+                schedule such as MS Enrichment, self study IB courses SSST
+                */
+                'cs_'||cc.schoolid||'_'||cc.course_number||'_'||cc.TermID||'_'||DECODE(regexp_replace(cc.expression, '[^0-9]', ''), 
+                1, 'A', 
+                2, 'B', 
+                3, 'C', 
+                4, 'D', 
+                5, 'E', 
+                6, 'F', 
+                7, 'G', 
+                8, 'H', 
+                9, 'ADV',
+                10, 'X',
+                'UNKNOWN')||'_'||cc.sectionid as "parent_code"
+            from 
+                SECTIONS SECTIONS,
+                COURSES COURSES,
+                CC CC,
+                STUDENTS STUDENTS,
+                TERMS TERMS
+            where CC.STUDENTID=STUDENTS.ID
+                and terms.id = cc.termid
+                and COURSES.COURSE_NUMBER=CC.COURSE_NUMBER
+                and SECTIONS.ID=CC.SECTIONID
+                and STUDENTS.ENROLL_STATUS =0
+                and STUDENTS.GRADE_LEVEL >=5
+                and CC.TERMID >= case 
+                    when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
+                    THEN (EXTRACT(year from sysdate)-2000+9)*100
+                    when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
+                    THEN (EXTRACT(year from sysdate)-2000+10)*100
+                end
+                /*
+                Only pull courses with firstday that is lessthan or equal to the current date.
+                This prevents adding enrolments changes that are not tracked by powerschool; 
+                changes are only tracked on or after the first day of the course.
+                */
+                and trunc(terms.firstday) <= trunc(sysdate)
+            order by 
+                "child_code" asc,
+                "parent_code" asc
+            ]]>
+        </sql>
+    </query>
+
+</queries>
