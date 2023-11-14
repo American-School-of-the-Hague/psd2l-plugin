@@ -4,13 +4,8 @@
 Feb-June 2022 : Aaron Ciuffo : aciuffo@ash.nl : aaron.ciuffo@gmail.com
 - [Data Flow and Integration](#data-flow-and-integration)
 - [Additional Tools](#additional-tools)
-  - [Package PowerQuery Plugins](#package-powerquery-plugins)
-  - [SFTP Script for PowerSchool Server](#sftp-script-for-powerschool-server)
-  - [Comparison and Validation Script](#comparison-and-validation-script)
 - [Implementation Notes](#implementation-notes)
   - [Important Implementation Choices](#important-implementation-choices)
-    - [Parents](#parents)
-    - [ASH Staff/Parents](#ash-staffparents)
 - [PowerSchool Setup and Installation](#powerschool-setup-and-installation)
   - [SIS Installation](#sis-installation)
   - [Data Export Manager Configuration](#data-export-manager-configuration)
@@ -28,8 +23,6 @@ Feb-June 2022 : Aaron Ciuffo : aciuffo@ash.nl : aaron.ciuffo@gmail.com
   - [Course Offerings](#course-offerings)
   - [Users](#users)
 
-*****
-
 ## Data Flow and Integration
 
 Data is exported from PowerSchool SIS (PS) using the Plugin structure and imported to Brightspace using [IPSIS](https://documentation.brightspace.com/EN/integrations/ipsis/admin/about_ipsis.htm). Plugins contain PS/SQL queries and are executed using the Data Export Manager functionality in PS. More information regarding the structure of the plugins can be found below.
@@ -38,6 +31,7 @@ Data is exported from PowerSchool SIS (PS) using the Plugin structure and import
 
 Several tools are provided by this repo to help package PowerQuery plugins and manage IPSIS imports.
 
+<!-- omit from toc -->
 ### Package PowerQuery Plugins
 
 `package.sh`: create a .zip file that is appropriately structured for upload into PowerSchool's plugin interface. The script will append the current version sourced from the version string in `PackageDir/plugin.xml` and the date and time.
@@ -71,7 +65,7 @@ $ ./package.sh BS_Organization
 
 CREATED PLUGIN: BS_Organization-V1.2.03-20230227_081756.zip
 ```
-
+<!-- omit from toc -->
 ### SFTP Script for PowerSchool Server
 
 The CSV files created by the PowerSchool Data Export Manager (DEM) need to be sent to D2L via SFTP as a single zip file. The .zip file must:
@@ -81,6 +75,7 @@ The CSV files created by the PowerSchool Data Export Manager (DEM) need to be se
 
 The [`run_SFTP_BS.bat`](./run_SFTP_BS.bat) can be run from the Windows OS that hosts the PowerSchool instance as a scheduled job. The script hard-codes the username and password for the D2L SFTP service. The username and password can be found in the [IPSIS configuration screen](https://lms.ash.nl/d2l/im/ipsis/admin/console/integration/3/configuration).
 
+<!-- omit from toc -->
 ### Comparison and Validation Script
 
 To ensure that an upgrade to the PowerSchool system does not result in major changes to the IPSIS CSV files, the following procedure is recommended:
@@ -99,33 +94,43 @@ Automated exports are managed through PowerSchool PowerQuery Plugins. Plugins fo
 
 Each CSV Export for Brightspace is managed through an individual plugin. Each plugin contains an SQL query that matches the required fields for the CSV. See the [Automated Exports from PSL to Brightspace](#automated-exports-from-psl-to-brightspace) section for more information.
 
+<!-- TOC ignore:True -->
 ### Important Implementation Choices
 
 <!-- TOC ignore:True -->
-#### Parents
+#### Parents & Guardians
 
-Parent/Auditor Association in Brightspace cannot be used as of May 2022. 
+Two different methods for enrolling parents are provided `BS_Users_Enrollments` and `D2L_Users_Enrollments`. `BS_Users_Enrollments` relies on contact information stored in the `U_STUDENTSUSERFIELDS` view. As of February 2024 this data will be deprecated. The `D2L_Users_Enrollments` plugin uses the new unlimited contacts data in PowerSchool. This plugin can be updated 
 
-There is no consistent way to link parents to students using the custom powerschool tables. The only way to provide a match between `motheremail`, `fatheremail` and `guiardianid` is by matching the first and last names stored in the `U_STUDENTSUSERFIELDS` and `GUARDIAN` tables. The first/last names stored in these tables is inconsistent. The result is that parent accounts cannot be created reliably in the IPSIS 7-Users uploads. This leads to an account creation failure when attempting to create students with Auditor associations.
+Parents & Guardians are enrolled in Brightspace with the following roles:
 
-The work around is to break the parent/auditor association and rely only on parent user accounts that are eventually enrolled using a read-only role in all student accounts. This means that the Brightspace Pulse application is not an option for parents.
+**Parent & Guardian**
 
-In the future, once ASH moves to the "contacts" feature in PowerSchool SIS, parents can reliably pulled from the database and parent associations can be crated.
+Provides access to:
 
-e <!-- TOC ignore:True -->
-#### ASH Staff/Parents
+*  Student progress and grades via *Parent & Guardian* app and web interface
+*  View only access to student courses (as Parent & Guardian role)
+*  Various training courses
 
-ASH staff that are also parents may not be able to sign using the Google SSO if they use their @ash.nl address as their contact email address in PowerSchool.
+**Learner**
 
-**SOLUTIONS**
+Provides access to:
 
-As of 31 May, 2022 solution 1 is temporarily being implemented. 
+* Select courses that rely on intelligent agents
 
-1. Teachers use username password login by visiting https://lms.ash.nl/d2l/local 
-   - Teachers can choose their own password by clicking on the "Forgot password" link. 
-   - The admissions team is working to update the email addresses of all current staff to use only non @ash.nl addresses.
-2. It is also possible to map the `OrgDefinedID` in BrightSpace to the Google IDP instead of the email address. 
-   - This will require updating the parent `OrgDefinedID` to match
+**ASH Staff/Parents**
+
+Some ASH staff that are also parents used their @ash.nl email address as their parent contact information. This caused collisions in between the Parent Role and the Teacher role when users were created.
+
+To remedy this, ASH staff usernames are set to the username portion of their @ash.nl email address. Staff sign in to Brightspace using Google SSO. The teacher username is only used in the event that SSO fails for a user.
+
+**Examples**
+
+* Name: Johan Myrthe 
+* ASH Email address: jmyrthe@ash.nl
+* Brightspace teacher username: jmyrthe
+* Parent username: jmyrthe@ash.nl
+
 
 ## PowerSchool Setup and Installation
 
@@ -215,9 +220,10 @@ Files are sent to IPSIS via SFTP. Find SFTP details within the platform [here](h
 
 - [BS_Organization](./BS_Organization/README_Organization.md): Export BrightSpace CSVs 1-6
   - 1: Other; 2: Departments; 3: Semesters; 4: Templates, 5: Offerings; 6: Sections
-- [BS_Users-Enrollments](./BS_Users_Enrollments/README_Users_Enrollments.md): Export BrightSpace CSVs 7-8
+- [BS_Users-Enrollments](./BS_Users_Enrollments/README_Users_Enrollments.md): Export BrightSpace CSVs 7-8 **This will be deprecated after PowerSchool moves to Unlimited Contacts**
   - 7: Users, 8: Enrollments
-
+- [D2L_Users_Enrollments](./D2L_Users_Enrollments/README_Users_Enrollments.md): Export Brightspace CSVs 7-8 **This plugin will replace the BS_Users-Enrollments plugin after the move to Unlimited Contacts.**
+  - 7: Users, 8: Enrollments
 
 ## Plugin Errors & Resolutions
 
