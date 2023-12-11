@@ -23,53 +23,45 @@
 		<!--SQL query in format <![CDATA[QUERY]]>-->
         <sql>
 			<![CDATA[
-            SELECT distinct
-                'user' as "type",
+            SELECT DISTINCT
+                'user'                  AS "type",
                 -- delete guardians that have departed more than N days ago
-                case when (trunc(sysdate) - s.exitdate) > 30
-                    then 'DELETE'
-                    else 'UPDATE'
-                end as "action",
-                lower(ema.emailaddress) as "username",
-                'P_'||gs.guardianid as "org_defined_id",
-                p.firstname as "first_name",
-                p.lastname as "last_name",
-                '' as "password",
-                0 as "is_active",
-                'Parent' as "role_name",
-                lower(EMA.emailaddress) as "email",
-                '' as "relationships",
-                '' as "pref_first_name",
-                '' as "pref_last_name"
-            FROM
-                students s
-                JOIN studentcontactassoc sca ON s.dcid = sca.studentdcid
-                join personemailaddressassoc PEAA on sca.personid = PEAA.personid
-                join emailaddress EMA on PEAA.emailaddressid = EMA.emailaddressid
-                JOIN person p ON sca.personid = p.id
-                join guardianstudent gs on s.dcid = gs.studentsdcid
-                join guardianpersonassoc GPA on p.id = GPA.personid
+                CASE WHEN (TRUNC(sysdate) - s.exitdate) > 30
+                    THEN 'DELETE'
+                    ELSE 'UPDATE'
+                END                     AS "action",
+                LOWER(ema.emailaddress) AS "username",
+                'P_'||gs.guardianid     AS "org_defined_id",
+                p.firstname             AS "first_name",
+                p.lastname              AS "last_name",
+                ''                      AS "password",
+                0                       AS "is_active",
+                'Parent'                AS "role_name",
+                LOWER(EMA.emailaddress) AS "email",
+                ''                      AS "relationships",
+                ''                      AS "pref_first_name",
+                ''                      AS "pref_last_name"
+            FROM students s
+                JOIN studentcontactassoc sca        ON s.dcid = sca.studentdcid
+                JOIN personemailaddressassoc peaa   ON sca.personid = peaa.personid
+                JOIN emailaddress ema               ON peaa.emailaddressid = ema.emailaddressid
+                JOIN person p                       ON sca.personid = p.id
+                JOIN guardianstudent gs             ON s.dcid = gs.studentsdcid
+                JOIN guardianpersonassoc gpa        ON p.id = gpa.personid
             WHERE
                 s.enroll_status > 0
-                and s.grade_level >= 5
+                AND s.grade_level >= 5
+                AND TRUNC(sysdate) - s.exitdate BETWEEN 0 AND 365
+
                 /*
-                if the count of the associated students is less than 1, there are no 
-                active students enrolled at ASH. 
-                */
-                and (
-                    SELECT COUNT(s_inner.enroll_status)
+                 * Check if the guardian has other students that are enrolled or pre-registered
+                 */
+                AND NOT EXISTS (
+                    SELECT *
                     FROM studentcontactassoc sca_inner
-                    JOIN students s_inner ON s_inner.dcid = sca_inner.studentdcid
+                        JOIN students s_inner ON s_inner.dcid = sca_inner.studentdcid
                     WHERE sca_inner.personid = sca.personid
-                    AND s_inner.enroll_status <= 0
-                ) < 1
-                -- use the firstday of the highest term for this calculation
-                AND s.exitdate > (
-                    SELECT firstday
-                    FROM terms
-                    WHERE yearid = (SELECT MAX(yearid) FROM terms WHERE schoolid = 3 AND MOD(id, 100) = 0)
-                    AND schoolid = 3
-                    AND MOD(id, 100) = 0
+                        AND s_inner.enroll_status <= 0
                 )
 			]]>
         </sql>
