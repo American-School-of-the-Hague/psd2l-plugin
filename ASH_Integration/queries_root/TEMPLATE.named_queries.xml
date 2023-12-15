@@ -1,0 +1,25 @@
+<queries>
+	<!--set name here (also applies to permissions_root-->
+    <query name="com.txoof.brightspace.students.user" coreTable="students" flattened="false">
+		<!--add description here-->
+        <description>active students</description>
+		<!--number of columns here must match number sql returns-->
+        <columns>
+			<column column="STUDENTS.ID">bar</column> <!-- for columns not in database use a core filed-->
+			<column column="STUDENTS.ID">id</column>
+			<column column="STUDENTS.LAST_NAME">LAST_NAME</column>
+ 		</columns>
+		<!--SQL query in format <![CDATA[QUERY]]>-->
+        <sql>
+			<![CDATA[
+			select 
+			    'foo' as "bar",
+			    STUDENTS.ID as ID,
+				STUDENTS.LAST_NAME as LAST_NAME 
+			from STUDENTS STUDENTS 
+			where STUDENTS.ENROLL_STATUS =0
+			]]>
+        </sql>
+    </query>
+
+</queries>
