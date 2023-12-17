@@ -15,60 +15,56 @@
         <sql>
             <![CDATA[
             /*
-            c08_e_t.named_queries.xml
-            enroll all  students into sections
+             * cSCH-08_e_s.named_queries.xml
+             * enroll all students into sections
+             *
+             * Pull from the tables for the FOLLOWING school year after schedules have been made, but
+             * before they are committed
+             */    
+            SELECT DISTINCT
+                'enrollment'                AS "type",
+                'UPDATE'                    AS "action",
 
-            Pull from the tables for the FOLLOWING school year after schedules have been made, but
-            before they are committed
-            
-            */            
-            -- 08_e_s enrol students in sections
-            select distinct
-                'enrollment' as "type",
-                'UPDATE' as "action",
-                /* using 7-Users:org_defined_id as child_code */
-                'S_'||STUDENTS.STUDENT_NUMBER as "child_code",
-                'Learner' as "role_name",
+                /* 
+                 * Using 7-Users:org_defined_id as child_code 
+                 */
+                'S_' || s.student_number    AS "child_code",
+                'Learner'                   AS "role_name",
+
                 /*
-                use the following format to ensure that section codes are unique
-                and remain constant even if the teacher is reassigned
+                 * Use the following format to ensure that section codes are unique
+                 * and remain constant even if the teacher is reassigned
+                 *
+                 * cs_cc.schoolid_cc.course_number_cc.termid_cc.expression_cc.sectionid
+                 * code: cs_3_SPHYIBS2_3200_D_28636
+                 *
+                 * NOTE: X block is added as a place-holder for courses that do not appear on the 
+                 * schedule such as MS Enrichment, self study IB courses SSST
+                 */
+                'cs_' || cc.schoolid || '_' || cc.course_number || '_' || cc.termid || '_' || DECODE(REGEXP_REPLACE(cc.expression, '[^0-9]', ''), 
+                    1, 'A', 
+                    2, 'B', 
+                    3, 'C', 
+                    4, 'D', 
+                    5, 'E', 
+                    6, 'F', 
+                    7, 'G', 
+                    8, 'H', 
+                    9, 'ADV',
+                    10, 'X',
+                'UNKNOWN') || '_' || cc.sectionid AS "parent_code"
+            FROM schedulecc cc
+                JOIN scheduleterms terms        ON cc.termid = terms.id
+                JOIN schedulesections sections  ON cc.sectionid = sections.id
+                JOIN students s                 ON s.id = cc.studentid
+                JOIN courses                    ON courses.course_number = cc.course_number
+            WHERE s.enroll_status = 0
+                AND s.grade_level >= 5
+                AND cc.termid >= (EXTRACT(year from sysdate)-2000+(CASE WHEN EXTRACT(month from sysdate) BETWEEN 7 AND 12 THEN 10 ELSE 9 END)) * 100
+            ORDER BY
+                "child_code" ASC,
+                "parent_code" ASC
 
-                cs_cc.schoolid_cc.course_number_cc.termid_cc.expression_cc.sectionid
-                code: cs_3_SPHYIBS2_3200_D_28636
-                
-                NOTE: X block is added as a place-holder for courses that do not appear on the 
-                schedule such as MS Enrichment, self study IB courses SSST
-                */
-                'cs_'||cc.schoolid||'_'||cc.course_number||'_'||cc.TermID||'_'||DECODE(regexp_replace(cc.expression, '[^0-9]', ''), 
-                1, 'A', 
-                2, 'B', 
-                3, 'C', 
-                4, 'D', 
-                5, 'E', 
-                6, 'F', 
-                7, 'G', 
-                8, 'H', 
-                9, 'ADV',
-                10, 'X',
-                'UNKNOWN')||'_'||cc.sectionid as "parent_code"
-            from 
-                schedulecc cc
-                join scheduleterms terms on cc.termid = terms.id
-                join schedulesections sections on cc.sectionid = sections.id
-                join students students on students.id = cc.studentid
-                join courses courses on courses.course_number = cc.course_number
-            where
-                students.enroll_status = 0
-                and CC.TERMID >= case 
-                    when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
-                    THEN (EXTRACT(year from sysdate)-2000+10)*100
-                    when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
-                    THEN (EXTRACT(year from sysdate)-2000+11)*100
-                end
-                and students.grade_level >= 5
-            order by 
-                "child_code" asc,
-                "parent_code" asc    
             ]]>
         </sql>
     </query>

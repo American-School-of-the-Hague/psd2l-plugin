@@ -15,42 +15,48 @@
         <sql>
             <![CDATA[
             /*
-            c08_e_t_school.named_queries.xml
-            Add all staff to their home schools 
-            Default role: Instructor
-            Use PS SIS assigned roles to elevate to Admin role
-            */
-            -- 08_e_t_school enrol teachers in home schools
-            select DISTINCT
-                'enrollment' as "type",
-                'UPDATE' as "action",
-                'T_'||users.TEACHERNUMBER as "child_code",
+             * c08_e_t_school.named_queries.xml
+             * Add all staff to their home schools 
+             * Default role: Instructor
+             * Use PS SIS assigned roles to elevate to Admin role
+             */
+            SELECT DISTINCT
+                'enrollment'                AS "type",
+                'UPDATE'                    AS "action",
+                'T_' || users.teachernumber AS "child_code",
+
                 /*
-                Use the role assigned in PowerSchool SIS
-                this ensures that the PS SIS assigned role is valid at the organization levels
-                in Brightspace.
-                */
-                case 
-                    when U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE is Null or lower(trim(U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE)) = lower('NONE')
-                    Then 'Instructor'
-                    ELSE trim(U_SCHOOLSTAFFUSERFIELDS.BRIGHTSPACE_ACCOUNT_TYPE)
-                end  as "role_name",    
-                users.homeschoolid as "parent_code"
-            from 
-                users users,
-                schoolstaff schoolstaff,
-                U_SCHOOLSTAFFUSERFIELDS U_SCHOOLSTAFFUSERFIELDS
-            where SCHOOLSTAFF.USERS_DCID=USERS.DCID
-                /* only the homeschool information for each user; 
-                this prevents multiple entries
-                */
-                and users.homeschoolid=schoolstaff.schoolid
-                /* Ignore all users with no email address */
+                 * Use the role assigned in PowerSchool SIS
+                 * this ensures that the PS SIS assigned role is valid at the organization levels
+                 * in Brightspace.
+                 */
+                CASE
+                    WHEN LOWER(uf.brightspace_account_type) LIKE '%-org%'
+                    THEN uf.brightspace_account_type
+                    ELSE 'Instructor'
+                END                         AS "role_name",    
+                users.homeschoolid          AS "parent_code"
+            FROM users 
+                JOIN schoolstaff                        ON schoolstaff.users_dcid = users.dcid
+                LEFT JOIN u_schoolstaffuserfields uf    ON schoolstaff.dcid = uf.schoolstaffdcid
+            WHERE 
+                /* 
+                 * Only the homeschool information for each user; 
+                 * this prevents multiple entries
+                 */
+                users.homeschoolid = schoolstaff.schoolid
+
+                /* 
+                 * Ignore all users with no email address 
+                 */
                 AND LENGTH(users.EMAIL_ADDR) > 0
-                /* only active staff */
-                and schoolstaff.status=1
-                and SCHOOLSTAFF.DCID=U_SCHOOLSTAFFUSERFIELDS.SCHOOLSTAFFDCID(+)
-            ORDER BY "child_code" asc
+
+                /* 
+                 * Only active staff 
+                 */
+                AND schoolstaff.status = 1
+            ORDER BY "child_code" ASC
+
             ]]>
         </sql>
     </query>

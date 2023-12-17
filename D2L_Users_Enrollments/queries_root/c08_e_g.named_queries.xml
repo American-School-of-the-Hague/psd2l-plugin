@@ -15,78 +15,72 @@
         <sql>
             <![CDATA[
             /*
-            all active guardian enrollments
-            */
-            -- 08_e_p enroll parents in student classes
-            select distinct
-                'enrollment' as "type",
-                'UPDATE' as "action",
-                'P_'||GUARDIAN.GUARDIANID as "child_code",
-                'Parent' as "role_name",
-               /*
-                use the following format to ensure that section codes are unique
-                and remain constant even if the teacher is reassigned
+             * All active guardian enrollments
+             *
+             * 08_e_p enroll parents in student classes
+             */
+            SELECT DISTINCT
+                'enrollment'                AS "type",
+                'UPDATE'                    AS "action",
+                'P_' || GUARDIAN.GUARDIANID AS "child_code",
+                'Parent'                    AS "role_name",
 
-                cs_cc.schoolid_cc.course_number_cc.termid_cc.expression_cc.sectionid
-                code: cs_3_SPHYIBS2_3200_D_28636
-                
-                NOTE: X block is added as a place-holder for courses that do not appear on the 
-                schedule such as MS Enrichment, self study IB courses SSST
-                */
-                'cs_'||cc.schoolid||'_'||cc.course_number||'_'||cc.TermID||'_'||DECODE(regexp_replace(cc.expression, '[^0-9]', ''), 
-                1, 'A', 
-                2, 'B', 
-                3, 'C', 
-                4, 'D', 
-                5, 'E', 
-                6, 'F', 
-                7, 'G', 
-                8, 'H', 
-                9, 'ADV',
-                10, 'X',
-                'UNKNOWN')||'_'||cc.sectionid as "parent_code"
-            from GUARDIAN GUARDIAN,
-                COURSES COURSES,
-                SECTIONS SECTIONS,
-                STUDENTS STUDENTS,
-                CC CC,
-                GUARDIANSTUDENT GUARDIANSTUDENT,
-                TERMS TERMS
-            where GUARDIANSTUDENT.STUDENTSDCID=STUDENTS.DCID
-                and STUDENTS.ID=CC.STUDENTID
-                and CC.SECTIONID=SECTIONS.ID
-                and TERMS.id = cc.termid
-                and SECTIONS.COURSE_NUMBER=COURSES.COURSE_NUMBER
-                and GUARDIANSTUDENT.GUARDIANID=GUARDIAN.GUARDIANID
-                and STUDENTS.ENROLL_STATUS =0
-                and STUDENTS.GRADE_LEVEL >=5
                 /*
-                Explicitly only include guardianstudent.guardianrelationshiptypeid
-                of type 10, 20.
-                
-                As of Jan 2023 we can only reliably create parent accounts that appear on the 
-                Admissions Screen in PowerSchool SIS under the mother/father contact details.
-                
-                It may be possible to improve this when moving to the PS SIS Contacts feature
+                 * use the following format to ensure that section codes are unique
+                 * and remain constant even if the teacher is reassigned
+                 * 
+                 * cs_cc.schoolid_cc.course_number_cc.termid_cc.expression_cc.sectionid
+                 * code: cs_3_SPHYIBS2_3200_D_28636
+                 * 
+                 * NOTE: X block is added AS a place-holder for courses that do not appear on the 
+                 * schedule such AS MS Enrichment, self study IB courses SSST
+                 */
+                'cs_' || cc.schoolid || '_' || cc.course_number || '_' || cc.termid || '_' || DECODE(regexp_replace(cc.expression, '[^0-9]', ''), 
+                    1, 'A', 
+                    2, 'B', 
+                    3, 'C', 
+                    4, 'D', 
+                    5, 'E', 
+                    6, 'F', 
+                    7, 'G', 
+                    8, 'H', 
+                    9, 'ADV',
+                    10, 'X',
+                    'UNKNOWN'
+                ) ||'_' || cc.sectionid AS "parent_code"
+            FROM guardian
+                JOIN guardianstudent gs     ON guardian.guardianid = gs.guardianid
+                JOIN students s             ON gs.studentsdcid = s.dcid 
+                JOIN cc                     ON s.id = cc.studentid
+                JOIN sections               ON cc.sectionid = sections.id
+                JOIN courses                ON sections.course_number = courses.course_number
+                JOIN terms                  ON cc.termid = terms.id
+            WHERE s.enroll_status = 0
+                AND s.grade_level >= 5
 
-                */
-                and guardianstudent.guardianrelationshiptypeid in(10, 20)
-                and CC.TERMID >= case 
-                    when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
-                    THEN (EXTRACT(year from sysdate)-2000+9)*100
-                    when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
-                    THEN (EXTRACT(year from sysdate)-2000+10)*100
-                end
                 /*
-                Only pull courses with firstday that is lessthan or equal to the current date.
-                This prevents adding enrolments changes that are not tracked by powerschool; 
-                changes are only tracked on or after the first day of the course.
-                */
-                and trunc(terms.firstday) <= trunc(sysdate)
+                 * Explicitly only include guardianstudent.guardianrelationshiptypeid
+                 * of type 10, 20.
+                 * 
+                 * AS of Jan 2023 we can only reliably create parent accounts that appear on the 
+                 * Admissions Screen in PowerSchool SIS under the mother/father contact details.
+                 * 
+                 * It may be possible to improve this when moving to the PS SIS Contacts feature
+                 * 
+                 */
+                AND gs.guardianrelationshiptypeid IN (10, 20)
+                AND cc.termid >= (EXTRACT(year from sysdate)-2000+(CASE WHEN EXTRACT(month from sysdate) BETWEEN 7 AND 12 THEN 10 ELSE 9 END)) * 100
 
-            order by 
+                /*
+                 * Only pull courses with firstday that is lessthan or equal to the current date.
+                 * This prevents adding enrolments changes that are not tracked by powerschool; 
+                 * changes are only tracked on or after the first day of the course.
+                 */
+                AND TRUNC(terms.firstday) <= TRUNC(sysdate)
+            ORDER BY
                 "child_code" ASC,
-                "parent_code" asc
+                "parent_code" ASC
+
             ]]>
         </sql>
     </query>

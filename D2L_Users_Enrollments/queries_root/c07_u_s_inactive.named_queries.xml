@@ -25,7 +25,7 @@
             /*
              * c07s_inactive
              */
-            select 
+            SELECT 
                 'user'                      AS "type",
                 /* 
                  * Students that have been gone for 50 days or more, delete
@@ -51,8 +51,7 @@
             FROM students s
                 JOIN personemailaddressassoc peaa   ON s.person_id = peaa.personid
                 JOIN emailaddress ema               ON peaa.emailaddressid = ema.emailaddressid
-            where 
-                s.enroll_status >= 1
+            WHERE s.enroll_status >= 1
 
                 /*
                  * Report period
@@ -69,7 +68,7 @@
                 /* Only students grade 5 and up */
                 AND s.grade_level >= 5
             ORDER BY s.exitdate ASC
-            
+
             ]]>
         </sql>
     </query>

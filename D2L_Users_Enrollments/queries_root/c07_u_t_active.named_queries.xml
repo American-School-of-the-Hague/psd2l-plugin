@@ -43,7 +43,7 @@
                 users.last_name                                 AS "last_name",
                 ''                                              AS "password",
                 1                                               AS "is_active",
-                
+
                 /*
                  * Add cascading system roles -- this should only be administrators/super admins or other global roles
                  *
@@ -66,8 +66,8 @@
                 ''                                              AS "pref_first_name",
                 ''                                              AS "pref_last_name"
             FROM users
-                JOIN schoolstaff staff                  ON staff.users_dcid = users.dcid
-                JOIN u_schoolstaffuserfields staffuser  ON staffuser.schoolstaffdcid = staff.dcid
+                JOIN schoolstaff staff                          ON staff.users_dcid = users.dcid
+                LEFT JOIN u_schoolstaffuserfields staffuser     ON staffuser.schoolstaffdcid = staff.dcid
             WHERE
                 /* 
                  * Only the homeschool information for each user; 

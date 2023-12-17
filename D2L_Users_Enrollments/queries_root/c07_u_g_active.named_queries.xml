@@ -27,7 +27,7 @@
                 'user'                  AS "type",
                 'UPDATE'                AS "action",
                 -- varchar2(255)
-                LOWER(EMA.emailaddress) AS "username",
+                LOWER(ema.emailaddress) AS "username",
                 'P_' || gs.guardianid   AS "org_defined_id",
                 p.firstname             AS "first_name",
                 p.lastname              AS "last_name",

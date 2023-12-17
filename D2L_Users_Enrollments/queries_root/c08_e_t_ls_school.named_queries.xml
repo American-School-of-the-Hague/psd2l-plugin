@@ -15,65 +15,57 @@
         <sql>
             <![CDATA[
             /*
-            c08_e_t_ls_eal_school.named_queries.xml
-            Add learning support and EAL teachers to the EAL/LS School
-            parent_code: 0_LS
-            role_name: Instructor
-
-
-            Teachers that are enrolled in multiple school will have
-            access to the 6606 landing page with the auditors tool. 
-
-            This query works together with the 08_e_t_school query to 
-            push Learner Support teachers into both their home school
-            as well as an additional school.
-
-            */
-            -- 08_e_t_ls_eal_school enrol teachers in home schools
-            select distinct
-                'enrollment' as "type",
-                'UPDATE' as "action",
-                'T_'||teachers.TEACHERNUMBER as "child_code",
-                'Learner' as "role_name",   
-                '0_LS' as "parent_code"
-            from 
-                teachers teachers
-                inner join sectionteacher on sectionteacher.teacherid = teachers.id
-                inner join cc on cc.sectionid = sectionteacher.sectionid
-                inner join students on students.id = cc.studentid
-                inner join courses on courses.course_number = cc.course_number
-                
-            where     
-                students.enroll_status = 0
-                and  (
+             * c08_e_t_ls_eal_school.named_queries.xml
+             * Add learning support and EAL teachers to the EAL/LS School
+             * parent_code: 0_LS
+             * role_name: Instructor
+             * 
+             * Teachers that are enrolled in multiple school will have
+             * access to the 6606 landing page with the auditors tool. 
+             * 
+             * This query works together with the 08_e_t_school query to 
+             * push Learner Support teachers into both their home school
+             * as well as an additional school.
+             */
+            SELECT DISTINCT
+                'enrollment'                    AS "type",
+                'UPDATE'                        AS "action",
+                'T_' || teachers.teachernumber  AS "child_code",
+                'Learner'                       AS "role_name",   
+                '0_LS'                          AS "parent_code"
+            FROM teachers
+                INNER JOIN sectionteacher       ON sectionteacher.teacherid = teachers.id
+                INNER JOIN cc                   ON cc.sectionid = sectionteacher.sectionid
+                INNER JOIN students s           ON s.id = cc.studentid
+                INNER JOIN courses              ON courses.course_number = cc.course_number
+            WHERE s.enroll_status = 0
+                AND (
                     /* 
-                    English Essentials, English Foundations, English for Accademic Purposes
-                    courses are in the MS/HS English Department, but service
-                    EAL students in both divisions
-                    */
-                    lower(courses.course_name) like '%english essentials%'
-                    or lower(courses.course_name) like '%english%academic%purposes%'
-                    or lower(courses.course_name) like 'eng%foundations%'
+                     * English Essentials, English Foundations, English for Accademic Purposes
+                     * courses are in the MS/HS English Department, but service
+                     * EAL students in both divisions
+                     */
+                    LOWER(courses.course_name) LIKE '%english essentials%'
+                    OR LOWER(courses.course_name) LIKE '%english%academic%purposes%'
+                    OR LOWER(courses.course_name) LIKE 'eng%foundations%'
                     /*
-                    HS Learning Support clasess are in the OTH department, MS
-                    Learning Suport classes are in the mslsc department
-                    */
-                    or lower(cc.course_number) like '%olea%'
+                     * HS Learning Support clasess are in the OTH department, MS
+                     * Learning Suport classes are in the mslsc department
+                     */
+                    OR LOWER(cc.course_number) LIKE '%olea%'
                     /*
-                    capture all EAL, LSC and Special Education classes in MS and HS
-                    */
-                    or lower(courses.sched_department) in('mseal', 'mslsc', 'msse')
-                    or lower(courses.sched_department) in('hseal', 'hslsc', 'hsse')
+                     * capture all EAL, LSC and Special Education classes in MS and HS
+                     */
+                    OR LOWER(courses.sched_department) IN ('mseal', 'mslsc', 'msse')
+                    OR LOWER(courses.sched_department) IN ('hseal', 'hslsc', 'hsse')
                 )
-                -- only the current term
-                and CC.TERMID >= case 
-                    when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
-                    THEN (EXTRACT(year from sysdate)-2000+9)*100
-                    when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
-                    THEN (EXTRACT(year from sysdate)-2000+10)*100
-                end 
-                order by
-                    "child_code" asc
+
+                /*
+                 * Only include the current term
+                 */
+                AND cc.termid >= (EXTRACT(year from sysdate)-2000+(CASE WHEN EXTRACT(month from sysdate) BETWEEN 7 AND 12 THEN 10 ELSE 9 END)) * 100
+                ORDER BY "child_code" ASC
+
             ]]>
         </sql>
     </query>
