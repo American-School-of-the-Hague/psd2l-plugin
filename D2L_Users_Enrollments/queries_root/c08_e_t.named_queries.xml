@@ -43,8 +43,8 @@
                     6, 'F', 
                     7, 'G', 
                     8, 'H', 
-                    9, 'ADV',
-                    10, 'X',
+                    9, 'X', 
+                    10, 'ADV',
                 'UNKNOWN') || '_' || cc.sectionid AS "parent_code"
             FROM teachers
                 JOIN sectionteacher     ON sectionteacher.teacherid = teachers.id
