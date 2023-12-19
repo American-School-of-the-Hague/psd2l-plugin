@@ -18,7 +18,7 @@
              * c08_e_t_ls_eal_school.named_queries.xml
              * Add learning support and EAL teachers to the EAL/LS School
              * parent_code: 0_LS
-             * role_name: Instructor
+             * role_name: Learner
              * 
              * Teachers that are enrolled in multiple school will have
              * access to the 6606 landing page with the auditors tool. 
