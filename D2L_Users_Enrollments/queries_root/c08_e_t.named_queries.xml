@@ -34,7 +34,7 @@
                  * NOTE: X block is added as a place-holder for courses that do not appear on the 
                  * schedule such as MS Enrichment, self study IB courses SSST
                  */
-                'cs_' || cc.schoolid || '_' || cc.course_number || '_' || cc.termid || '_' || DECODE(REGEXP_REPLACE(cc.expression, '[^0-9]', ''), 
+                'cs_' || cc.schoolid || '_' || cc.course_number || '_' || REGEXP_REPLACE(cc.termid, '[^0-9]+', '') || '_' || DECODE(REGEXP_REPLACE(cc.expression, '[^0-9]', ''), 
                     1, 'A', 
                     2, 'B', 
                     3, 'C', 
@@ -43,9 +43,9 @@
                     6, 'F', 
                     7, 'G', 
                     8, 'H', 
-                    9, 'X', 
-                    10, 'ADV',
-                'UNKNOWN') || '_' || cc.sectionid AS "parent_code"
+                    9, 'ADV', 
+                    10, 'X',
+                'UNKNOWN') || '_' || REGEXP_REPLACE(cc.sectionid, '[^0-9]+', '') AS "parent_code"
             FROM teachers
                 JOIN sectionteacher     ON sectionteacher.teacherid = teachers.id
                 JOIN cc                 ON cc.sectionid = sectionteacher.sectionid

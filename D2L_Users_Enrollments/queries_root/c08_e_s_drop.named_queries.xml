@@ -46,8 +46,8 @@
                     6, 'F', 
                     7, 'G', 
                     8, 'H', 
-                    9, 'X', 
-                    10, 'ADV', 
+                    9, 'ADV', 
+                    10, 'X', 
                 'UNKNOWN') || '_'|| REGEXP_REPLACE(cc.sectionid, '[^0-9]+', '') AS "parent_code"
             FROM cc
                 JOIN students s         ON cc.studentid = s.id
