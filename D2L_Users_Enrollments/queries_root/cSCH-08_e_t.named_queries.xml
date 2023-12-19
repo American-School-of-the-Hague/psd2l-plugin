@@ -56,7 +56,7 @@
                 JOIN students s                 ON s.id = cc.studentid   
             WHERE s.enroll_status = 0
                 AND s.grade_level >= 5
-                AND cc.termid >= (EXTRACT(year from sysdate)-2000+(CASE WHEN EXTRACT(month from sysdate) BETWEEN 7 AND 12 THEN 10 ELSE 9 END)) * 100
+                AND cc.termid >= (EXTRACT(year from sysdate)-2000+(CASE WHEN EXTRACT(month from sysdate) BETWEEN 7 AND 12 THEN 11 ELSE 10 END)) * 100
 
                 /* 
                  * Exclude teachers that do not have an email address 

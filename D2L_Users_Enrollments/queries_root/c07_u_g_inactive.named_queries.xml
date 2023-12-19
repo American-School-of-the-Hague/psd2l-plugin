@@ -31,7 +31,7 @@
                     ELSE 'UPDATE'
                 END                     AS "action",
                 LOWER(ema.emailaddress) AS "username",
-                'P_'||gs.guardianid     AS "org_defined_id",
+                'P_' || gs.guardianid   AS "org_defined_id",
                 p.firstname             AS "first_name",
                 p.lastname              AS "last_name",
                 ''                      AS "password",
@@ -47,7 +47,7 @@
                 JOIN emailaddress ema               ON peaa.emailaddressid = ema.emailaddressid
                 JOIN person p                       ON sca.personid = p.id
                 JOIN guardianstudent gs             ON s.dcid = gs.studentsdcid
-                JOIN guardianpersonassoc gpa        ON p.id = gpa.personid
+                JOIN guardianpersonassoc gpa        ON p.id = gpa.personid AND gpa.guardianid = gs.guardianid
             WHERE
                 s.enroll_status > 0
                 AND s.grade_level >= 5

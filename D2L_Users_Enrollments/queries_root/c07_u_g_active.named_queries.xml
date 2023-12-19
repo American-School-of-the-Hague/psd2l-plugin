@@ -56,9 +56,9 @@
                 
             WHERE
                 s.enroll_status = 0
-                and s.grade_level >= 5
-                and peaa.isprimaryemailaddress = 1
-                and p.isactive = 1
+                AND s.grade_level >= 5
+                AND peaa.isprimaryemailaddress = 1
+                AND p.isactive = 1
 			]]>
         </sql>
     </query>
