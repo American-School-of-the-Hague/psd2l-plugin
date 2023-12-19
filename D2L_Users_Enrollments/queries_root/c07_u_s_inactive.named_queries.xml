@@ -6,7 +6,7 @@
         <!--number of columns here must match number sql returns-->
         <columns>
             <column column="STUDENTS.ID">type</column> <!-- for columns not in database use a core filed-->
-            <column column="STUDENTS.EXITDATE">action</column> 
+            <column column="s.exitdate">action</column> 
             <column column="STUDENTS.ID">username</column> 
             <column column="STUDENTS.ID">org_defined_id</column>
             <column column="STUDENTS.FIRST_NAME">first_name</column>
@@ -22,52 +22,53 @@
         <!--SQL query in format <![CDATA[QUERY]]>-->
         <sql>
             <![CDATA[
-            -- c07s_inactive
-            select 
-                'user' as "type",
+            /*
+             * c07s_inactive
+             */
+            SELECT 
+                'user'                      AS "type",
                 /* 
-                students that have been gone for 50 days or more, delete
-                */
-                case 
-                WHEN (trunc(sysdate) - STUDENTS.EXITDATE) >= 50
+                 * Students that have been gone for 50 days or more, delete
+                 */
+                CASE WHEN (TRUNC(sysdate) - s.exitdate) >= 50
                     THEN 'DELETE'
-                ELSE 
-                    'UPDATE'
-                END "action",
-                ema.emailaddress as "username",
-                /* prepend a 'S" to the number to distinguish between students & teachers */
-                'S_'||STUDENTS.STUDENT_NUMBER as "org_defined_id",
-                STUDENTS.FIRST_NAME as "first_name",
-                STUDENTS.LAST_NAME as "last_name",
-                '' as "password",
-                /* Mark students that are not "active" in powerschool (PS !=0) as inactive (BS=0) */
-                (CASE STUDENTS.ENROLL_STATUS
-                    WHEN 0 THEN 1
-                    ELSE 0 END) as "is_active",
-                'Learner' as "role_name",
-                ema.emailaddress as "email",
-                '' as "relationships",
-                '' as "pref_first_name",
-                '' as "pref_last_name"
-            from STUDENTS STUDENTS
-                join personemailaddressassoc PEAA on students.person_id = PEAA.personid
-                join emailaddress ema on PEAA.emailaddressid = ema.emailaddressid
-            where 
-                STUDENTS.ENROLL_STATUS >= 1
+                    ELSE 'UPDATE'
+                END                         AS "action",
+                ema.emailaddress            AS "username",
+                /* 
+                 * Prepend a 'S" to the number to distinguish between students & teachers 
+                 */
+                'S_' || s.student_number    AS "org_defined_id",
+                s.first_name                AS "first_name",
+                s.last_name                 AS "last_name",
+                ''                          AS "password",
+                0                           AS "is_active",
+                'Learner'                   AS "role_name",
+                ema.emailaddress            AS "email",
+                ''                          AS "relationships",
+                ''                          AS "pref_first_name",
+                ''                          AS "pref_last_name"
+            FROM students s
+                JOIN personemailaddressassoc peaa   ON s.person_id = peaa.personid
+                JOIN emailaddress ema               ON peaa.emailaddressid = ema.emailaddressid
+            WHERE s.enroll_status >= 1
+
                 /*
-                report period
-                NOTE: The deletion horizon should be within a few days of this to prevent
-                attempting to delete the same user over and over again. This results in the
-                following error.
-                    IPSIS error: `No user mapping found for source system`
-                This error occurs when a non-existant user is queued for deletion multiple
-                times
-                */
-                and trunc(sysdate) - STUDENTS.EXITDATE <= 60
-                and trunc(sysdate) - STUDENTS.EXITDATE > 0
+                 * Report period
+                 * NOTE: The deletion horizon should be within a few days of this to prevent
+                 * attempting to delete the same user over and over again. This results in the
+                 * following error.
+                 *     IPSIS error: `No user mapping found for source system`
+                 * This error occurs when a non-existant user is queued for deletion multiple
+                 * times
+                 */
+                AND TRUNC(sysdate) - s.exitdate <= 60
+                AND TRUNC(sysdate) - s.exitdate > 0
+
                 /* Only students grade 5 and up */
-                and STUDENTS.GRADE_LEVEL >= 5
-            order by STUDENTS.EXITDATE asc
+                AND s.grade_level >= 5
+            ORDER BY s.exitdate ASC
+
             ]]>
         </sql>
     </query>
