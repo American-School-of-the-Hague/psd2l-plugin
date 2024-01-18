@@ -38,7 +38,18 @@
                 'co_'||cc.schoolid||'_'||cc.course_number||'_'||cc.termid as "code",
                 c.course_name||' ('||terms.abbreviation||')' as "name",
                 TERMS.FIRSTDAY as "start_date",
-                TERMS.LASTDAY + 60 as "end_date",
+                /*
+                Keep HS Year-Long courses open for 60 days beyond the last day of school.
+                This supports IB Yr1 students that need to work over the summer
+                */
+                case
+                    -- only apply to HS courses with termid that is divisible by 100
+                    when mod(cc.termid, 100) = 0 and c.schoolid = 3
+                    then TERMS.LASTDAY + 60
+                    -- everything else (S1, S2, Q1-Q4, all MS) should use the last day
+                    else TERMS.LASTDAY
+                end as "end_date",
+                   
                 /* set courses as inactive by default */
                 1 as "is_active",
                 '' as "department_code",
@@ -63,9 +74,10 @@
                 join courses c on c.course_number = cc.course_number
                 join terms on terms.id = cc.termid
             where
-                    terms.id = cc.termid 
+                    -- terms.id = cc.termid 
+                   
                     /* select only courses that are in the current yearid (e.g. 2021-2022 == 3100)*/
-                    and cc.termid >= case 
+                    cc.termid >= case 
                         when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
                         THEN (EXTRACT(year from sysdate)-2000+9)*100
                         when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
