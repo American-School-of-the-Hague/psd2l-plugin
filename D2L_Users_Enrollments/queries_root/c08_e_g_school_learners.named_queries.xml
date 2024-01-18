@@ -14,58 +14,48 @@
         <!--SQL query in format <![CDATA[QUERY]]>-->
         <sql>
             <![CDATA[
-             /*
-             Add parents to special school org units as Learners.
-             The schools run parallel to thier children's school enrollment.
-             Adding parents as "Learners" allows intelligent agents to pick
-             them up and auto-enroll in training courses and library courses
+            /*
+             * Add parents to special school org units as Learners.
+             * The schools run parallel to thier children's school enrollment.
+             * Adding parents as "Learners" allows intelligent agents to pick
+             * them up and auto-enroll in training courses and library courses
              */
-            select distinct
-                'enrollment' as "type",
-                'UPDATE' as "action",
-                'P_'||GUARDIAN.GUARDIANID as "child_code",
-                'Learner' as "role_name",
-                'P_'||students.schoolid as "parent_code"    
-            from GUARDIAN GUARDIAN,
-                COURSES COURSES,
-                SECTIONS SECTIONS,
-                STUDENTS STUDENTS,
-                CC CC,
-                GUARDIANSTUDENT GUARDIANSTUDENT,
-                TERMS TERMS
-            where GUARDIANSTUDENT.STUDENTSDCID=STUDENTS.DCID
-                and STUDENTS.ID=CC.STUDENTID
-                and CC.SECTIONID=SECTIONS.ID
-                and TERMS.id = cc.termid
-                and SECTIONS.COURSE_NUMBER=COURSES.COURSE_NUMBER
-                and GUARDIANSTUDENT.GUARDIANID=GUARDIAN.GUARDIANID
-                and STUDENTS.ENROLL_STATUS =0
-                and STUDENTS.GRADE_LEVEL >= 5
-                /*
-                Explicitly only include guardianstudent.guardianrelationshiptypeid
-                of type 10, 20.
-                
-                As of Jan 2023 we can only reliably create parent accounts that appear on the 
-                Admissions Screen in PowerSchool SIS under the mother/father contact details.
-                
-                It may be possible to improve this when moving to the PS SIS Contacts feature
+            SELECT DISTINCT
+                'enrollment'                AS "type",
+                'UPDATE'                    AS "action",
+                'P_' || guardian.guardianid AS "child_code",
+                'Learner'                   AS "role_name",
+                'P_' || s.schoolid          AS "parent_code"    
+            FROM guardian
+                JOIN guardianstudent gs     ON guardian.guardianid = gs.guardianid
+                JOIN students s             ON gs.studentsdcid = s.dcid 
+                JOIN cc                     ON s.id = cc.studentid
+                JOIN sections               ON cc.sectionid = sections.id
+                JOIN courses                ON sections.course_number = courses.course_number
+                JOIN terms                  ON cc.termid = terms.id
+            WHERE s.enroll_status = 0
+                AND s.grade_level >= 5
 
-                */
-                and guardianstudent.guardianrelationshiptypeid in(10, 20)
-                and CC.TERMID >= case 
-                    when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
-                    THEN (EXTRACT(year from sysdate)-2000+9)*100
-                    when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
-                    THEN (EXTRACT(year from sysdate)-2000+10)*100
-                end
                 /*
-                Only pull courses with firstday that is lessthan or equal to the current date.
-                This prevents adding enrolments changes that are not tracked by powerschool; 
-                changes are only tracked on or after the first day of the course.
-                */
-                and trunc(terms.firstday) <= trunc(sysdate)
-            order by
-                "parent_code" asc
+                 * Explicitly only include guardianstudent.guardianrelationshiptypeid
+                 * of type 10, 20.
+                 * 
+                 * As of Jan 2023 we can only reliably create parent accounts that appear on the 
+                 * Admissions Screen in PowerSchool SIS under the mother/father contact details.
+                 * 
+                 * It may be possible to improve this when moving to the PS SIS Contacts feature
+                 * 
+                 */
+                AND gs.guardianrelationshiptypeid IN (10, 20)
+                AND cc.termid >= (EXTRACT(year from sysdate)-2000+(CASE WHEN EXTRACT(month from sysdate) BETWEEN 7 AND 12 THEN 10 ELSE 9 END)) * 100
+
+                /*
+                 * Only pull courses with firstday that is lessthan or equal to the current date.
+                 * This prevents adding enrolments changes that are not tracked by powerschool; 
+                 * changes are only tracked on or after the first day of the course.
+                 */
+                AND TRUNC(terms.firstday) <= TRUNC(sysdate)
+            ORDER BY "parent_code" ASC
             
                 
             ]]>

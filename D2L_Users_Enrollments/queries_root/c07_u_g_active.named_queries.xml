@@ -23,40 +23,42 @@
 		<!--SQL query in format <![CDATA[QUERY]]>-->
         <sql>
 			<![CDATA[
-            select distinct
-                'user' as "type",
-                'UPDATE' as "action",
+            SELECT DISTINCT
+                'user'                  AS "type",
+                'UPDATE'                AS "action",
                 -- varchar2(255)
-                lower(EMA.emailaddress)as "username",
+                LOWER(ema.emailaddress) AS "username",
+                'P_' || gs.guardianid   AS "org_defined_id",
+                p.firstname             AS "first_name",
+                p.lastname              AS "last_name",
+                ''                      AS "password",
+                1                       AS "is_active",
+                'Parent'                AS "role_name",
+                LOWER(ema.emailaddress) AS "email",
+                ''                      AS "relationships",
+                ''                      AS "pref_first_name",
+                ''                      AS "pref_last_name"
+            FROM students s
+                JOIN studentcontactassoc sca        ON s.dcid = sca.studentdcid
+                JOIN personemailaddressassoc peaa   ON sca.personid = peaa.personid
+                JOIN emailaddress ema               ON peaa.emailaddressid = ema.emailaddressid
+                JOIN person p                       ON peaa.personid = p.id
 
-                'P_'||gs.guardianid as "org_defined_id",
-                p.firstname as "first_name",
-                p.lastname as "last_name",
-                '' as "password",
-                1 as "is_active",
-                'Parent' as "role_name",
-                lower(EMA.emailaddress) as "email",
-                '' as "relationships",
-                '' as "pref_first_name",
-                '' as "pref_last_name"
-            from 
-                students s
-                join studentcontactassoc SCA on s.dcid = SCA.studentdcid
-                join personemailaddressassoc PEAA on SCA.personid = PEAA.personid
-                join emailaddress EMA on PEAA.emailaddressid = EMA.emailaddressid
-                join person p on PEAA.personid = p.id
-                -- this should ensure that only active contacts with "Data Access" == True are selected
-                -- see https://help.powerschool.com/t5/PowerSchool-SIS-Administrator/What-field-and-table-is-quot-Allow-Data-Access-quot-for-contacts/ta-p/459319
-                join guardianstudent gs on s.dcid = gs.studentsdcid
-                join guardianpersonassoc GPA on p.id = GPA.personid
+                /*
+                 * This should ensure that only active contacts with "Data Access" == True are selected
+                 * The GuardianStudent record only exists for contacts that have Data Access enabled
+                 * To include all contacts make the gpa join a left join. The Data Access can be checked with a 'guardianpersonassocid IS NULL' statement where true means no access.
+                 * 
+                 * see https://help.powerschool.com/t5/PowerSchool-SIS-Administrator/What-field-and-table-is-quot-Allow-Data-Access-quot-for-contacts/ta-p/459319
+                 */
+                JOIN guardianstudent gs             ON s.dcid = gs.studentsdcid
+                JOIN guardianpersonassoc gpa        ON p.id = gpa.personid AND gpa.guardianid = gs.guardianid
                 
-            where
+            WHERE
                 s.enroll_status = 0
-                and s.grade_level >= 5
-                and PEAA.isprimaryemailaddress = 1
-                and p.isactive = 1
-                and GPA.guardianid = gs.guardianid
-           
+                AND s.grade_level >= 5
+                AND peaa.isprimaryemailaddress = 1
+                AND p.isactive = 1
 			]]>
         </sql>
     </query>

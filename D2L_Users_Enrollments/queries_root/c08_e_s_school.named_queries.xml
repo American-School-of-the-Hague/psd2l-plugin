@@ -15,35 +15,27 @@
         <sql>
             <![CDATA[
             /*
-            Add all students to their home school as learners
-            */
-            -- 08_e_s_school enrol students in home schools
-            select DISTINCT
-                'enrollment' as "type",
-                'UPDATE' as "action",
-                'S_'||STUDENTS.STUDENT_NUMBER as "child_code",
-                'Learner' as  "role_name",    
-                students.schoolid as "parent_code"
-            from 
-                sections sections,
-                courses courses,
-                cc cc,
-                students students
+             * Add all students to their home school as learners
+             * 
+             * 08_e_s_school enrol students in home schools
+             */
+            SELECT DISTINCT
+                'enrollment'                AS "type",
+                'UPDATE'                    AS "action",
+                'S_' || s.student_number    AS "child_code",
+                'Learner'                   AS "role_name",    
+                s.schoolid                  AS "parent_code"
+            FROM sections
+                JOIN cc         ON cc.sectionid = sections.id
+                JOIN courses    ON cc.course_number = courses.course_number
+                JOIN students s ON s.id = cc.studentid
+            WHERE s.enroll_status = 0
+                AND s.grade_level >= 5
+                AND cc.termid >= (EXTRACT(year from sysdate)-2000+(CASE WHEN EXTRACT(month from sysdate) BETWEEN 7 AND 12 THEN 10 ELSE 9 END)) * 100
+            ORDER BY
+                "parent_code" ASC,
+                "child_code" ASC
 
-            where CC.STUDENTID=STUDENTS.ID
-                and COURSES.COURSE_NUMBER=CC.COURSE_NUMBER
-                and SECTIONS.ID=CC.SECTIONID
-                and STUDENTS.ENROLL_STATUS =0
-                and STUDENTS.GRADE_LEVEL >=5
-                and CC.TERMID >= case 
-                    when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
-                        THEN (EXTRACT(year from sysdate)-2000+9)*100
-                    when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
-                        THEN (EXTRACT(year from sysdate)-2000+10)*100
-                end
-            order by 
-                "parent_code" asc,
-                "child_code" asc
             ]]>
         </sql>
     </query>
