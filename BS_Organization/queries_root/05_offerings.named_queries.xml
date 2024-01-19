@@ -46,8 +46,8 @@
                     -- only apply to HS courses with termid that is divisible by 100
                     when mod(cc.termid, 100) = 0 and c.schoolid = 3
                     then TERMS.LASTDAY + 60
-                    -- everything else (S1, S2, Q1-Q4, all MS) should use the last day
-                    else TERMS.LASTDAY
+                    -- everything else (S1, S2, Q1-Q4, all MS) should use the last day + 1 day
+                    else TERMS.LASTDAY + 1
                 end as "end_date",
                    
                 /* set courses as inactive by default */
