@@ -6,7 +6,7 @@
         <!--number of columns here must match number sql returns-->
         <columns>
             <column column="STUDENTS.ID">type</column> <!-- for columns not in database use a core filed-->
-            <column column="s.exitdate">action</column> 
+            <column column="STUDENTS.ID">action</column> 
             <column column="STUDENTS.ID">username</column> 
             <column column="STUDENTS.ID">org_defined_id</column>
             <column column="STUDENTS.FIRST_NAME">first_name</column>
