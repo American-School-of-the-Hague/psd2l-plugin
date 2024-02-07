@@ -30,7 +30,10 @@ fi
 
 TIME=$(date "+%Y%m%d_%H%M%S")
 pushd $1
-VERSION=$(grep -Eo '^\s+version="(.*)"' ./plugin.xml | sed -ne 's/[^0-9]*\(\([0-9]\.\)\{0,5\}[0-9]\{0,8\}[^.]\).*".*/\1/p')
+# VERSION=$(grep -Eo '^\s+version="(.*)"' ./plugin.xml | sed -ne 's/[^0-9]*\(\([0-9]\.\)\{0,5\}[0-9]\{0,8\}[^.]\).*".*/\1/p')
+VERSION=$(grep -Ei '^\s+version=".*"' ./plugin.xml | sed -E 's/^[[:space:]]{0,}version="(.*)"/\1/')
+
+echo "VERSION: $VERSION"
 PACKAGENAME=$(basename $1)-V$VERSION-$TIME.zip
 # echo $VERSION
 zip -X -r  ../$PACKAGENAME ./* -x "*.md" -x ".*"
