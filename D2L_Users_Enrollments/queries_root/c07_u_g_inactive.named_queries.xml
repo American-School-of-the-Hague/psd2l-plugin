@@ -13,7 +13,7 @@
 			<column column="STUDENTS.FIRST_NAME">first_name</column>
 			<column column="STUDENTS.LAST_NAME">last_name</column>
 			<column column="STUDENTS.ID">password</column>
-			<column column="STUDENTS.ENROLL_STATUS">is_active</column>
+			<column column="STUDENTS.ID">is_active</column>
 			<column column="STUDENTS.ID">role_name</column>
 			<column column="STUDENTS.ID">email</column>
 			<column column="STUDENTS.ID">relationships</column>
@@ -55,10 +55,10 @@
                 AND TRUNC(sysdate) - s.exitdate BETWEEN 0 AND 365
 
                 /*
-                 * Check if the guardian has other students that are enrolled or pre-registered
+                 Check if the guardian has other students that are enrolled or pre-registered
                  */
                 AND NOT EXISTS (
-                    SELECT *
+                    SELECT 1
                     FROM studentcontactassoc sca_inner
                         JOIN students s_inner ON s_inner.dcid = sca_inner.studentdcid
                     WHERE sca_inner.personid = sca.personid
