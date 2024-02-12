@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- set description and name here; does not need to match others-->
+<plugin xmlns="http://plugin.powerschool.pearson.com"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		description="Plugin to export Powerschool data to FinalSite"
+		name="FinalSite integration"
+		version="1.0.0.20240212"
+		xsi:schemaLocation="http://plugin.powerschool.pearson.com plugin.xsd">
+		
+	<publisher name="Jelle Dijkstra">
+		<contact email="jelle.dijkstra@starc.nl"/>
+	</publisher>
+</plugin>
