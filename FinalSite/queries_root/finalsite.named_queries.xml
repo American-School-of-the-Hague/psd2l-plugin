@@ -162,8 +162,8 @@
 				ctwo.address        AS "Contact2_Address"
 			FROM students s 
 				LEFT JOIN person_primary_email e ON s.person_id = e.personid
-				LEFT JOIN sca_complete cone ON cone.studentdcid = s.dcid AND cone.contactprio = 1
-				LEFT JOIN sca_complete ctwo ON ctwo.studentdcid = s.dcid AND ctwo.contactprio = 2
+				LEFT JOIN (SELECT * FROM sca_complete) cone ON cone.studentdcid = s.dcid AND cone.contactprio = 1
+				LEFT JOIN (SELECT * FROM sca_complete) ctwo ON ctwo.studentdcid = s.dcid AND ctwo.contactprio = 2
 			WHERE s.enroll_status = 0
 			ORDER BY s.lastfirst
 			]]>
