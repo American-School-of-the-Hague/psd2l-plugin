@@ -4,7 +4,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		description="Plugin to export Powerschool data to FinalSite"
 		name="FinalSite integration"
-		version="1.0.0.20240212"
+		version="1.0.10.20240212"
 		xsi:schemaLocation="http://plugin.powerschool.pearson.com plugin.xsd">
 		
 	<publisher name="Jelle Dijkstra">

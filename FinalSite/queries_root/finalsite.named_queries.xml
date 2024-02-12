@@ -108,7 +108,7 @@
 						a.address,
 						gender.code AS gender,
 						relation.code AS relation,
-						row_number() OVER (PARTITION BY studentdcid ORDER BY contactpriorityorder) AS contactprio
+						row_number() OVER (PARTITION BY sca.studentdcid ORDER BY sca.contactpriorityorder) AS contactprio
 					FROM studentcontactassoc sca
 						LEFT JOIN person ON person.id = sca.personid
 						LEFT JOIN person_primary_email e ON e.personid = person.id
@@ -142,28 +142,28 @@
 				e.emailaddress          AS "Student_Email",
 
 				-- Contact1 fields
-				contact1.personid       AS "Contact1_ID",
-				contact1.firstname      AS "Contact1_First_Name",
-				contact1.lastname       AS "Contact1_Last_Name",
-				contact1.gender         AS "Contact1_Gender",
-				contact1.relation       AS "Contact1_Relation",
-				contact1.emailaddress   AS "Contact1_Email",
-				CASE WHEN contact1.phonenumber IS NOT NULL THEN CONCAT('+', contact1.phonenumber) ELSE NULL END AS "Contact1_Phonenumber",
-				contact1.address        AS "Contact1_Address",
+				cone.personid       AS "Contact1_ID",
+				cone.firstname      AS "Contact1_First_Name",
+				cone.lastname       AS "Contact1_Last_Name",
+				cone.gender         AS "Contact1_Gender",
+				cone.relation       AS "Contact1_Relation",
+				cone.emailaddress   AS "Contact1_Email",
+				CASE WHEN cone.phonenumber IS NOT NULL THEN CONCAT('+', cone.phonenumber) ELSE NULL END AS "Contact1_Phonenumber",
+				cone.address        AS "Contact1_Address",
 
 				-- Contact2 fields
-				contact2.personid       AS "Contact2_ID",
-				contact2.firstname      AS "Contact2_First_Name",
-				contact2.lastname       AS "Contact2_Last_Name",
-				contact2.gender         AS "Contact2_Gender",
-				contact2.relation       AS "Contact2_Relation",
-				contact2.emailaddress   AS "Contact2_Email",
-				CASE WHEN contact2.phonenumber IS NOT NULL THEN CONCAT('+', contact2.phonenumber) ELSE NULL END AS  "Contact2_Phonenumber",
-				contact2.address        AS "Contact2_Address"
+				ctwo.personid       AS "Contact2_ID",
+				ctwo.firstname      AS "Contact2_First_Name",
+				ctwo.lastname       AS "Contact2_Last_Name",
+				ctwo.gender         AS "Contact2_Gender",
+				ctwo.relation       AS "Contact2_Relation",
+				ctwo.emailaddress   AS "Contact2_Email",
+				CASE WHEN ctwo.phonenumber IS NOT NULL THEN CONCAT('+', ctwo.phonenumber) ELSE NULL END AS "Contact2_Phonenumber",
+				ctwo.address        AS "Contact2_Address"
 			FROM students s 
 				LEFT JOIN person_primary_email e ON s.person_id = e.personid
-				LEFT JOIN sca_complete contact1 ON contact1.studentdcid = s.dcid AND contact1.contactprio = 1
-				LEFT JOIN sca_complete contact2 ON contact2.studentdcid = s.dcid AND contact2.contactprio = 2
+				LEFT JOIN sca_complete cone ON cone.studentdcid = s.dcid AND cone.contactprio = 1
+				LEFT JOIN sca_complete ctwo ON ctwo.studentdcid = s.dcid AND ctwo.contactprio = 2
 			WHERE s.enroll_status = 0
 			ORDER BY s.lastfirst
 			]]>
