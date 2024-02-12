@@ -48,6 +48,7 @@
                 JOIN person p                       ON sca.personid = p.id
                 JOIN guardianstudent gs             ON s.dcid = gs.studentsdcid
                 JOIN guardianpersonassoc gpa        ON p.id = gpa.personid AND gpa.guardianid = gs.guardianid
+
             WHERE
                 s.enroll_status > 0
                 AND s.grade_level >= 5
