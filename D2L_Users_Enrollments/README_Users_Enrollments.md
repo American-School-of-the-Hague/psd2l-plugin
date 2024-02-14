@@ -95,11 +95,11 @@ Use the field menu on the left to select all columns (see Example 1). Change the
 
 **Example 1**
 
-![](../../documentation/DEM_01.png)
+![](../documentation/DEM_01.png)
 
 **Example 2**
 
-![](../../documentation/DEM_02.png)
+![](../documentation/DEM_02.png)
 
 On the *Select/Edit Records from...* screen, use the following settings:
 - ◉ Export All Rows

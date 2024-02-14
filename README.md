@@ -6,6 +6,7 @@ Feb-June 2022 : Aaron Ciuffo : aciuffo@ash.nl : aaron.ciuffo@gmail.com
 - [Additional Tools](#additional-tools)
 - [Implementation Notes](#implementation-notes)
   - [Important Implementation Choices](#important-implementation-choices)
+    - [Parents \& Guardians](#parents--guardians)
 - [PowerSchool Setup and Installation](#powerschool-setup-and-installation)
   - [SIS Installation](#sis-installation)
   - [Data Export Manager Configuration](#data-export-manager-configuration)
@@ -14,7 +15,6 @@ Feb-June 2022 : Aaron Ciuffo : aciuffo@ash.nl : aaron.ciuffo@gmail.com
   - [IPSIS Upload](#ipsis-upload)
 - [List of Plugins and Functions](#list-of-plugins-and-functions)
 - [Plugin Errors \& Resolutions](#plugin-errors--resolutions)
-  - [Data Export Manager](#data-export-manager)
 - [Plugin Documentation](#plugin-documentation)
   - [Updating a Plugin](#updating-a-plugin)
 - [Reference Documentation](#reference-documentation)
@@ -227,58 +227,7 @@ Files are sent to IPSIS via SFTP. Find SFTP details within the platform [here](h
 
 ## Plugin Errors & Resolutions
 
-### Data Export Manager
-
-**SCREEN:** *Data Export Manager > Select/Edit Records from NQ... > Show Records [button]*
-
-**ERROR:** `Unable to execute the query operation due to an invalid parameter. Update your filter values and try again.`
-
-**SCREEN:** *Data Export Manager > Export Summary and Output Options > Export [button]*
-
-**ERROR:** `An unexpected error occurred while communicating with the server. Please contact your administrator.`
-
-**RESOLUTIONS:** 
-
-* Ensure that all `order by` statements in the SQL query are fields that are directly represented in the `select` section. 
-* Entirely remove the `order by` statements -- in some cases this resolves the above error entirely
-
-
-**NON FUNCTIONAL EXAMPLE:**
-
-```SQL
-select distinct
-    'enrollment' as "type",
-    'UPDATE' as "action",
-    'T_'||teachers.teachernumber as "child_code",
-    'Instructor' as "role_name",
-    teachers.homeschoolid as "parent_code"
- from TEACHERS TEACHERS
- where teachers.status =1
-    and length(teachers.email_addr) >0
-/*
-note that the teacher number is not a directly select'd statement.
-In this case it is concat'd to 'T_'
-*/ 
- order by teachers.teachernumber asc
-```
-
-**FUNCTIONAL EXAMPLE:**
-
-```SQL
-select distinct
-    'enrollment' as "type",
-    'UPDATE' as "action",
-    'T_'||teachers.teachernumber as "child_code",
-    'Instructor' as "role_name",
-    teachers.homeschoolid as "parent_code"
- from TEACHERS TEACHERS
- where teachers.status =1
-    and length(teachers.email_addr) >0
-/*
-homeschoolid is directly select'd 
-*/ 
- order by teachers.homeschoolid asc
-```
+See this [GitHub Gist](https://gist.github.com/txoof/d09a808abadcb97240c79c4f22931f78) for common problems and resolutions.
 
 ## Plugin Documentation
 
