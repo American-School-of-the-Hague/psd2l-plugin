@@ -1,0 +1,173 @@
+<queries>
+	<!--set name here (also applies to permissions_root-->
+    <query name="com.txoof.finalsite" coreTable="students" flattened="false">
+		<!--add description here-->
+        <description>Active students and two contacts per student</description>
+		<!--number of columns here must match number sql returns-->
+        <columns>
+			<column column="STUDENTS.ID">Student_Number</column>
+			<column column="STUDENTS.ID">Enroll_Status</column>
+			<column column="STUDENTS.ID">Family_Ident</column>
+			<column column="STUDENTS.ID">Grade_Level</column>
+			<column column="STUDENTS.ID">ClassOf</column>
+			<column column="STUDENTS.ID">Student_Last_Name</column>
+			<column column="STUDENTS.ID">Student_First_Name</column>
+			<column column="STUDENTS.ID">Student_Gender</column>
+			<column column="STUDENTS.ID">DistrictEntryDate</column>
+			<column column="STUDENTS.ID">Home_Room</column>
+			<column column="STUDENTS.ID">Student_Mailing_Street</column>
+			<column column="STUDENTS.ID">Student_Mailing_City</column>
+			<column column="STUDENTS.ID">Student_Mailing_Zip</column>
+			<column column="STUDENTS.ID">SchoolID</column>
+			<column column="STUDENTS.ID">Student_Email</column>
+			<column column="STUDENTS.ID">Contact1_ID</column>
+			<column column="STUDENTS.ID">Contact1_First_Name</column>
+			<column column="STUDENTS.ID">Contact1_Last_Name</column>
+			<column column="STUDENTS.ID">Contact1_Gender</column>
+			<column column="STUDENTS.ID">Contact1_Relation</column>
+			<column column="STUDENTS.ID">Contact1_Email</column>
+			<column column="STUDENTS.ID">Contact1_Phonenumber</column>
+			<column column="STUDENTS.ID">Contact1_Address</column>
+			<column column="STUDENTS.ID">Contact2_ID</column>
+			<column column="STUDENTS.ID">Contact2_First_Name</column>
+			<column column="STUDENTS.ID">Contact2_Last_Name</column>
+			<column column="STUDENTS.ID">Contact2_Gender</column>
+			<column column="STUDENTS.ID">Contact2_Relation</column>
+			<column column="STUDENTS.ID">Contact2_Email</column>
+			<column column="STUDENTS.ID">Contact2_Phonenumber</column>
+			<column column="STUDENTS.ID">Contact2_Address</column>
+ 		</columns>
+		<!--SQL query in format <![CDATA[QUERY]]>-->
+        <sql>
+			<![CDATA[
+			WITH 
+				/**
+				* Query person primary email address 
+				*/ 
+				person_primary_email AS (
+					SELECT
+						personid,
+						emailaddress
+					FROM (SELECT
+						peaa.personid,
+						emailaddress.emailaddress,
+						row_number() OVER (PARTITION BY peaa.personid ORDER BY peaa.emailaddresspriorityorder) AS emailprio
+					FROM personemailaddressassoc peaa
+						LEFT JOIN emailaddress ON peaa.emailaddressid = emailaddress.emailaddressid
+					) all_emails WHERE emailprio = 1
+				), 
+
+				/**
+				* Query person primary phonenumber
+				*/
+				person_primary_phone AS (
+				SELECT
+					personid,
+					phonenumber
+				FROM (SELECT
+						ppna.personid,
+						phonenumber.phonenumber,
+						row_number() OVER (PARTITION BY ppna.personid ORDER BY ppna.phonenumberpriorityorder) AS phoneprio
+					FROM
+						personphonenumberassoc ppna
+						LEFT JOIN phonenumber ON ppna.phonenumberid = phonenumber.phonenumberid
+					) all_phones WHERE phoneprio = 1 
+				),
+
+				/**
+				* Query person primary address
+				*/
+				person_primary_address AS (
+					SELECT
+						personid,
+						address
+					FROM (SELECT
+						paa.personid,
+						addresstype.code || ': ' || personaddress.street || ' / ' || personaddress.city || ', ' || personaddress.postalcode  AS "ADDRESS",
+						row_number() OVER (PARTITION BY paa.personid ORDER BY paa.addresspriorityorder) AS addressprio
+					FROM
+						personaddressassoc paa
+						JOIN personaddress ON paa.personaddressid = personaddress.personaddressid
+						LEFT JOIN codeset addresstype ON paa.addresstypecodesetid = addresstype.codesetid
+						--left outer join codeset state on personaddress.statescodesetid = state.codesetid
+					) all_addresses WHERE addressprio = 1
+				),
+
+				/**
+				* Complete SCA query will later be joined with student data
+				* Add any data that is needed from a contact to this query
+				*/
+				sca_complete AS (
+					SELECT
+						sca.studentdcid,
+						sca.personid,
+						person.firstname,
+						person.lastname,
+						e.emailaddress,
+						p.phonenumber,
+						a.address,
+						gender.code AS gender,
+						relation.code AS relation,
+						row_number() OVER (PARTITION BY sca.studentdcid ORDER BY sca.contactpriorityorder) AS contactprio
+					FROM studentcontactassoc sca
+						LEFT JOIN person ON person.id = sca.personid
+						LEFT JOIN person_primary_email e ON e.personid = person.id
+						LEFT JOIN person_primary_phone p ON p.personid = person.id
+						LEFT JOIN person_primary_address a ON a.personid = person.id
+						LEFT JOIN codeset gender ON gender.codesetid = person.gendercodesetid
+						LEFT JOIN codeset relation ON relation.codesetid = sca.currreltypecodesetid
+				)
+
+			/**
+			* Student query
+			* Joines sca query above
+			* Add any data that is needed from a student to this query
+			*/
+			SELECT 
+				-- Student fields
+				s.student_number        AS "Student_Number",
+				s.enroll_status         AS "Enroll_Status",
+				s.family_ident          AS "Family_Ident",
+				s.grade_level           AS "Grade_Level",
+				s.classof               AS "ClassOf",
+				s.last_name             AS "Student_Last_Name",
+				s.first_name            AS "Student_First_Name",
+				s.gender                AS "Student_Gender",
+				s.DistrictEntryDate     AS "DistrictEntryDate",
+				s.Home_Room             AS "Home_Room",
+				s.Mailing_Street        AS "Student_Mailing_Street",
+				s.Mailing_City          AS "Student_Mailing_City",
+				s.Mailing_Zip           AS "Student_Mailing_Zip",
+				s.SchoolID              AS "SchoolID",
+				e.emailaddress          AS "Student_Email",
+
+				-- Contact1 fields
+				cone.personid       AS "Contact1_ID",
+				cone.firstname      AS "Contact1_First_Name",
+				cone.lastname       AS "Contact1_Last_Name",
+				cone.gender         AS "Contact1_Gender",
+				cone.relation       AS "Contact1_Relation",
+				cone.emailaddress   AS "Contact1_Email",
+				CASE WHEN cone.phonenumber IS NOT NULL THEN CONCAT('+', cone.phonenumber) ELSE NULL END AS "Contact1_Phonenumber",
+				cone.address        AS "Contact1_Address",
+
+				-- Contact2 fields
+				ctwo.personid       AS "Contact2_ID",
+				ctwo.firstname      AS "Contact2_First_Name",
+				ctwo.lastname       AS "Contact2_Last_Name",
+				ctwo.gender         AS "Contact2_Gender",
+				ctwo.relation       AS "Contact2_Relation",
+				ctwo.emailaddress   AS "Contact2_Email",
+				CASE WHEN ctwo.phonenumber IS NOT NULL THEN CONCAT('+', ctwo.phonenumber) ELSE NULL END AS "Contact2_Phonenumber",
+				ctwo.address        AS "Contact2_Address"
+			FROM students s 
+				LEFT JOIN person_primary_email e ON s.person_id = e.personid
+				LEFT JOIN (SELECT * FROM sca_complete) cone ON cone.studentdcid = s.dcid AND cone.contactprio = 1
+				LEFT JOIN (SELECT * FROM sca_complete) ctwo ON ctwo.studentdcid = s.dcid AND ctwo.contactprio = 2
+			WHERE s.enroll_status = 0
+			ORDER BY s.lastfirst
+			]]>
+        </sql>
+    </query>
+
+</queries>
