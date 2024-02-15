@@ -174,7 +174,7 @@ PQ File: [c07_u_t_inactive.named_queries.xml](./queries_root/c07_u_t_inactive.na
 
 * **Named Query (NQ)**: `com.txoof.brightspace.users.c07t_inactive`
 * **Export File Name**: 7-Users_100_guardians_inactive-%d.csv
-* **Template Name**: BS 7-Users Teachers Inactive
+* **Template Name**: D2L 07-Users Teachers Inactive
 * **Template Description**: Updated: YYYY/MM/DD [your initials]
 
 **Active**
@@ -183,7 +183,7 @@ PQ File: [c07_u_t_active.named_queries.xml](./queries_root/c07_u_t_active.named_
 
 * **Named Query (NQ)**: `com.txoof.brightspace.users.c07t_active`
 * **Export File Name**: 7-Users_101_guardians_active-%d.csv
-* **Template Name**: BS 7-Users Teachers Active
+* **Template Name**: D2L 07-Users Teachers Active
 * **Template Description**: Updated: YYYY/MM/DD [your initials]
 
 
@@ -200,7 +200,7 @@ PQ File: [c07_u_s_inactive.named_queries.xml](./queries_root/c07_u_s_inactive.na
 
 * **Named Query (NQ)**: `com.txoof.brightspace.users.c07s_inactive`
 * **Export File Name**: 7-Users_200_students_inactive-%d.csv
-* **Template Name**: BS 7-Users Students Inactive
+* **Template Name**: D2L 07-Users Students Inactive
 * **Template Description**: Updated: YYYY/MM/DD [your initials]
 
 **Active**
@@ -209,7 +209,7 @@ PQ File: [c07_u_s_active.named_queries.xml](./queries_root/c07_u_s_active.named_
 
 * **Named Query (NQ)**: `com.txoof.brightspace.users.c07s_active`
 * **Export File Name**: 7-Users_201_students_active-%d.csv
-* **Template Name**: BS 7-Users Guardians Inactive
+* **Template Name**: D2L 07-Users Guardians Inactive
 * **Template Description**: Updated: YYYY/MM/DD [your initials]
 
 ### Student-Parent Relationships
@@ -317,7 +317,7 @@ PQ File: [c08_e_g_drop.named_queries.xml](./queries_root/c08_e_g_drop.named_quer
 
 * **Named Query (NQ)**: `com.txoof.brightspace.enroll.c08_guardian_drop`
 * **Export File Name**: 8-Enrollments_000_guardians_auditor_drop-%d.csv
-* **Template Name**: BS 8-Enrollment Guardians Auditor Drop
+* **Template Name**: D2L 08-Enrollment Guardians Auditor Drop
 * **Template Description**: Updated: YYYY/MM/DD [your initials]
 
 
@@ -329,7 +329,7 @@ PQ File: [c08_e_g.named_queries.xml](./queries_root/c08_e_g.named_queries.xml)
 
 * **Named Query (NQ)**: `com.txoof.brightspace.enroll.c08_guardian_enroll`
 * **Export File Name**: 8-Enrollments_001_guardians_auditor_enroll-%d.csv
-* **Template Name**: BS 8-Enrollment Guardians Auditor
+* **Template Name**: D2L 08-Enrollment Guardians Auditor
 * **Template Description**: Updated: YYYY/MM/DD [your initials]
 
 **Enroll in School as Learners**
@@ -340,7 +340,7 @@ PQ File: [c08_e_g_school_learners.named_queries.xml](./queries_root/c08_e_g_scho
 
 * **Named Query (NQ)**: `com.txoof.brightspace.enroll.c08_guardian_schl_lrnr`
 * **Export File Name**: 8-Enrollments_002_guardians_school_learner_enroll-%d.csv
-* **Template Name**: BS 8-Enrollment Guardians Auditor
+* **Template Name**: D2L 08-Enrollment Guardians School
 * **Template Description**: Updated: YYYY/MM/DD [your initials]
 
 ### 8 - Enrollments Teachers
@@ -358,7 +358,7 @@ PQ File: [c08_e_t.named_queries.xml](./queries_root/c08_e_t.named_queries.xml)
 
 * **Named Query (NQ)**: `com.txoof.brightspace.enroll.c08_teacher_enroll`
 * **Export File Name**: 8-Enrollments_100_teachers-%d.csv
-* **Template Name**: BS 8-Enrollment Teachers
+* **Template Name**: D2L 08-Enrollment Teachers
 * **Template Description**: Updated: YYYY/MM/DD [your initials]
 
 **Enroll in School**
@@ -369,7 +369,7 @@ PQ File: [c08_e_t_school.named_queries.xml](./queries_root/c08_e_t_school.named_
 
 * **Named Query (NQ)**: `com.txoof.brightspace.enroll.c08_teacher_school`
 * **Export File Name**: 8-Enrollments_101_teachers_school-%d.csv
-* **Template Name**: BS 8-Enrollment Teachers School
+* **Template Name**: D2L 08-Enrollment Teachers School
 * **Template Description**: Updated: YYYY/MM/DD [your initials]
 
 **Enroll in LS School**
@@ -380,7 +380,7 @@ PQ File: [c08_e_t_ls_school.named_queries.xml](./queries_root/c08_e_t_ls_school.
 
 * **Named Query (NQ)**: `com.txoof.brightspace.enroll.c08_teacher_ls_school`
 * **Export File Name**: 8-Enrollments_102_teachers_ls_auditors-%d.csv
-* **Template Name**: BS 8-Enrollment Teachers Auditors
+* **Template Name**: D2L 08-Enrollment Teachers Auditors
 * **Template Description**: Updated: YYYY/MM/DD [your initials]
 
 **Enroll in ASH101**
@@ -391,7 +391,7 @@ PQ File: [c08_e_t_ash101.named_queries.xml](./queries_root/c08_e_t_ash101.named_
 
 * **Named Query (NQ)**: `com.txoof.brightspace.enroll.c08_teacher_ash101`
 * **Export File Name**: 8-Enrollments_103_teachers_ash101-%d.csv
-* **Template Name**: BS 8-Enrollment Teachers ASH101
+* **Template Name**: D2L 08-Enrollment Teachers ASH101
 * **Template Description**: Updated: YYYY/MM/DD [your initials]
 
 ----
@@ -410,7 +410,7 @@ PQ File: [c08_e_s_drop.named_queries.xml](./queries_root/c08_e_s_drop.named_quer
 
 * **Named Query (NQ)**: `com.txoof.brightspace.enroll.c08_s_drop`
 * **Export File Name**: 8-Enrollments_200_students_drop-%d.csv
-* **Template Name**: BS 8-Enrollment Students Drop
+* **Template Name**: D2L 08-Enrollment Students Drop
 * **Template Description**: Updated: YYYY/MM/DD [your initials]
 
 
@@ -422,7 +422,7 @@ PQ File: [c08_e_s_school.named_queries.xml](./queries_root/c08_e_s_school.named_
 
 * **Named Query (NQ)**: `com.txoof.brightspace.enroll.c08_student_school`
 * **Export File Name**: 8-Enrollments_201_students_school-%d.csv
-* **Template Name**: BS 8-Enrollment Students School
+* **Template Name**: D2L 08-Enrollment Students School
 * **Template Description**: Updated: YYYY/MM/DD [your initials]
 
 **Enroll in Courses**
@@ -433,5 +433,5 @@ PQ File: [c08_e_s.named_queries.xml](./queries_root/c08_e_s.named_queries.xml)
 
 * **Named Query (NQ)**: `com.txoof.brightspace.enroll.c08_students`
 * **Export File Name**: 8-Enrollments_202_students_enroll-%d.csv
-* **Template Name**: BS 8-Enrollment Students Courses
+* **Template Name**: D2L 08-Enrollment Students Courses
 * **Template Description**: Updated: YYYY/MM/DD [your initials]
