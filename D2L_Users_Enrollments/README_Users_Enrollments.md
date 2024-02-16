@@ -11,7 +11,6 @@ PowerQuery plugin for exporting information from PowerSchool and importing to Br
   - [7 Users - Guardians](#7-users---guardians)
   - [7 Users - Teachers](#7-users---teachers)
   - [7 Users - Students](#7-users---students)
-  - [Student-Parent Relationships](#student-parent-relationships)
 - [User Enrollments](#user-enrollments)
   - [8 - Enrollments Guardians](#8---enrollments-guardians)
   - [8 - Enrollments Teachers](#8---enrollments-teachers)
@@ -139,7 +138,7 @@ Guardians must always be created prior to students to prevent a condition where 
 
 **Inactive**
 
-Guardians with [Data Access = True](#7-users-guardians) that have zero active students are considered *inactive*. Inactive guardians are first set as *inactive* and then deleted after a fixed period (currently 30 days).
+Description: Guardians with [Data Access = True](#7-users-guardians) that have zero active students are considered *inactive*. Inactive guardians are first set as *inactive* and then deleted after a fixed period (currently 30 days).
 
 PQ File: [c07_u_g_inactive.named_queries.xml](./queries_root/c07_u_g_inactive.named_queries.xml)
 
@@ -150,7 +149,7 @@ PQ File: [c07_u_g_inactive.named_queries.xml](./queries_root/c07_u_g_inactive.na
 
 **Active**
 
-Guardians with [Data Access = True](#7-users-guardians) that have one or more active students are considered *active*. Active guardians are created using their guardian ID and contact email address from PowerSchool. See [Brightspace User Details](#brightspace-user-details).
+Description: Guardians with [Data Access = True](#7-users-guardians) that have one or more active students are considered *active*. Active guardians are created using their guardian ID and contact email address from PowerSchool. See [Brightspace User Details](#brightspace-user-details).
 
 PQ File: [c07_u_g_active.named_queries.xml](./queries_root/07_u_g_active.named_queries.xml)
 
@@ -170,6 +169,8 @@ Teachers must always be created prior to students to prevent a condition where n
 
 **Inactive**
 
+Description: Deactivates staff that is no longer working at ASH
+
 PQ File: [c07_u_t_inactive.named_queries.xml](./queries_root/c07_u_t_inactive.named_queries.xml)
 
 * **Named Query (NQ)**: `com.txoof.brightspace.users.c07t_inactive`
@@ -178,6 +179,8 @@ PQ File: [c07_u_t_inactive.named_queries.xml](./queries_root/c07_u_t_inactive.na
 * **Template Description**: Updated: YYYY/MM/DD [your initials]
 
 **Active**
+
+Description: Creates Brightspace accounts for all staff members (including support and non-teaching staff)
 
 PQ File: [c07_u_t_active.named_queries.xml](./queries_root/c07_u_t_active.named_queries.xml)
 
@@ -196,6 +199,8 @@ Provides access accounts for students in grades 5+. Students must always be crea
 
 **Inactive**
 
+Description: Removes inactive students from Brightspace
+
 PQ File: [c07_u_s_inactive.named_queries.xml](./queries_root/c07_u_s_inactive.named_queries.xml)
 
 * **Named Query (NQ)**: `com.txoof.brightspace.users.c07s_inactive`
@@ -205,96 +210,25 @@ PQ File: [c07_u_s_inactive.named_queries.xml](./queries_root/c07_u_s_inactive.na
 
 **Active**
 
+Description: Adds active students to Brightspace and builds *Auditor* relationships with LSC, EAL, Special Ed teachers.
+
 PQ File: [c07_u_s_active.named_queries.xml](./queries_root/c07_u_s_active.named_queries.xml)
 
 * **Named Query (NQ)**: `com.txoof.brightspace.users.c07s_active`
 * **Export File Name**: 7-Users_201_students_active-%d.csv
-* **Template Name**: D2L 07-Users Guardians Inactive
+* **Template Name**: D2L 07-Users Students Active
 * **Template Description**: Updated: YYYY/MM/DD [your initials]
 
-### Student-Parent Relationships
+**Active with Guardians**
 
-The query below provides parents access to the Brightspace Parent and Guardian application. This works by adding the parent `org_defined_id` to the `relationship` field for students. This query can take the place of the current [Students Active Query](./queries_root/07_u_s_active.named_queries.xml).
+Description: Adds active students to Brightspace; builds *Auditor* relationship with LSC, EAL, Special Ed teachers; adds *Parent* relationship so guardians can view student progress.
 
-```SQL
-/*
-Guardian Contacts Relationships
-https://support.powerschool.com/thread/23796?94834
-*/
-SELECT
-    'user' as "type",
-    'UPDATE' as "action",
-    ema.emailaddress AS "username",
-    'S_'||students.student_number as "org_defined_id",
-    students.first_name as "first_name",
-    students.last_name as "last_name",
-    '' as "password",
-    1 as "is_active",
-    'Learner' as "role_name",
-    ema.emailaddress as "email",
-    CASE
-        WHEN Auditors.Auditors IS NOT NULL AND Parents.Parents IS NOT NULL
-        THEN Auditors.Auditors || '|' || Parents.Parents
-        ELSE COALESCE(Auditors.Auditors,Parents.Parents)
-    END AS "relationships",
-    '' as "pref_first_name",
-    '' as "pref_last_name"
-FROM
-    Students
-    join personemailaddressassoc PEAA on students.person_id = PEAA.personid
-    join emailaddress ema on PEAA.emailaddressid = ema.emailaddressid
-    -- JOIN U_StudentsUserFields ON Students.DCID = U_StudentsUserFields.StudentsDCID
-    LEFT JOIN (
-        SELECT
-            Helper.StudentID,
-            LISTAGG('Auditor'||CHR(58)||'T_'||Helper.TeacherNumber,'|')
-                WITHIN GROUP (ORDER BY Helper.TeacherNumber DESC) AS Auditors
-        FROM ( /* Oracle 12c method to deduplicate the LISTAGG */
-            SELECT DISTINCT
-                CC.StudentID,
-                Teachers.TeacherNumber
-            FROM
-                CC
-                JOIN Courses ON CC.Course_Number = Courses.Course_Number
-                JOIN Teachers ON CC.TeacherID = Teachers.ID
-            WHERE
-                (
-                    Courses.Course_Name LIKE 'ENG English Foundations%'
-                    OR Courses.Course_name LIKE 'Grade%English Essentials%'
-                    OR CC.Course_Number = 'OLEA'
-                    OR Courses.Sched_Department IN ('MSEAL','MSLSC')
-                )
-                     and CC.TERMID >= case 
-                        when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
-                        THEN (EXTRACT(year from sysdate)-2000+9)*100
-                        when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
-                        THEN (EXTRACT(year from sysdate)-2000+10)*100
-                     end
-        ) Helper
-        GROUP BY
-            Helper.StudentID
-    ) Auditors ON Students.ID = Auditors.StudentID
-    LEFT JOIN ( /* I didn't deduplicate here because there shouldn't be duplicate
-        parent accounts, but you could use that same approach here if needed. */
-        SELECT
-            GuardianStudent.StudentsDCID,
-            LISTAGG('Parent' || CHR(58) || 'P_' || GuardianID,'|')
-                WITHIN GROUP (ORDER BY Guardian.LastName DESC) AS Parents
-        FROM
-            Guardian
-            JOIN GuardianStudent USING(GuardianID)
-        GROUP BY
-            GuardianStudent.StudentsDCID
-    ) Parents ON Students.DCID = Parents.StudentsDCID
-WHERE
-    Students.Enroll_Status = 0
-    AND Students.Grade_Level >= 5
-    -- AND U_StudentsUserFields.EmailStudent IS NOT NULL
-    /* Only pull students that have some kind of relationship */
-    AND COALESCE(Auditors.Auditors,Parents.Parents) IS NOT NULL
-ORDER BY
-    students.student_number
-```
+PQ File: [c07_u_s_active_guardians.named_queries.xml](./queries_root/c07_u_s_active_guardians.named_queries.xml)
+
+* **Named Query (NQ)**: `com.txoof.brightspace.users.c07s_active_guardians`
+* **Export File Name**: 7-Users_201_students_active_guardians-%d.csv
+* **Template Name**: D2L 07-Users Students Active w/ Guardians
+* **Template Description**: Updated: YYYY/MM/DD [your initials]
 
 ## User Enrollments
 
