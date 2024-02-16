@@ -100,7 +100,7 @@ Each CSV Export for Brightspace is managed through an individual plugin. Each pl
 <!-- TOC ignore:True -->
 #### Parents & Guardians
 
-Two different methods for enrolling parents are provided `BS_Users_Enrollments` and `D2L_Users_Enrollments`. `BS_Users_Enrollments` relies on contact information stored in the `U_STUDENTSUSERFIELDS` view. As of February 2024 this data will be deprecated. The `D2L_Users_Enrollments` plugin uses the new unlimited contacts data in PowerSchool. This plugin can be updated 
+Two different methods for enrolling parents are provided `BS_Users_Enrollments` and `D2L_Users_Enrollments`. `BS_Users_Enrollments` relies on contact information stored in the `U_STUDENTSUSERFIELDS` view. As of February 2024 this data will be deprecated. The `D2L_Users_Enrollments` plugin uses the new unlimited contacts data in PowerSchool.
 
 Parents & Guardians are enrolled in Brightspace with the following roles:
 
@@ -180,6 +180,21 @@ The basic settings are as follows:
 7. Click _Save as New_
 
 ## Automated Exports from PSL to BrightSpace
+
+After templates are created or updated, they need to be scheduled to run using the *Scheduled Systems Templates* interface in the *Data Export Manager* screens. **Note:** PowerSchool users can only schedule templates that they have created. It is not possible to see other users templates.
+
+To schedule a template:
+
+1. Navigate to *My Templates* tab in the *Data Export Manager* screen.
+2. Click the calendar icon to the right of the template in the *Actions* column
+3. Set the schedule with the following settings:
+    - Schedule Active: ☑
+    - Days To Execute: Monday, Tuesday, Wednesday, Thrusday, Friday, Saturday, Sunday
+    - When to Execute: Any time between 12:00AM and 4:00AM
+    - Send Output To: PowerSchool Folder
+    - Path: `C:\Brightspace\Exports`
+
+![DEM Scheduled Template](./documentation/DEM_Schedule.png)
 
 Data is uploaded to Brightspace via the [IPSIS interface](https://documentation.brightspace.com/EN/integrations/ipsis/admin/about_ipsis.htm). The data upload is managed from the PowerSchool Windows server using a scheduled task and is executed via a windows BATCH file.
 
