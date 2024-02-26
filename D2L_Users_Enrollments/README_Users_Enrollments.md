@@ -174,7 +174,7 @@ Description: Deactivates staff that is no longer working at ASH
 PQ File: [c07_u_t_inactive.named_queries.xml](./queries_root/c07_u_t_inactive.named_queries.xml)
 
 * **Named Query (NQ)**: `com.txoof.brightspace.users.c07t_inactive`
-* **Export File Name**: 7-Users_100_guardians_inactive-%d.csv
+* **Export File Name**: 7-Users_100_teachers_inactive-%d.csv
 * **Template Name**: D2L 07-Users Teachers Inactive
 * **Template Description**: Updated: YYYY/MM/DD [your initials]
 
@@ -185,7 +185,7 @@ Description: Creates Brightspace accounts for all staff members (including suppo
 PQ File: [c07_u_t_active.named_queries.xml](./queries_root/c07_u_t_active.named_queries.xml)
 
 * **Named Query (NQ)**: `com.txoof.brightspace.users.c07t_active`
-* **Export File Name**: 7-Users_101_guardians_active-%d.csv
+* **Export File Name**: 7-Users_101_teachers_active-%d.csv
 * **Template Name**: D2L 07-Users Teachers Active
 * **Template Description**: Updated: YYYY/MM/DD [your initials]
 
