@@ -1,5 +1,9 @@
 <!-- omit in toc -->
-# BrightSpace D2L User and Enrollments (7-8)
+# DEPRECATED BrightSpace D2L User and Enrollments (7-8)
+
+This plugin is deprecated in favor of the newer [D2L Users Enrollment Plugin](../D2L_Users_Enrollments/README_Users_Enrollments.md). The D2L Users Enrollment plugin supports PowerSchool unlimted contacts; this plugin does not.
+
+**It is not recommended to use this plugin for any reason. **
 
 PowerQuery Plugin for exporting the following information from PowerSchool &rarr; BrightSpace. This plugin creates the following exports:
 
