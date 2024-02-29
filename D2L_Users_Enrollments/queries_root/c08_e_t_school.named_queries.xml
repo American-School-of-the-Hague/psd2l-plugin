@@ -31,9 +31,14 @@
                  * in Brightspace.
                  */
                 CASE
+                    WHEN uf.brightspace_account_type IS NULL OR LOWER(TRIM(uf.brightspace_account_type)) = LOWER('NONE')
+                    THEN 'Instructor'
+                    ELSE TRIM(uf.brightspace_account_type)
+                /*
                     WHEN LOWER(uf.brightspace_account_type) LIKE '%-org%'
                     THEN uf.brightspace_account_type
                     ELSE 'Instructor'
+                */
                 END                         AS "role_name",    
                 users.homeschoolid          AS "parent_code"
             FROM users 
