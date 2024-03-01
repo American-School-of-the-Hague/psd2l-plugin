@@ -86,6 +86,7 @@
                                 LOWER(courses.course_name) LIKE '%english essentials%'
                                 OR LOWER(courses.course_name) LIKE '%english%academic%purposes%'
                                 OR LOWER(courses.course_name) LIKE 'eng%foundations%'
+                                OR LOWER(courses.course_name) LIKE '%advisory%'
 
                                 /*
                                  * HS Learning Support clasess are in the OTH department, MS

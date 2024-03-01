@@ -210,7 +210,9 @@ PQ File: [c07_u_s_inactive.named_queries.xml](./queries_root/c07_u_s_inactive.na
 
 **Active**
 
-Description: Adds active students to Brightspace and builds *Auditor* relationships with LSC, EAL, Special Ed teachers.
+Description: Adds active students to Brightspace and builds *Auditor* relationships with LSC, EAL, Special Ed and Advisory teachers.
+
+LSC, EAL, Special Ed and Advisory teachers can *Audit* any student they teach. This allows them to have a read-only view of a student through the *Audit* interface. See the [D2L Auditors and Bulk Auditor](https://community.d2l.com/brightspace/kb/articles/17896-auditors-and-bulk-auditor-management) article for more information.
 
 PQ File: [c07_u_s_active.named_queries.xml](./queries_root/c07_u_s_active.named_queries.xml)
 
