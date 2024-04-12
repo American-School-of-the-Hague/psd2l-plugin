@@ -1,5 +1,6 @@
 <!-- omit in toc -->
-# D2L BrightSpace IPSIS exports from PowerSchool SIS
+# PowerSchool-D2L Plugin
+This plugin creates CSV files compatible with D2L IPSIS for managing student, staff, guardian and course synchronization from PowerSchool to Brightspace.
 
 Feb-June 2022 : Aaron Ciuffo : aciuffo@ash.nl : aaron.ciuffo@gmail.com
 - [Data Flow and Integration](#data-flow-and-integration)
@@ -25,7 +26,7 @@ Feb-June 2022 : Aaron Ciuffo : aciuffo@ash.nl : aaron.ciuffo@gmail.com
 
 ## Data Flow and Integration
 
-Data is exported from PowerSchool SIS (PS) using the Plugin structure and imported to Brightspace using [IPSIS](https://documentation.brightspace.com/EN/integrations/ipsis/admin/about_ipsis.htm). Plugins contain PS/SQL queries and are executed using the Data Export Manager functionality in PS. More information regarding the structure of the plugins can be found below.
+Data is exported from PowerSchool SIS (PS) using the PowerSchool Plugin structure and imported to Brightspace using [IPSIS](https://documentation.brightspace.com/EN/integrations/ipsis/admin/about_ipsis.htm). Plugins contain PS/SQL queries and are executed using the scheduled Data Export Manager functionality in PS. More information regarding the structure of the plugins can be found below.
 
 ## Additional Tools
 
@@ -38,7 +39,7 @@ Several tools are provided by this repo to help package PowerQuery plugins and m
 
 **Usage:**
 
-`package.sh /path/to/directory`
+`package.sh ./path/to/directory`
 
 Example
 
@@ -155,7 +156,7 @@ PowerQuery Plugin exports are scheduled through the Data Export Manager [(DEM) i
 
 **Start Page > System Administrator > Page and Data Management > Data Export Manager**
 
-Each plugin needs to be configured to produce CSV files with the appropriate data, characterset and column headers. Each plugin documents the structure and settings under the **Data Export Manager Setup** heading. See the `README.md` in each plugin directory for more details.
+Each plugin needs to be configured to produce CSV files with the appropriate data, character set and column headers. Each plugin documents the structure and settings under the **Data Export Manager Setup** heading. See the `README.md` in each plugin directory for more details.
 
 The basic settings are as follows:
 
@@ -181,7 +182,7 @@ The basic settings are as follows:
 
 ## Automated Exports from PSL to BrightSpace
 
-After templates are created or updated, they need to be scheduled to run using the *Scheduled Systems Templates* interface in the *Data Export Manager* screens. **Note:** PowerSchool users can only schedule templates that they have created. It is not possible to see other users templates.
+After templates are created, they need to be scheduled to run using the *Scheduled Systems Templates* interface in the *Data Export Manager* screens. **Note:** PowerSchool users can only schedule templates that they have created. It is not possible to see other users templates.
 
 To schedule a template:
 
