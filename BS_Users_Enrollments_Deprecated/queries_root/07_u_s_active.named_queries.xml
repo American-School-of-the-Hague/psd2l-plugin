@@ -1,0 +1,119 @@
+<queries>
+    <!--set name here (also applies to permissions_root-->
+    <query name="com.txoof.brightspace.users.07s_active" coreTable="students" flattened="false">
+        <!--add description here-->
+        <description>export all active students grades 5-13 for use with a BrightSpace 7-User import</description>
+        <!--number of columns here must match number sql returns-->
+        <columns>
+            <column column="STUDENTS.ID">type</column> <!-- for columns not in database use a core filed-->
+            <column column="STUDENTS.ID">action</column> <!-- for columns not in database use a core filed-->
+            <column column="U_STUDENTSUSERFIELDS.EMAILSTUDENT">username</column> 
+            <column column="STUDENTS.ID">org_defined_id</column>
+            <column column="STUDENTS.FIRST_NAME">first_name</column>
+            <column column="STUDENTS.LAST_NAME">last_name</column>
+            <column column="STUDENTS.ID">password</column>
+            <column column="STUDENTS.ENROLL_STATUS">is_active</column>
+            <column column="STUDENTS.ID">role_name</column>
+            <column column="U_STUDENTSUSERFIELDS.EMAILSTUDENT">email</column>
+            <column column="STUDENTS.ID">relationships</column>
+            <column column="STUDENTS.ID">pref_first_name</column>
+            <column column="STUDENTS.ID">pref_last_name</column>
+         </columns>
+        <!--SQL query in format <![CDATA[QUERY]]>-->
+        <sql>
+            <![CDATA[
+            /*
+            07_u_s_active.named_queries.xml
+
+            update/create accounts for all active students
+            */
+            SELECT
+                'user' as "type",
+                'UPDATE' as "action",
+                U_StudentsUserFields.EmailStudent AS "username",
+                'S_'||students.student_number as "org_defined_id",
+                students.first_name as "first_name",
+                students.last_name as "last_name",
+                '' as "password",
+                1 as "is_active",
+                'Learner' as "role_name",
+                u_studentsuserfields.emailstudent as "email",
+                CASE
+                    WHEN Auditors.Auditors IS NOT NULL AND Parents.Parents IS NOT NULL
+                    THEN Auditors.Auditors || ''
+                    ELSE Auditors.Auditors
+                END AS "relationships",
+                regexp_replace(students.middle_name, '[()]+', '') as "pref_first_name",
+                '' as "pref_last_name"
+            FROM
+                Students
+                JOIN U_StudentsUserFields ON Students.DCID = U_StudentsUserFields.StudentsDCID
+                LEFT JOIN (
+                    SELECT
+                        Helper.StudentID,
+                        LISTAGG('Auditor'||CHR(58)||'T_'||Helper.TeacherNumber,'|')
+                            WITHIN GROUP (ORDER BY Helper.TeacherNumber DESC) AS Auditors
+                    FROM ( /* Oracle 12c method to deduplicate the LISTAGG */
+                        SELECT DISTINCT
+                            CC.StudentID,
+                            Teachers.TeacherNumber
+                        FROM
+                            teachers teachers
+                            inner join sectionteacher on sectionteacher.teacherid = teachers.id
+                            inner join cc on cc.sectionid = sectionteacher.sectionid
+                            inner join students on students.id = cc.studentid
+                            inner join courses on courses.course_number = cc.course_number                
+                        WHERE
+                            ( 
+                                /* 
+                                English Essentials, English Foundations, English for Accademic Purposes
+                                courses are in the MS/HS English Department, but service
+                                EAL students in both divisions
+                                */
+                                lower(courses.course_name) like '%english essentials%'
+                                or lower(courses.course_name) like '%english%academic%purposes%'
+                                or lower(courses.course_name) like 'eng%foundations%'
+                                /*
+                                HS Learning Support clasess are in the OTH department, MS
+                                Learning Suport classes are in the mslsc department
+                                */
+                                or lower(cc.course_number) like '%olea%'
+                                /*
+                                capture all EAL, LSC and Special Education classes in MS and HS
+                                */
+                                or lower(courses.sched_department) in('mseal', 'mslsc', 'msse')
+                                or lower(courses.sched_department) in('hseal', 'hslsc', 'hsse')
+                            )
+                                and CC.TERMID >= case 
+                                    when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
+                                    THEN (EXTRACT(year from sysdate)-2000+9)*100
+                                    when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
+                                    THEN (EXTRACT(year from sysdate)-2000+10)*100
+                                end
+                    ) Helper
+                    GROUP BY
+                        Helper.StudentID
+                ) Auditors ON Students.ID = Auditors.StudentID
+                LEFT JOIN ( /* I didn't deduplicate here because there shouldn't be duplicate
+                    parent accounts, but you could use that same approach here if needed. */
+                    SELECT
+                        GuardianStudent.StudentsDCID,
+                        LISTAGG('Parent' || CHR(58) || 'P_' )
+                            WITHIN GROUP (ORDER BY Guardian.LastName DESC) AS Parents
+                    FROM
+                        Guardian Guardian
+                        JOIN GuardianStudent USING(GuardianID)
+                    GROUP BY
+                        GuardianStudent.StudentsDCID
+                ) Parents ON Students.DCID = Parents.StudentsDCID
+            WHERE
+                Students.Enroll_Status = 0
+                AND Students.Grade_Level >= 5
+                AND U_StudentsUserFields.EmailStudent IS NOT NULL
+            ORDER BY
+                U_StudentsUserFields.EmailStudent
+            ]]>
+        </sql>
+    </query>
+
+</queries>

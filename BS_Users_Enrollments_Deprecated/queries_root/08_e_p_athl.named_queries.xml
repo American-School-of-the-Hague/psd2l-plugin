@@ -1,0 +1,42 @@
+<queries>
+    <!--set name here (also applies to permissions_root-->
+    <query name="com.txoof.brightspace.enroll.08_parents_athl" coreTable="cc" flattened="false">
+        <!--add description here-->
+        <description>enroll active parents in athletics matching their children</description>
+        <!--number of columns here must match number sql returns-->
+        <columns>
+            <column column="CC.ID">type</column>
+            <column column="CC.ID">action</column>
+            <column column="GUARDIAN.GUARDIANID">child_code</column>
+            <column column="CC.ID">role_name</column>
+            <column column="CC.schoolid">parent_code</column>
+         </columns>
+        <!--SQL query in format <![CDATA[QUERY]]>-->
+        <sql>
+            <![CDATA[
+            SELECT distinct
+                'enrollment' as "type",
+                'UPDATE' as "action",
+                -- 'S_'||STUDENTS.STUDENT_NUMBER as "child_code",
+                'P_'||GUARDIAN.GUARDIANID as "child_code",
+                'Learner' as "role_name",
+                'co_ath_'||Gen.Name AS "parent_code"
+
+            FROM
+                Students
+                JOIN Gen ON Gen.cat='activity',
+                GUARDIAN GUARDIAN,
+                GUARDIANSTUDENT GUARDIANSTUDENT
+            WHERE
+                Students.Enroll_Status = 0
+                and GUARDIANSTUDENT.STUDENTSDCID=STUDENTS.DCID
+                and GUARDIANSTUDENT.GUARDIANID=GUARDIAN.GUARDIANID
+                and STUDENTS.GRADE_LEVEL >=5
+                AND PS_CustomFields.GetStudentsCF(Students.ID,Gen.Value) IS NOT NULL
+                AND PS_CustomFields.GetStudentsCF(Students.ID,Gen.Value) >=1
+                AND Gen.Name LIKE '%Athletics - %'
+            ]]>
+        </sql>
+    </query>
+
+</queries>

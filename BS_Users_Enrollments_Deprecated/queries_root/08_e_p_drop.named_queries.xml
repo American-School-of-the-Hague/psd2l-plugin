@@ -1,0 +1,72 @@
+<queries>
+    <!--set name here (also applies to permissions_root-->
+    <query name="com.txoof.brightspace.enroll.08_parents_drop" coreTable="cc" flattened="false">
+        <!--add description here-->
+        <description>enroll active students</description>
+        <!--number of columns here must match number sql returns-->
+        <columns>
+            <column column="CC.ID">type</column>
+            <column column="CC.ID">action</column>
+            <column column="GUARDIAN.GUARDIANID">child_code</column>
+            <column column="CC.ID">role_name</column>
+            <column column="CC.schoolid">parent_code</column>
+         </columns>
+        <!--SQL query in format <![CDATA[QUERY]]>-->
+        <sql>
+            <![CDATA[
+            /*
+            08_e_p_drop.named_queries.xml
+            Update enrollments for parents: drop parents from classes that students have dropped 
+            */
+            -- 08_e_p_drop enrol parents; drop courses
+            select
+                'enrollment' as "type",
+                'DELETE' as "action",
+                'P_'||guardian.guardianid as "child_code",
+                'Learner' as "role_name",
+                /*
+                use the following format to ensure that section codes are unique
+                and remain constant even if the teacher is reassigned
+                code: cs_3_SPHYIBS2_3200_D_28636
+                */
+                -- at some points during the year the TERMID and SECTIONID values become negative
+                -- use regexp_replace to remove any non-digit characters 
+                'cs_'||cc.schoolid||'_'||cc.course_number||'_'||REGEXP_REPLACE(cc.termid, '\D+', '')||'_'||DECODE(regexp_replace(cc.expression, '[^0-9]', ''), 
+                1, 'A', 
+                2, 'B', 
+                3, 'C', 
+                4, 'D', 
+                5, 'E', 
+                6, 'F', 
+                7, 'G', 
+                8, 'H', 
+                9, 'ADV',
+                10, 'X', 
+                'UNKNOWN')||'_'||REGEXP_REPLACE(cc.sectionid, '\D+', '') as "parent_code"
+            from
+                cc
+                join students on cc.studentid = students.id
+                join sections on CC.OrigSectionID = Sections.ID
+                join courses on sections.course_number = courses.course_number
+                join teachers on sections.teacher = teachers.id
+                join guardianstudent on students.dcid = guardianstudent.studentsdcid
+                join guardian on guardianstudent.guardianid = guardian.guardianid
+            
+            where
+                sections.TERMID  >= case 
+                    when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
+                    THEN (EXTRACT(year from sysdate)-2000+9)*100
+                    when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
+                    THEN (EXTRACT(year from sysdate)-2000+10)*100
+                end
+                -- only select students that are "active"
+                and students.enroll_status IN (0)
+                -- only select students grades 5+
+                and students.grade_level >= 5
+            order by
+                "child_code" desc
+            ]]>
+        </sql>
+    </query>
+
+</queries>

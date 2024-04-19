@@ -1,0 +1,97 @@
+<queries>
+    <!--set name here (also applies to permissions_root-->
+    <query name="com.txoof.brightspace.users.07t_inactive" coreTable="teachers" flattened="false">
+        <!--add description here-->
+        <description>export all inactive teachers for use with a BrightSpace 7-User import</description>
+        <!--number of columns here must match number sql returns-->
+        <columns>
+            <column column="TEACHERS.TEACHERNUMBER">type</column> <!-- for columns not in database use a core filed-->
+            <column column="TEACHERS.TEACHERNUMBER">action</column> <!-- for columns not in database use a core filed-->
+            <column column="TEACHERS.EMAIL_ADDR">username</column> 
+            <column column="TEACHERS.TEACHERNUMBER">org_defined_id</column>
+            <column column="TEACHERS.FIRST_NAME">first_name</column>
+            <column column="TEACHERS.LAST_NAME">last_name</column>
+            <column column="TEACHERS.TEACHERNUMBER">password</column>
+            <column column="TEACHERS.STATUS">is_active</column>
+            <column column="TEACHERS.TEACHERNUMBER">role_name</column>
+            <column column="TEACHERS.EMAIL_ADDR">email</column>
+            <column column="TEACHERS.TEACHERNUMBER">relationships</column>
+            <column column="TEACHERS.TEACHERNUMBER">pref_first_name</column>
+            <column column="TEACHERS.TEACHERNUMBER">pref_last_name</column>
+         </columns>
+        <!--SQL query in format <![CDATA[QUERY]]>-->
+        <sql>
+            <![CDATA[
+            select distinct
+                'user' as "type",    
+                /*
+                Deactivate teachers with departure dates less than 181 days
+                Delete teachers with transaction dates greaterthan or equal to 181
+
+                The interval here should be exactly one day less than the value used below
+                in the `WHERE` clause
+                */
+                case 
+                    when sysdate - schoolstaff.transaction_date >= to_dsinterval('181 00:00:00')
+                    THEN 'DELETE'
+                    else 'UPDATE'
+                end as "action",
+                'T_'||t.TEACHERNUMBER as "org_defined_id",
+                /* 
+                use username portion of teacher/staff email addresses for D2L username.
+                This is necessary because some staff use their @ash.nl email address as
+                their guardian contact information. The parent accounts are created first
+                resulting in a colision between the parent account username and teacher 
+                account username.
+                
+                If the username is null (nvl); use a portion of their first name, teacher number 
+                to generate one. This should only be for departed staff.
+                */
+                nvl(regexp_replace(t.EMAIL_ADDR, '(@.*)', ''), substr(t.first_name, 1, 2)||'_'||t.teachernumber||'_DEPARTED' ) as "username",
+                t.first_name as "first_name",
+                t.last_name as "last_name",
+                '' as "password",
+                /*
+                decode the sum to a boolean value
+                */
+                decode(t.active_sum, 0, 0, 1) as "is_active",
+                'Instructor' as "role_name",
+                t.email_addr as "email",
+                '' as "relationships",
+                '' as "pref_first_name",
+                '' as "pref_last_name"
+            from 
+                (select 
+                    last_name, 
+                    first_name,
+                    homeschoolid, 
+                    teachernumber, 
+                    EMAIL_ADDR,
+                    /*
+                    coerce inactive to 0 and active to 1
+                    add up all the values
+                    SIS standard: 2 = no longer here, 1 = Active 
+                    */
+                    sum(decode(status, 2, 0, 1, 1)) over (partition by teachernumber) as active_sum
+                from 
+                    teachers) t,
+                users users,
+                schoolstaff schoolstaff
+                
+            where 
+                users.teachernumber = t.teachernumber
+                and t.active_sum = 0
+                and schoolstaff.users_dcid = users.dcid
+                /*
+                locate transaction dates that are older than N days to try to find recently deactivated
+                accountes
+
+                the value here should be equal exactly to the value in the 'action'
+                field
+                */
+                and sysdate - schoolstaff.transaction_date < to_dsinterval('182 00:00:00')
+            ]]>
+        </sql>
+    </query>
+
+</queries>
