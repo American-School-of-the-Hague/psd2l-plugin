@@ -37,23 +37,23 @@
                 AND s.grade_level >= 5
 
                 /*
-                 * Explicitly only include guardianstudent.guardianrelationshiptypeid
-                 * of type 10, 20.
-                 * 
-                 * As of Jan 2023 we can only reliably create parent accounts that appear on the 
-                 * Admissions Screen in PowerSchool SIS under the mother/father contact details.
-                 * 
-                 * It may be possible to improve this when moving to the PS SIS Contacts feature
-                 * 
-                 */
+                    * Explicitly only include guardianstudent.guardianrelationshiptypeid
+                    * of type 10, 20.
+                    * 
+                    * As of Jan 2023 we can only reliably create parent accounts that appear on the 
+                    * Admissions Screen in PowerSchool SIS under the mother/father contact details.
+                    * 
+                    * It may be possible to improve this when moving to the PS SIS Contacts feature
+                    * 
+                    */
                 AND gs.guardianrelationshiptypeid IN (10, 20)
                 AND cc.termid >= (EXTRACT(year from sysdate)-2000+(CASE WHEN EXTRACT(month from sysdate) BETWEEN 7 AND 12 THEN 10 ELSE 9 END)) * 100
 
                 /*
-                 * Only pull courses with firstday that is lessthan or equal to the current date.
-                 * This prevents adding enrolments changes that are not tracked by powerschool; 
-                 * changes are only tracked on or after the first day of the course.
-                 */
+                    * Only pull courses with firstday that is lessthan or equal to the current date.
+                    * This prevents adding enrolments changes that are not tracked by powerschool; 
+                    * changes are only tracked on or after the first day of the course.
+                    */
                 AND TRUNC(terms.firstday) <= TRUNC(sysdate)
             ORDER BY "parent_code" ASC
             

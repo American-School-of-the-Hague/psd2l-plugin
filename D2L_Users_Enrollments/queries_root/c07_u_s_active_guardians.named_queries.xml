@@ -23,9 +23,12 @@
         <sql>
             <![CDATA[
             /*
-             * c07_u_s_active.named_queries.xml
+             * c07_u_s_active_guardians.named_queries.xml
              *
              * update/create accounts for all active students
+             * add guardians as auditors
+             * add LSC & EAL teachers as auditors
+             * add Advisory teachers as auditors
              */
             SELECT
                 'user'                                      AS "type",
@@ -82,6 +85,7 @@
                                 LOWER(courses.course_name) LIKE '%english essentials%'
                                 OR LOWER(courses.course_name) LIKE '%english%academic%purposes%'
                                 OR LOWER(courses.course_name) LIKE 'eng%foundations%'
+                                OR LOWER(courses.course_name) LIKE '%advisory%'
 
                                 /*
                                     * HS Learning Support clasess are in the OTH department, MS
