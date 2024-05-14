@@ -16,16 +16,14 @@
             <![CDATA[
             /*
             Update enrollments for parents: drop parents from classes that students have dropped 
+            08_e_p_drop enrol parents; drop courses
             */
-            -- 08_e_p_drop enrol parents; drop courses
 
             SELECT DISTINCT
-            --    cc.termid,
-            --    sections.termid               AS "sections.termid",
                 'enrollment'                  AS "type",
-                'UPDATE'                      AS "action",
+                'DELETE'                      AS "action",
                 'P_'||guardian.guardianid     AS "child_code",
-                'Parent'                      AS "role_name",
+                'Learner'                      AS "role_name",
                 
                 /*
                 * use the following format to ensure that section codes are unique
@@ -60,6 +58,11 @@
                 
 
             WHERE 
+                /*
+                * get the year number by getting the largest termid dividing by 10
+                * and taking the integer portion (modulo 10) of the value. 
+                * 3306 yields 3300
+                */
                 sections.termid >= (SELECT TRUNC( MAX(termid) /10 ) * 10 FROM cc)
                 AND s.enroll_status IN (0)
                 AND s.grade_level >= 5
