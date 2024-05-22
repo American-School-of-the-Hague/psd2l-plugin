@@ -17,37 +17,15 @@
             /*
              * All active guardian enrollments
              *
-             * 08_e_p enroll parents in student classes
+             * 08_e_g enroll parents in parent schools so they can be added using
+             * intelligent agents to training courses and library courses
              */
             SELECT DISTINCT
                 'enrollment'                AS "type",
                 'UPDATE'                    AS "action",
-                'P_' || GUARDIAN.GUARDIANID AS "child_code",
-                'Parent'                    AS "role_name",
-
-                /*
-                 * use the following format to ensure that section codes are unique
-                 * and remain constant even if the teacher is reassigned
-                 * 
-                 * cs_cc.schoolid_cc.course_number_cc.termid_cc.expression_cc.sectionid
-                 * code: cs_3_SPHYIBS2_3200_D_28636
-                 * 
-                 * NOTE: X block is added AS a place-holder for courses that do not appear on the 
-                 * schedule such AS MS Enrichment, self study IB courses SSST
-                 */
-                'cs_' || cc.schoolid || '_' || cc.course_number || '_' || REGEXP_REPLACE(cc.termid, '[^0-9]+', '') || '_' || DECODE(regexp_replace(cc.expression, '[^0-9]', ''), 
-                    1, 'A', 
-                    2, 'B', 
-                    3, 'C', 
-                    4, 'D', 
-                    5, 'E', 
-                    6, 'F', 
-                    7, 'G', 
-                    8, 'H', 
-                    9, 'ADV', 
-                    10, 'X',
-                    'UNKNOWN'
-                ) ||'_' || REGEXP_REPLACE(cc.sectionid, '[^0-9]+', '') AS "parent_code"
+                'P_' || guardian.guardianid AS "child_code",
+                'Learner'                   AS "role_name",
+                'P_' || s.schoolid          AS "parent_code"    
             FROM guardian
                 JOIN guardianstudent gs     ON guardian.guardianid = gs.guardianid
                 JOIN students s             ON gs.studentsdcid = s.dcid 
@@ -57,29 +35,14 @@
                 JOIN terms                  ON cc.termid = terms.id
             WHERE s.enroll_status = 0
                 AND s.grade_level >= 5
-
+                AND cc.termid >= (SELECT TRUNC( MAX(termid) /10 ) * 10 FROM cc)
                 /*
-                 * Explicitly only include guardianstudent.guardianrelationshiptypeid
-                 * of type 10, 20.
-                 * 
-                 * AS of Jan 2023 we can only reliably create parent accounts that appear on the 
-                 * Admissions Screen in PowerSchool SIS under the mother/father contact details.
-                 * 
-                 * It may be possible to improve this when moving to the PS SIS Contacts feature
-                 * 
-                 */
-                AND gs.guardianrelationshiptypeid IN (10, 20)
-                AND cc.termid >= (EXTRACT(year from sysdate)-2000+(CASE WHEN EXTRACT(month from sysdate) BETWEEN 7 AND 12 THEN 10 ELSE 9 END)) * 100
-
-                /*
-                 * Only pull courses with firstday that is lessthan or equal to the current date.
-                 * This prevents adding enrolments changes that are not tracked by powerschool; 
-                 * changes are only tracked on or after the first day of the course.
-                 */
+                * Only pull courses with firstday that is lessthan or equal to the current date.
+                * This prevents adding enrolments changes that are not tracked by powerschool; 
+                * changes are only tracked on or after the first day of the course.
+                */
                 AND TRUNC(terms.firstday) <= TRUNC(sysdate)
-            ORDER BY
-                "child_code" ASC,
-                "parent_code" ASC
+            ORDER BY "parent_code" ASC
 
             ]]>
         </sql>

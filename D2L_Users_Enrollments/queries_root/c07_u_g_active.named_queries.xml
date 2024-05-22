@@ -23,14 +23,18 @@
 		<!--SQL query in format <![CDATA[QUERY]]>-->
         <sql>
 			<![CDATA[
+            /*
+                * c07_u_g_active.named_queries.xml
+                * update/create accounts for all active parents with data access
+            */
             SELECT DISTINCT
                 'user'                  AS "type",
                 'UPDATE'                AS "action",
                 -- varchar2(255)
                 LOWER(ema.emailaddress) AS "username",
                 'P_' || gs.guardianid   AS "org_defined_id",
-                p.firstname             AS "first_name",
-                p.lastname              AS "last_name",
+                guardian.firstname      AS "first_name",
+                guardian.lastname       AS "last_name",
                 ''                      AS "password",
                 1                       AS "is_active",
                 'Parent'                AS "role_name",
@@ -38,27 +42,30 @@
                 ''                      AS "relationships",
                 ''                      AS "pref_first_name",
                 ''                      AS "pref_last_name"
-            FROM students s
-                JOIN studentcontactassoc sca        ON s.dcid = sca.studentdcid
-                JOIN personemailaddressassoc peaa   ON sca.personid = peaa.personid
-                JOIN emailaddress ema               ON peaa.emailaddressid = ema.emailaddressid
-                JOIN person p                       ON peaa.personid = p.id
-
+            FROM 
+                students s
+                JOIN guardianstudent gs                 ON s.dcid = gs.studentsdcid
+                JOIN guardian                           ON gs.guardianid = guardian.guardianid
+                JOIN studentcontactassoc sca            ON s.dcid = sca.studentdcid
+                JOIN personemailaddressassoc peaa       ON sca.personid = peaa.personid
+                JOIN emailaddress ema                   ON peaa.emailaddressid = ema.emailaddressid
                 /*
                  * This should ensure that only active contacts with "Data Access" == True are selected
                  * The GuardianStudent record only exists for contacts that have Data Access enabled
                  * To include all contacts make the gpa join a left join. The Data Access can be checked with a 'guardianpersonassocid IS NULL' statement where true means no access.
                  * 
                  * see https://help.powerschool.com/t5/PowerSchool-SIS-Administrator/What-field-and-table-is-quot-Allow-Data-Access-quot-for-contacts/ta-p/459319
-                 */
-                JOIN guardianstudent gs             ON s.dcid = gs.studentsdcid
-                JOIN guardianpersonassoc gpa        ON p.id = gpa.personid AND gpa.guardianid = gs.guardianid
+                 */                
+                JOIN guardianpersonassoc gpa            ON sca.personid = gpa.personid AND gpa.guardianid = gs.guardianid
                 
-            WHERE
+                
+                
+            WHERE 
                 s.enroll_status = 0
                 AND s.grade_level >= 5
                 AND peaa.isprimaryemailaddress = 1
-                AND p.isactive = 1
+                
+            ORDER BY "org_defined_id"
 			]]>
         </sql>
     </query>

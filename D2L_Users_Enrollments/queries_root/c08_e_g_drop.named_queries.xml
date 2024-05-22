@@ -16,22 +16,26 @@
             <![CDATA[
             /*
             Update enrollments for parents: drop parents from classes that students have dropped 
+            08_e_p_drop enrol parents; drop courses
             */
-            -- 08_e_p_drop enrol parents; drop courses
-            SELECT
-                'enrollment'                        AS "type",
-                'DELETE'                            AS "action",
-                'P_' || guardian.guardianid         AS "child_code",
-                'Learner'                           AS "role_name",
+
+            SELECT DISTINCT
+                'enrollment'                  AS "type",
+                'DELETE'                      AS "action",
+                'P_'||guardian.guardianid     AS "child_code",
+                'Learner'                      AS "role_name",
+                
                 /*
-                 * Use the following format to ensure that section codes are unique
-                 * and remain constant even if the teacher is reassigned
-                 * code: cs_3_SPHYIBS2_3200_D_28636
-                 *
-                 * at some points during the year the TERMID and SECTIONID values become negative
-                 * use regexp_replace to remove any non-digit characters 
-                 */
-                'cs_' || cc.schoolid || '_' || cc.course_number || '_' || REGEXP_REPLACE(cc.termid, '[^0-9]+', '') || '_' || DECODE(REGEXP_REPLACE(cc.expression, '[^0-9]', ''), 
+                * use the following format to ensure that section codes are unique
+                * and remain constant even if the teacher is reassigned
+                * 
+                * cs_cc.schoolid_cc.course_number_cc.termid_cc.expression_cc.sectionid
+                * code: cs_3_SPHYIBS2_3200_D_28636
+                * 
+                * NOTE: X block is added AS a place-holder for courses that do not appear on the 
+                * schedule such AS MS Enrichment, self study IB courses SSST
+                */    
+                'cs_' || cc.schoolid || '_' || cc.course_number || '_' || REGEXP_REPLACE(cc.termid, '[^0-9]+', '') || '_' || DECODE(regexp_replace(cc.expression, '[^0-9]', ''), 
                     1, 'A', 
                     2, 'B', 
                     3, 'C', 
@@ -43,22 +47,26 @@
                     9, 'ADV', 
                     10, 'X',
                     'UNKNOWN'
-                ) || '_' || REGEXP_REPLACE(cc.sectionid, '[^0-9]+', '') AS "parent_code"
+                ) ||'_' || REGEXP_REPLACE(cc.sectionid, '[^0-9]+', '') AS "parent_code"
+
             FROM cc
-                JOIN students           ON cc.studentid = students.id
+                JOIN students s         ON cc.studentid = s.id
                 JOIN sections           ON cc.origsectionid = sections.id
                 JOIN courses            ON sections.course_number = courses.course_number
-                -- JOIN teachers           ON sections.teacher = teachers.id
-                JOIN guardianstudent    ON students.dcid = guardianstudent.studentsdcid
-                JOIN guardian           ON guardianstudent.guardianid = guardian.guardianid
-            WHERE
-                sections.termid >= (EXTRACT(year from sysdate)-2000+(CASE WHEN EXTRACT(month from sysdate) BETWEEN 7 AND 12 THEN 10 ELSE 9 END)) * 100
+                JOIN guardianstudent gs ON s.dcid = gs.studentsdcid
+                JOIN guardian           ON gs.guardianid = guardian.guardianid
+                
 
-                -- Only select students that are "active"
-                AND students.enroll_status IN (0)
+            WHERE 
+                /*
+                * get the year number by getting the largest termid dividing by 10
+                * and taking the integer portion (modulo 10) of the value. 
+                * 3306 yields 3300
+                */
+                sections.termid >= (SELECT TRUNC( MAX(termid) /10 ) * 10 FROM cc)
+                AND s.enroll_status IN (0)
+                AND s.grade_level >= 5
 
-                -- Only select students grades 5+
-                AND students.grade_level >= 5
             ORDER BY "child_code" DESC
 
             ]]>
