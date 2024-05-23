@@ -196,6 +196,44 @@ Provides access accounts for students in grades 5+. Students must always be crea
 
 <!-- omit in toc -->
 #### Student Queries
+Description: Adds active students to Brightspace and builds *Auditor* relationships for any course that contains the sub-string `d2l-audit` in the `courses.prerequsitevalue` field. This field can be edited from the Courses > Course Notes screen in PowerSchool. 
+
+Suggested text for the *Course Notes* field:
+
+```text
+d2l-audit
+
+Adding "d2l-audit" to the first line of this note will build the auditor:student relationship in Brightspace for this course. The teacher(s) will be able to use the audit feature of Brightspace to impersonate/shadow their students.
+
+-- Add additional notes below this line --
+```
+
+Any teacher of a course where `d2l-audit` is set can *Audit* any student in the course. This allows teachers to have a view of a student through the *Audit* interface. See the [D2L Auditors and Bulk Auditor](https://community.d2l.com/brightspace/kb/articles/17896-auditors-and-bulk-auditor-management) article for more information.
+
+Courses such as EAL, Advisory, English Essentials and LSC courses are included. To see a full list see the enterprise report "Brightspace Student:Teacher Auditors - Course List", or run the following query:
+
+```SQL
+SELECT DISTINCT
+    cc.schoolid,
+    schools.name,
+    c.course_name,
+    c.course_number
+FROM 
+    courses c
+    JOIN cc                     ON c.course_number = cc.course_number
+    JOIN terms                  ON cc.termid = terms.id
+    JOIN sectionteacher         ON cc.sectionid = sectionteacher.sectionid
+    JOIN teachers               ON sectionteacher.teacherid = teachers.id
+    JOIN schools                ON cc.schoolid = schools.dcid
+    
+WHERE
+    REGEXP_LIKE(lower(c.prerequisitesvalue), 'd2l-audit')
+    AND cc.termid >= (EXTRACT(year from sysdate)-2000+(CASE WHEN EXTRACT(month from sysdate) BETWEEN 7 AND 12 THEN 10 ELSE 9 END)) * 100
+
+ORDER BY
+    cc.schoolid asc, c.course_name
+
+```
 
 **Inactive**
 
@@ -210,9 +248,6 @@ PQ File: [c07_u_s_inactive.named_queries.xml](./queries_root/c07_u_s_inactive.na
 
 **Active**
 
-Description: Adds active students to Brightspace and builds *Auditor* relationships with LSC, EAL, Special Ed and Advisory teachers.
-
-LSC, EAL, Special Ed and Advisory teachers can *Audit* any student they teach. This allows them to have a read-only view of a student through the *Audit* interface. See the [D2L Auditors and Bulk Auditor](https://community.d2l.com/brightspace/kb/articles/17896-auditors-and-bulk-auditor-management) article for more information.
 
 PQ File: [c07_u_s_active.named_queries.xml](./queries_root/c07_u_s_active.named_queries.xml)
 
@@ -223,7 +258,7 @@ PQ File: [c07_u_s_active.named_queries.xml](./queries_root/c07_u_s_active.named_
 
 **Active with Guardians**
 
-Description: Adds active students to Brightspace; builds *Auditor* relationship with LSC, EAL, Special Ed teachers; adds *Parent* relationship so guardians can view student progress.
+Description: Adds active students to Brightspace; builds *Auditor* relationship for courses that contain the `d2l-audit` string in the *Course Notes* field; adds *Parent* relationship so guardians can view student progress.
 
 PQ File: [c07_u_s_active_guardians.named_queries.xml](./queries_root/c07_u_s_active_guardians.named_queries.xml)
 
@@ -237,6 +272,7 @@ PQ File: [c07_u_s_active_guardians.named_queries.xml](./queries_root/c07_u_s_act
 User enrollments connect users with their courses. Enrollments must always occur after user creation.
 
 It is important to run course drops prior to enrollments. This protects against situations when students are added to a course dropped from a course, and then added again.
+
 
 ### 8 - Enrollments Guardians
 

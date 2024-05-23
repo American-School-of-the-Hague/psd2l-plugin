@@ -27,102 +27,86 @@
              *
              * update/create accounts for all active students
              */
-            SELECT
-                'user'                                      AS "type",
-                'UPDATE'                                    AS "action",
-                ema.emailaddress                            AS "username",
-                'S_'||s.student_number                      AS "org_defined_id",
-                s.first_name                                AS "first_name",
-                s.last_name                                 AS "last_name",
-                ''                                          AS "password",
-                1                                           AS "is_active",
-                'Learner'                                   AS "role_name",
-                ema.emailaddress                            AS "email",
+SELECT
+    'user'                                      AS "type",
+    'UPDATE'                                    AS "action",
+    ema.emailaddress                            AS "username",
+    'S_'||s.student_number                      AS "org_defined_id",
+    s.first_name                                AS "first_name",
+    s.last_name                                 AS "last_name",
+    ''                                          AS "password",
+    1                                           AS "is_active",
+    'Learner'                                   AS "role_name",
+    ema.emailaddress                            AS "email",
 
-                /* 
-                 * Parent functionality not included yet
-                 * Remove comments in the next CASE block to add the functionality
-                 */
-                CASE
-                    WHEN auditors.auditors IS NOT NULL AND parents.parents IS NOT NULL
-                        THEN auditors.auditors -- || '|' || parents.parents
-                    WHEN auditors.auditors IS NOT NULL
-                        THEN auditors.auditors
-                    -- WHEN parents.parents IS NOT NULL
-                    --     THEN parents.parents
-                    ELSE ''
-                END                                         AS "relationships",
-                REGEXP_REPLACE(s.middle_name, '[()]+', '')  AS "pref_first_name",
-                ''                                          AS "pref_last_name"
-            FROM students s
-                JOIN personemailaddressassoc peaa           ON s.person_id = peaa.personid
-                JOIN emailaddress ema                       ON peaa.emailaddressid = ema.emailaddressid
-                LEFT JOIN (
-                    SELECT
-                        helper.studentid,
-                        LISTAGG(
-                            'Auditor' || CHR(58) || 'T_' || helper.teachernumber,
-                            '|'
-                        ) WITHIN GROUP (ORDER BY helper.teachernumber DESC) AS auditors
-                    FROM ( 
-                        /* 
-                         * Oracle 12c method to deduplicate the LISTAGG 
-                         */
-                        SELECT DISTINCT
-                            cc.studentid,
-                            t.teachernumber
-                        FROM teachers t
-                            INNER JOIN sectionteacher   ON sectionteacher.teacherid = t.id
-                            INNER JOIN cc               ON cc.sectionid = sectionteacher.sectionid
-                            INNER JOIN students         ON students.id = cc.studentid
-                            INNER JOIN courses          ON courses.course_number = cc.course_number                
-                        WHERE
-                            ( 
-                                /* 
-                                 * English Essentials, English Foundations, English for Accademic Purposes
-                                 * courses are in the MS/HS English Department, but service
-                                 * EAL students in both divisions
-                                 */
-                                LOWER(courses.course_name) LIKE '%english essentials%'
-                                OR LOWER(courses.course_name) LIKE '%english%academic%purposes%'
-                                OR LOWER(courses.course_name) LIKE 'eng%foundations%'
-                                OR LOWER(courses.course_name) LIKE '%advisory%'
-
-                                /*
-                                 * HS Learning Support clasess are in the OTH department, MS
-                                 * Learning Suport classes are in the mslsc department
-                                 */
-                                OR LOWER(cc.course_number) LIKE '%olea%'
-
-                                /*
-                                 * Capture all EAL, LSC and Special Education classes in MS and HS
-                                 */
-                                OR LOWER(courses.sched_department) IN ('mseal', 'mslsc', 'msse')
-                                OR LOWER(courses.sched_department) IN ('hseal', 'hslsc', 'hsse')
-                            )
-                            AND cc.termid >= (EXTRACT(year from sysdate)-2000+(CASE WHEN EXTRACT(month from sysdate) BETWEEN 7 AND 12 THEN 10 ELSE 9 END)) * 100
-                    ) helper
-                    GROUP BY helper.studentid
-                ) auditors ON s.id = auditors.studentid
-                LEFT JOIN ( 
-                    /* 
-                     * I didn't deduplicate here because there shouldn't be duplicate
-                     * parent accounts, but you could use that same approach here if needed. 
-                     */
-                    SELECT
-                        gs.studentsdcid,
-                        LISTAGG(
-                            'Parent' || CHR(58) || 'P_' || g.guardianid,
-                            '|'
-                        ) WITHIN GROUP (ORDER BY g.lastname DESC) AS parents
-                    FROM guardian g
-                        JOIN guardianstudent gs ON g.guardianid = gs.guardianid
-                    GROUP BY gs.studentsdcid
-                ) parents ON s.dcid = parents.studentsdcid
+    /* 
+        * Parent functionality not included yet
+        * Remove comments in the next CASE block to add the functionality
+        */
+    CASE
+        WHEN auditors.auditors IS NOT NULL AND parents.parents IS NOT NULL
+            THEN auditors.auditors -- || '|' || parents.parents
+        WHEN auditors.auditors IS NOT NULL
+            THEN auditors.auditors
+        -- WHEN parents.parents IS NOT NULL
+        --     THEN parents.parents
+        ELSE ''
+    END                                         AS "relationships",
+    REGEXP_REPLACE(s.middle_name, '[()]+', '')  AS "pref_first_name",
+    ''                                          AS "pref_last_name"
+FROM students s
+    JOIN personemailaddressassoc peaa           ON s.person_id = peaa.personid
+    JOIN emailaddress ema                       ON peaa.emailaddressid = ema.emailaddressid
+    LEFT JOIN (
+        SELECT
+            helper.studentid,
+            LISTAGG(
+                'Auditor' || CHR(58) || 'T_' || helper.teachernumber,
+                '|'
+            ) WITHIN GROUP (ORDER BY helper.teachernumber DESC) AS auditors
+        FROM ( 
+            /* 
+                * Oracle 12c method to deduplicate the LISTAGG 
+                */
+            SELECT DISTINCT
+                cc.studentid,
+                t.teachernumber
+            FROM teachers t
+                INNER JOIN sectionteacher   ON sectionteacher.teacherid = t.id
+                INNER JOIN cc               ON cc.sectionid = sectionteacher.sectionid
+                INNER JOIN students         ON students.id = cc.studentid
+                INNER JOIN courses          ON courses.course_number = cc.course_number                
             WHERE
-                s.enroll_status = 0
-                AND s.grade_level >= 5
-            ORDER BY s.student_number
+                ( 
+             
+              
+                    REGEXP_LIKE(lower(courses.prerequisitesvalue), 'd2l-audit')
+
+                 
+                )
+                AND cc.termid >= (EXTRACT(year from sysdate)-2000+(CASE WHEN EXTRACT(month from sysdate) BETWEEN 7 AND 12 THEN 10 ELSE 9 END)) * 100
+        ) helper
+        GROUP BY helper.studentid
+    ) auditors ON s.id = auditors.studentid
+    LEFT JOIN ( 
+        /* 
+            * I didn't deduplicate here because there shouldn't be duplicate
+            * parent accounts, but you could use that same approach here if needed. 
+            */
+        SELECT
+            gs.studentsdcid,
+            LISTAGG(
+                'Parent' || CHR(58) || 'P_' || g.guardianid,
+                '|'
+            ) WITHIN GROUP (ORDER BY g.lastname DESC) AS parents
+        FROM guardian g
+            JOIN guardianstudent gs ON g.guardianid = gs.guardianid
+        GROUP BY gs.studentsdcid
+    ) parents ON s.dcid = parents.studentsdcid
+WHERE
+    s.enroll_status = 0
+    AND s.grade_level >= 5
+ORDER BY s.student_number
 
             ]]>
         </sql>
