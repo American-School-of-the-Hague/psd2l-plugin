@@ -26,26 +26,29 @@
 
 				create the templates for each department
 				*/
-				select distinct
-					'course template' as "type",
-					'UPDATE' as "action",
-					'Templ_'||CC.SCHOOLID||'_'||COURSES.SCHED_DEPARTMENT as "code",
-					COURSES.SCHED_DEPARTMENT as "name",
-					'' as "start_date",
-					'' as "end_date",
-					'1' as "is_active",
-					CC.SCHOOLID||'_'||COURSES.SCHED_DEPARTMENT as "department_code",
-					'' as "template_code",
-					'' as "semester_code",
-					'' as "offering_code",
-					'' as "custom_code"
-				from CC CC
-				    inner join STUDENTS on CC.studentid = students.id
-				    inner join COURSES on cc.course_number = courses.course_number
-				-- get the higest yearid and multiply by 100 to get the termid
-				where CC.TERMID >= (SELECT MAX(yearid) FROM TERMS)*100
-					and length(COURSES.SCHED_DEPARTMENT) > 0
-				order by "code" asc
+SELECT DISTINCT
+    'course template'                               as "type",
+    'UPDATE'                                        as "action",
+    'Templ_'||cc.schoolid||'_'||c.sched_department  as "code",
+    c.sched_department                              as "name",
+    ''                                              as "start_date",
+    ''                                              as "end_date",
+    '1'                                             as "is_active",
+    cc.schoolid||'_'||c.sched_department            as "department_code",
+    ''                                              as "template_code",
+    ''                                              as "semester_code",
+    ''                                              as "offering_code",
+    ''                                              as "custom_code"
+FROM cc
+    JOIN students s                                 on cc.studentid = s.id
+    JOIN courses c                                  on cc.course_number = c.course_number
+    JOIN terms                                      on cc.termid = terms.id
+WHERE 
+    s.enroll_status = 0 
+    AND s.grade_level >= 5
+    AND cc.termid >= (EXTRACT(year from sysdate)-2000+(CASE WHEN EXTRACT(month from sysdate) BETWEEN 7 AND 12 THEN 10 ELSE 9 END)) * 100
+ORDER BY 
+    "code" ASC
 			]]>
         </sql>
     </query>

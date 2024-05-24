@@ -28,34 +28,35 @@
 
 				This query is for testing against the up-comming school year
 				*/
-				select distinct
-					'course template' as "type",
-					'UPDATE' as "action",
-					'Templ_TEST_'||CC.SCHOOLID||'_'||COURSES.SCHED_DEPARTMENT as "code",
-					COURSES.SCHED_DEPARTMENT as "name",
-					'' as "start_date",
-					'' as "end_date",
-					'1' as "is_active",
-					CC.SCHOOLID||'_TEST_'||COURSES.SCHED_DEPARTMENT as "department_code",
-					'' as "template_code",
-					'' as "semester_code",
-					'' as "offering_code",
-					'' as "custom_code"
-				from COURSES COURSES,
-					STUDENTS STUDENTS,
-					SCHEDULECC CC,
-					SCHOOLS SCHOOLS
-				where CC.STUDENTID=STUDENTS.ID
-					and CC.SCHOOLID=SCHOOLS.SCHOOL_NUMBER
-					and CC.COURSE_NUMBER=COURSES.COURSE_NUMBER
-					and CC.TERMID >= case 
-							when (EXTRACT(month from sysdate) >= 1 and EXTRACT(month from sysdate) <= 6)
-							THEN (EXTRACT(year from sysdate)-2000+10)*100
-							when (EXTRACT(month from sysdate) >= 7 and EXTRACT(month from sysdate) <= 12)
-							THEN (EXTRACT(year from sysdate)-2000+10)*100
-							end
-					and length(COURSES.SCHED_DEPARTMENT) > 0
-				order by "code" asc
+SELECT DISTINCT
+    'course template'                               as "type",
+    'UPDATE'                                        as "action",
+    'Templ_'||cc.schoolid||'_'||c.sched_department  as "code",
+    c.sched_department                              as "name",
+    ''                                              as "start_date",
+    ''                                              as "end_date",
+    '1'                                             as "is_active",
+    cc.schoolid||'_'||c.sched_department            as "department_code",
+    ''                                              as "template_code",
+    ''                                              as "semester_code",
+    ''                                              as "offering_code",
+    ''                                              as "custom_code"
+/*
+ * pull from teh schedulecc table in place of cc
+*/
+FROM schedulecc cc
+    JOIN students s             					on cc.studentid = s.id
+    JOIN courses c              					on cc.course_number = c.course_number
+    JOIN terms                  					on cc.termid = terms.id
+WHERE 
+    s.enroll_status = 0 
+    AND s.grade_level >= 5
+    /*
+     * pull courses for the following school year 
+    */
+    AND cc.termid >= (EXTRACT(year from sysdate)-1999+(CASE WHEN EXTRACT(month from sysdate) BETWEEN 7 AND 12 THEN 10 ELSE 9 END)) * 100
+ORDER BY 
+    "code" ASC
 			]]>
         </sql>
     </query>
